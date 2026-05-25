@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import '@fontsource-variable/inter/wght.css';
+
+@theme {
+  --color-sena: #39A900;
+}
+
+* {
+  font-family: 'Inter Variable', sans-serif;
+}
