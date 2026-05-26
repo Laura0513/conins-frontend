@@ -88,6 +88,29 @@ export const api = {
             })
         },
     },
+
+    fichas: {
+        getAll() {
+            return apiFetch('/fichas')
+        },
+    },
+
+    assignments: {
+        getAll() {
+            return apiFetch('/asignaciones')
+        },
+        create(data: any) {
+            return apiFetch('/asignaciones', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        delete(id: number) {
+            return apiFetch(`/asignaciones/${id}`, {
+                method: 'DELETE',
+            })
+        },
+    },
 }
 
 export type ApiResponse<T = unknown> = {

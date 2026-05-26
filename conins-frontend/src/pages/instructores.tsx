@@ -2,6 +2,10 @@ import { useState, useEffect } from "react"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
+import CreateInstructorModal from "@/components/instructores/CreateInstructorModal"
+import NovedadModal from "@/components/instructores/NovedadModal"
+import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
+import EditInstructorModal from "@/components/instructores/EditInstructorModal"
 import {
   Search,
   Plus,
@@ -10,7 +14,6 @@ import {
   CalendarX,
   ChevronLeft,
   ChevronRight,
-  X,
   Loader2,
   AlertTriangle,
 } from "lucide-react"
@@ -24,6 +27,7 @@ type Instructor = {
   activo: boolean
   roles: string
   horas_semana?: number
+  tiene_novedad?: boolean
 }
 
 export default function InstructoresPage() {
@@ -31,30 +35,25 @@ export default function InstructoresPage() {
   const [instructores, setInstructores] = useState<Instructor[]>([])
   const [loading, setLoading] = useState(true)
 
-  // Estados para Modal de Crear Instructor
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [formData, setFormData] = useState({
-    nombre: "",
-    email: "",
-    tipo_contrato: "contratista",
-    tipo_area: "tecnica",
-  })
-
-  // Estados para Modal de Novedad
   const [isNovedadModalOpen, setIsNovedadModalOpen] = useState(false)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedInstructor, setSelectedInstructor] = useState<Instructor | null>(null)
   const [selectedInstructorId, setSelectedInstructorId] = useState<number | null>(null)
-  const [novedadData, setNovedadData] = useState({
-    tipo: "licencia",
-    fecha_inicio: "",
-    fecha_regreso: "",
-    observacion: "",
-  })
+  const [selectedInstructorName, setSelectedInstructorName] = useState<string>("")
 
-  // Filtros
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    onConfirm: () => void
+  }>({ isOpen: false, title: "", message: "", onConfirm: () => {} })
+
   const [search, setSearch] = useState("")
   const [filtroContrato, setFiltroContrato] = useState("todos")
   const [filtroArea, setFiltroArea] = useState("todas")
+  const [filtroEstado, setFiltroEstado] = useState("todos")
 
   useEffect(() => {
     cargarInstructores()
@@ -72,59 +71,76 @@ export default function InstructoresPage() {
     }
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+  const handleCreateInstructor = async (data: { nombre: string; email: string; tipo_contrato: string; tipo_area: string }) => {
+    await api.instructors.create(data)
+    showToast("Instructor registrado exitosamente", "success")
+    setIsCreateModalOpen(false)
+    cargarInstructores()
   }
 
-  const handleCreateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
-    try {
-      await api.instructors.create(formData)
-      showToast("Instructor registrado exitosamente", "success")
-      setIsCreateModalOpen(false)
-      setFormData({ nombre: "", email: "", tipo_contrato: "contratista", tipo_area: "tecnica" })
-      cargarInstructores()
-    } catch (err) {
-      showToast("Error al crear instructor. Verifica el backend.", "error")
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  const handleNovedadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleNovedadSubmit = async (data: { tipo: string; fecha_inicio: string; fecha_regreso: string; observacion: string }) => {
     if (!selectedInstructorId) return
 
-    setSubmitting(true)
-    try {
-      // Aquí irá la llamada a la API cuando Jair tenga el endpoint listo
-      // await api.instructors.addNovedad(selectedInstructorId, novedadData)
-      showToast("Novedad registrada exitosamente", "success")
-      setIsNovedadModalOpen(false)
-      setNovedadData({ tipo: "licencia", fecha_inicio: "", fecha_regreso: "", observacion: "" })
-    } catch (err) {
-      showToast("Error al registrar novedad.", "error")
-    } finally {
-      setSubmitting(false)
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: "Confirmar novedad",
+      message: `Estas seguro de que quieres registrar esta novedad para ${selectedInstructorName}? El instructor quedara excluido de asignaciones mientras la novedad este vigente.`,
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false })
+        try {
+          // Aqui ira la llamada a la API cuando Jair tenga el endpoint listo
+          // await api.instructors.addNovedad(selectedInstructorId, data)
+          showToast("Novedad registrada exitosamente", "success")
+          setIsNovedadModalOpen(false)
+        } catch (err) {
+          showToast("Error al registrar novedad.", "error")
+        }
+      },
+    })
   }
 
-  const openNovedadModal = (instructorId: number) => {
+  const openNovedadModal = (instructorId: number, instructorName: string) => {
     setSelectedInstructorId(instructorId)
+    setSelectedInstructorName(instructorName)
     setIsNovedadModalOpen(true)
   }
 
-  // Lógica de filtrado
+  const openDetailModal = (instructor: Instructor) => {
+    setSelectedInstructor(instructor)
+    setIsDetailModalOpen(true)
+  }
+
+  const openEditModal = (instructor: Instructor) => {
+    setSelectedInstructor(instructor)
+    setIsEditModalOpen(true)
+  }
+
+  const handleEditInstructor = async (data: Partial<Instructor>) => {
+    if (!selectedInstructor) return
+    // await api.instructors.update(selectedInstructor.id, data)
+    showToast("Instructor actualizado exitosamente", "success")
+    setIsEditModalOpen(false)
+    cargarInstructores()
+  }
+
   const listaFiltrada = instructores.filter((inst) => {
     const texto = search.toLowerCase()
     const coincideBusqueda = inst.nombre.toLowerCase().includes(texto) || inst.email.toLowerCase().includes(texto)
     const coincideContrato = filtroContrato === "todos" || inst.tipo_contrato === filtroContrato
     const coincideArea = filtroArea === "todas" || inst.tipo_area === filtroArea
-    return coincideBusqueda && coincideContrato && coincideArea
+
+    let coincideEstado = true
+    if (filtroEstado === "activo") {
+      coincideEstado = inst.activo && !inst.tiene_novedad
+    } else if (filtroEstado === "con_novedad") {
+      coincideEstado = !!inst.tiene_novedad
+    } else if (filtroEstado === "inactivo") {
+      coincideEstado = !inst.activo
+    }
+
+    return coincideBusqueda && coincideContrato && coincideArea && coincideEstado
   })
 
-  // Función auxiliar para simular horas
   const getMockHoras = (id: number): number => {
     const horas = [22, 30, 40, 45, 18, 35, 28]
     return horas[id % horas.length]
@@ -134,11 +150,10 @@ export default function InstructoresPage() {
     <DashboardLayout>
       <div className="p-6 space-y-6">
 
-        {/* Encabezado */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Instructores</h1>
-            <p className="text-gray-500 text-sm">Gestión de instructores del CDMC</p>
+            <p className="text-gray-500 text-sm">Gestion de instructores del CDMC</p>
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
@@ -149,7 +164,6 @@ export default function InstructoresPage() {
           </button>
         </div>
 
-        {/* Barra de Filtros */}
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
           <div className="relative w-full md:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -178,14 +192,24 @@ export default function InstructoresPage() {
               onChange={(e) => setFiltroArea(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
-              <option value="todas">Área: Todas</option>
-              <option value="tecnica">Técnica</option>
+              <option value="todas">Area: Todas</option>
+              <option value="tecnica">Tecnica</option>
               <option value="transversal">Transversal</option>
+            </select>
+
+            <select
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+            >
+              <option value="todos">Estado: Todos</option>
+              <option value="activo">Activo</option>
+              <option value="con_novedad">Con novedad</option>
+              <option value="inactivo">Inactivo</option>
             </select>
           </div>
         </div>
 
-        {/* Tabla */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
             <div className="p-12 flex flex-col items-center justify-center text-gray-500">
@@ -204,7 +228,7 @@ export default function InstructoresPage() {
                     <th className="px-6 py-4">Nombre</th>
                     <th className="px-6 py-4">Correo</th>
                     <th className="px-6 py-4">Contrato</th>
-                    <th className="px-6 py-4">Área</th>
+                    <th className="px-6 py-4">Area</th>
                     <th className="px-6 py-4">Horas/sem</th>
                     <th className="px-6 py-4 text-center">Estado</th>
                     <th className="px-6 py-4 text-center">Acciones</th>
@@ -261,15 +285,22 @@ export default function InstructoresPage() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <button className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors" title="Ver detalle">
+                          <button
+                            onClick={() => openDetailModal(inst)}
+                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                            title="Ver detalle"
+                          >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Editar">
+                          <button
+                            onClick={() => openEditModal(inst)}
+                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="Editar"
+                          >
                             <Pencil className="w-4 h-4" />
                           </button>
-                          {/* Botón de Novedad */}
                           <button
-                            onClick={() => openNovedadModal(inst.id)}
+                            onClick={() => openNovedadModal(inst.id, inst.nombre)}
                             className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
                             title="Registrar novedad"
                           >
@@ -284,7 +315,6 @@ export default function InstructoresPage() {
             </div>
           )}
 
-          {/* Paginación Visual */}
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <span className="text-sm text-gray-500">
               Mostrando {listaFiltrada.length} de {instructores.length}
@@ -302,177 +332,58 @@ export default function InstructoresPage() {
         </div>
       </div>
 
-      {/* Modal de Registro de Instructor */}
-      {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">Registrar instructor</h2>
-              <button onClick={() => setIsCreateModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      <CreateInstructorModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateInstructor}
+      />
 
-            <form onSubmit={handleCreateSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
-                <input
-                  name="nombre"
-                  required
-                  value={formData.nombre}
-                  onChange={handleInputChange}
-                  placeholder="Ej: Juan Pérez"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
-                />
-              </div>
+      <NovedadModal
+        isOpen={isNovedadModalOpen}
+        onClose={() => setIsNovedadModalOpen(false)}
+        onSubmit={handleNovedadSubmit}
+        instructorName={selectedInstructorName}
+      />
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="correo@sena.edu.co"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
-                />
-              </div>
+      <DetailInstructorModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        instructor={selectedInstructor}
+      />
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de contrato</label>
-                  <select
-                    name="tipo_contrato"
-                    value={formData.tipo_contrato}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-                  >
-                    <option value="contratista">Contratista</option>
-                    <option value="de_planta">De Planta</option>
-                  </select>
+      <EditInstructorModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        instructor={selectedInstructor}
+        onSubmit={handleEditInstructor}
+      />
+
+      {confirmDialog.isOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-orange-600" />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de área</label>
-                  <select
-                    name="tipo_area"
-                    value={formData.tipo_area}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-                  >
-                    <option value="tecnica">Técnica</option>
-                    <option value="transversal">Transversal</option>
-                  </select>
-                </div>
+                <h3 className="text-lg font-bold text-gray-900">{confirmDialog.title}</h3>
               </div>
-
-              <div className="pt-4 flex items-center justify-end gap-3">
+              <p className="text-sm text-gray-600 mb-6">{confirmDialog.message}</p>
+              <div className="flex items-center justify-end gap-3">
                 <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
+                  onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
                   className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                  onClick={confirmDialog.onConfirm}
+                  className="px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors"
                 >
-                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Guardar
+                  Confirmar
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Registrar Novedad */}
-      {isNovedadModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">Registrar novedad</h2>
-              <button onClick={() => setIsNovedadModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
             </div>
-
-            <form onSubmit={handleNovedadSubmit} className="p-6 space-y-5">
-              {/* Alerta informativa */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex gap-3 items-start">
-                <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
-                <p className="text-sm text-yellow-800">
-                  El instructor quedará excluido de asignaciones mientras la novedad esté vigente.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-                <select
-                  value={novedadData.tipo}
-                  onChange={(e) => setNovedadData({...novedadData, tipo: e.target.value})}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-                >
-                  <option value="licencia">Licencia</option>
-                  <option value="incapacidad">Incapacidad</option>
-                  <option value="comision">Comisión</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha inicio</label>
-                  <input
-                    type="date"
-                    required
-                    value={novedadData.fecha_inicio}
-                    onChange={(e) => setNovedadData({...novedadData, fecha_inicio: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fecha est. de regreso</label>
-                  <input
-                    type="date"
-                    required
-                    value={novedadData.fecha_regreso}
-                    onChange={(e) => setNovedadData({...novedadData, fecha_regreso: e.target.value})}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Observación</label>
-                <textarea
-                  rows={3}
-                  value={novedadData.observacion}
-                  onChange={(e) => setNovedadData({...novedadData, observacion: e.target.value})}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 resize-none"
-                  placeholder="Motivo o detalles adicionales..."
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsNovedadModalOpen(false)}
-                  className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
-                >
-                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Registrar novedad
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
