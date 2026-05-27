@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
+import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import CrearFichaModal from "@/components/fichas/CrearFichaModal"
 import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import EditFichaModal from "@/components/fichas/EditFichaModal"
@@ -37,6 +38,7 @@ const MOCK_FICHAS: Ficha[] = [
 ]
 
 export default function FichasPage() {
+  const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [fichas, setFichas] = useState<Ficha[]>([])
   const [loading, setLoading] = useState(true)
@@ -121,6 +123,17 @@ export default function FichasPage() {
     showToast("Ficha actualizada exitosamente", "success")
     setIsEditModalOpen(false)
     cargarFichas()
+  }
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-gray-500">
+          <Loader2 className="w-8 h-8 animate-spin text-sena" />
+          <p>Cargando...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

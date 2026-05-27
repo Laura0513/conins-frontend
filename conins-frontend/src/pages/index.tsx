@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react"
+import { useRouter } from "next/router"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
+import { useAuth } from "@/lib/AuthContext"
+import { Loader2 } from "lucide-react"
 
 // Datos de prueba (mock data) - TEMPORAL hasta que el backend tenga los endpoints
 const cargaHorariaMock = [
@@ -40,20 +43,40 @@ function getAlertBadgeColor(tipo: string) {
 }
 
 export default function Home() {
+  const router = useRouter()
+  const { user, loading } = useAuth()
   const [instructorCount, setInstructorCount] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [dataLoading, setDataLoading] = useState(true)
 
   useEffect(() => {
-    api.instructors.getAll()
-      .then((res) => {
-        // El backend devuelve la lista en res.data
-        setInstructorCount(res.data.length)
-      })
-      .catch((err) => {
-        console.error("Error cargando instructores:", err)
-      })
-      .finally(() => setLoading(false))
-  }, [])
+    if (!loading && !user) {
+      router.replace("/auth")
+    }
+  }, [user, loading, router])
+
+  useEffect(() => {
+    if (user) {
+      api.instructors.getAll()
+        .then((res) => {
+          setInstructorCount(res.data.length)
+        })
+        .catch((err) => {
+          console.error("Error cargando instructores:", err)
+        })
+        .finally(() => setDataLoading(false))
+    }
+  }, [user])
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-gray-500">
+          <Loader2 className="w-8 h-8 animate-spin text-sena" />
+          <p>Verificando sesión...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <DashboardLayout>
@@ -68,7 +91,7 @@ export default function Home() {
           <div className="bg-white p-6 rounded-xl border border-gray-200">
             <p className="text-sm text-gray-500 mb-1">Instructores activos</p>
             <p className="text-3xl font-bold text-gray-900">
-              {loading ? "..." : instructorCount}
+              {dataLoading ? "..." : instructorCount}
             </p>
           </div>
 

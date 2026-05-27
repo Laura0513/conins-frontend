@@ -111,6 +111,18 @@ export const api = {
             })
         },
     },
+
+    horarios: {
+        getAll() {
+            return apiFetch('/horarios')
+        },
+        create(data: any) {
+            return apiFetch('/horarios', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+    },
 }
 
 export type ApiResponse<T = unknown> = {

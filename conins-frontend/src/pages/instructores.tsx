@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
+import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import CreateInstructorModal from "@/components/instructores/CreateInstructorModal"
 import NovedadModal from "@/components/instructores/NovedadModal"
 import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
@@ -31,6 +32,7 @@ type Instructor = {
 }
 
 export default function InstructoresPage() {
+  const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [instructores, setInstructores] = useState<Instructor[]>([])
   const [loading, setLoading] = useState(true)
@@ -144,6 +146,17 @@ export default function InstructoresPage() {
   const getMockHoras = (id: number): number => {
     const horas = [22, 30, 40, 45, 18, 35, 28]
     return horas[id % horas.length]
+  }
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-gray-500">
+          <Loader2 className="w-8 h-8 animate-spin text-sena" />
+          <p>Cargando...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

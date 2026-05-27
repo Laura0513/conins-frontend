@@ -1,8 +1,15 @@
-import { Bell } from "lucide-react"
+import { Bell, LogOut } from "lucide-react"
+import { useRouter } from "next/router"
 import { useAuth } from "@/lib/AuthContext"
 
 export default function Header() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    logout()
+    router.push("/auth")
+  }
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
@@ -36,6 +43,15 @@ export default function Header() {
           <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-semibold text-sm">
             {user?.nombre?.charAt(0) || "U"}
           </div>
+          
+          {/* Boton Logout */}
+          <button
+            onClick={handleLogout}
+            className="ml-2 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Cerrar sesión"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </header>

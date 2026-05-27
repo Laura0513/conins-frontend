@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
+import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import CrearAsignacionModal from "@/components/asignaciones/CrearAsignacionModal"
 import RegistrarProvisionalModal from "@/components/asignaciones/RegistrarProvisionalModal"
 import DetailAsignacionModal from "@/components/asignaciones/DetailAsignacionModal"
@@ -37,6 +38,7 @@ const MOCK_ASIGNACIONES: Asignacion[] = [
 ]
 
 export default function AsignacionesPage() {
+  const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [asignaciones, setAsignaciones] = useState<Asignacion[]>([])
   const [loading, setLoading] = useState(true)
@@ -152,6 +154,17 @@ export default function AsignacionesPage() {
     { id: "provisional", label: "Provisionales", count: asignaciones.filter(a => a.tipo === "provisional").length },
     { id: "historica", label: "Históricas", count: asignaciones.filter(a => a.tipo === "historica").length },
   ]
+
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-gray-500">
+          <Loader2 className="w-8 h-8 animate-spin text-sena" />
+          <p>Cargando...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <DashboardLayout>
