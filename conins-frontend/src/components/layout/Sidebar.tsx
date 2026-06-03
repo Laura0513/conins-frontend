@@ -15,16 +15,20 @@ import {
 const menuItems = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Instructores", href: "/instructores", icon: Users },
-  { name: "Fichas", href: "/fichas", icon: BookOpen },
-  { name: "Horarios", href: "/horarios", icon: Calendar },
-  { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
   { name: "Ambientes", href: "/ambientes", icon: Building2 },
+  { name: "Fichas", href: "/fichas", icon: BookOpen },
+  { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
+  { name: "Horarios", href: "/horarios", icon: Calendar },
   { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
   { name: "Consultas", href: "/consultas", icon: Search },
   { name: "Usuarios", href: "/usuarios", icon: UserCog },
 ]
 
-export default function Sidebar() {
+type SidebarProps = {
+  alertasViewed: boolean
+}
+
+export default function Sidebar({ alertasViewed }: SidebarProps) {
   const router = useRouter()
 
   return (
@@ -60,7 +64,7 @@ export default function Sidebar() {
             >
               <Icon className="w-5 h-5" />
               <span>{item.name}</span>
-              {item.badge && (
+              {item.badge && !alertasViewed && (
                 <span className="ml-auto bg-white text-sena text-xs font-bold px-2 py-0.5 rounded-full">
                   {item.badge}
                 </span>

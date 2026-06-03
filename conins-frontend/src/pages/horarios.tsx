@@ -93,15 +93,37 @@ export default function HorariosPage() {
 
   const handleCreate = async (data: any) => {
     try {
-      // await api.horarios.create(data)
+      const now = new Date()
+      const day = now.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      const lunes = new Date(now)
+      lunes.setDate(now.getDate() + diff)
+      const semana = lunes.toISOString().split('T')[0]
+
+      const dias = data.dias || [data.dia_semana] // Fallback for single day
+      
+      for (const dia of dias) {
+        const payload = {
+          ficha_id: data.ficha_id,
+          instructor_id: data.instructor_id,
+          competencia_id: data.competencia_id,
+          dia_semana: Number(dia),
+          hora_inicio: data.hora_inicio,
+          hora_fin: data.hora_fin,
+          jornada_id: data.jornada_id,
+          ambiente_id: data.ambiente_id,
+          semana,
+        }
+        await api.horarios.create(payload)
+      }
+      
       showToast("Horario registrado exitosamente", "success")
       setIsCreateModalOpen(false)
       cargarHorarios()
-    } catch (err) {
-      showToast("Error al registrar horario", "error")
+    } catch (err: any) {
+      showToast(err.message || "Error al registrar horario", "error")
     }
   }
-
   const openEditModal = (horario: Horario) => {
     setSelectedHorario(horario)
     setIsEditModalOpen(true)
@@ -110,8 +132,15 @@ export default function HorariosPage() {
   const handleEdit = async (data: any) => {
     if (!selectedHorario) return
     try {
-      // await api.horarios.update(selectedHorario.id, data)
-      showToast("Horario actualizado exitosamente", "success")
+      const res = await api.horarios.update(selectedHorario.id, data)
+      
+      if (res.alertas && res.alertas.length > 0) {
+        const alertMessage = res.alertas.join(", ")
+        showToast(`Horario actualizado con alertas: ${alertMessage}`, "info")
+      } else {
+        showToast("Horario actualizado exitosamente", "success")
+      }
+      
       setIsEditModalOpen(false)
       cargarHorarios()
     } catch (err) {
@@ -128,11 +157,11 @@ export default function HorariosPage() {
       onConfirm: async (motivo?: string) => {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
         try {
-          // await api.horarios.toggle(horario.id, motivo)
+          await api.horarios.toggleActivo(horario.id, motivo)
           showToast(`Horario ${horario.activo ? "deshabilitado" : "habilitado"}`, "success")
           cargarHorarios()
-        } catch (err) {
-          showToast("Error al cambiar estado", "error")
+        } catch (err: any) {
+          showToast(err.message || "Error al cambiar estado", "error")
         }
       },
     })

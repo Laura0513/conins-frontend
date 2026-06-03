@@ -6,6 +6,13 @@ export const crearInstructorSchema = z.object({
   tipo_area: z.enum(['tecnica', 'transversal']),
 });
 
+export const crearInstructorCompletoSchema = z.object({
+  nombre: z.string().min(2).max(100),
+  email: z.string().email().max(100),
+  tipo_contrato: z.enum(['contratista', 'de_planta']),
+  tipo_area: z.enum(['tecnica', 'transversal']),
+});
+
 export const actualizarInstructorSchema = z.object({
   tipo_contrato: z.enum(['contratista', 'de_planta']).optional(),
   tipo_area: z.enum(['tecnica', 'transversal']).optional(),

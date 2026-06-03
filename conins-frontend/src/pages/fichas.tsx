@@ -56,13 +56,24 @@ export default function FichasPage() {
 
   const [search, setSearch] = useState("")
   const [filtroPrograma, setFiltroPrograma] = useState("todos")
+  const [programas, setProgramas] = useState<{ id: number; nombre: string }[]>([])
   const [filtroJornada, setFiltroJornada] = useState("todas")
   const [filtroEtapa, setFiltroEtapa] = useState("todas")
   const [filtroModalidad, setFiltroModalidad] = useState("todas")
 
   useEffect(() => {
     cargarFichas()
+    cargarProgramas()
   }, [])
+
+  const cargarProgramas = async () => {
+    try {
+      const res = await api.programs.getAll()
+      setProgramas(res.data)
+    } catch (err) {
+      console.warn("Backend no disponible para programas:", err)
+    }
+  }
 
   const cargarFichas = async () => {
     setLoading(true)
@@ -107,11 +118,11 @@ export default function FichasPage() {
       onConfirm: async () => {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
         try {
-          // await api.fichas.finalizar(ficha.id)
+          await api.fichas.finalizar(ficha.id)
           showToast(`Ficha ${ficha.numero_ficha} finalizada`, "success")
           cargarFichas()
-        } catch (err) {
-          showToast("Error al finalizar ficha", "error")
+        } catch (err: any) {
+          showToast(err.message || "Error al finalizar ficha", "error")
         }
       },
     })
@@ -119,10 +130,14 @@ export default function FichasPage() {
 
   const handleEditFicha = async (data: Partial<Ficha>) => {
     if (!selectedFicha) return
-    // await api.fichas.update(selectedFicha.id, data)
-    showToast("Ficha actualizada exitosamente", "success")
-    setIsEditModalOpen(false)
-    cargarFichas()
+    try {
+      await api.fichas.update(selectedFicha.id, data)
+      showToast("Ficha actualizada exitosamente", "success")
+      setIsEditModalOpen(false)
+      cargarFichas()
+    } catch (err: any) {
+      showToast(err.message || "Error al actualizar ficha", "error")
+    }
   }
 
   if (authLoading || !user) {
@@ -173,6 +188,9 @@ export default function FichasPage() {
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="todos">Programa: Todos</option>
+              {programas.map((p) => (
+                <option key={p.id} value={p.nombre}>{p.nombre}</option>
+              ))}
             </select>
 
             <select
@@ -317,12 +335,12 @@ export default function FichasPage() {
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={async (data) => {
           try {
-            // await api.fichas.create(data)
+            await api.fichas.create(data)
             showToast("Ficha registrada exitosamente", "success")
             setIsCreateModalOpen(false)
             cargarFichas()
-          } catch (err) {
-            showToast("Error al crear ficha", "error")
+          } catch (err: any) {
+            showToast(err.message || "Error al crear ficha", "error")
           }
         }}
       />

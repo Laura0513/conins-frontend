@@ -157,7 +157,7 @@ export default function Home() {
           <div className="bg-white p-6 rounded-xl border border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-900">Alertas recientes</h2>
-              <button className="text-sena text-sm font-medium hover:underline">Ver todas</button>
+              <button onClick={() => router.push("/alertas")} className="text-sena text-sm font-medium hover:underline">Ver todas</button>
             </div>
             <div className="space-y-4">
               {alertasMock.map((alerta, i) => (

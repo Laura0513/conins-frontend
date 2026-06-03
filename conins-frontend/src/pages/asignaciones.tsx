@@ -22,19 +22,24 @@ import {
 
 type Asignacion = {
   id: number
+  instructor_id: number
+  ficha_id: number
+  competencia_id: number
   instructor_nombre: string
   ficha_numero: string
   competencia: string
   ambiente: string
   jornada: string
   es_lider: boolean
+  es_provisional: boolean
+  activo: boolean
   tipo: "activa" | "provisional" | "historica"
 }
 
 const MOCK_ASIGNACIONES: Asignacion[] = [
-  { id: 1, instructor_nombre: "Carlos Álvarez", ficha_numero: "2995403", competencia: "ADSO", ambiente: "Aula 203", jornada: "Mañana", es_lider: true, tipo: "activa" },
-  { id: 2, instructor_nombre: "Andrés Pareja", ficha_numero: "2887341", competencia: "Contabilidad", ambiente: "Aula 207", jornada: "Mixta", es_lider: false, tipo: "activa" },
-  { id: 3, instructor_nombre: "William Ramírez", ficha_numero: "3012456", competencia: "Logística", ambiente: "Taller T2", jornada: "Noche", es_lider: true, tipo: "activa" },
+  { id: 1, instructor_id: 1, ficha_id: 1, competencia_id: 1, instructor_nombre: "Carlos Álvarez", ficha_numero: "2995403", competencia: "ADSO", ambiente: "Aula 203", jornada: "Mañana", es_lider: true, es_provisional: false, activo: true, tipo: "activa" },
+  { id: 2, instructor_id: 2, ficha_id: 2, competencia_id: 2, instructor_nombre: "Andrés Pareja", ficha_numero: "2887341", competencia: "Contabilidad", ambiente: "Aula 207", jornada: "Mixta", es_lider: false, es_provisional: false, activo: true, tipo: "activa" },
+  { id: 3, instructor_id: 3, ficha_id: 3, competencia_id: 3, instructor_nombre: "William Ramírez", ficha_numero: "3012456", competencia: "Logística", ambiente: "Taller T2", jornada: "Noche", es_lider: true, es_provisional: false, activo: true, tipo: "activa" },
 ]
 
 export default function AsignacionesPage() {
@@ -68,7 +73,11 @@ export default function AsignacionesPage() {
     setLoading(true)
     try {
       const res = await api.assignments.getAll()
-      setAsignaciones(res.data)
+      const mapped = res.data.map((a: any) => ({
+        ...a,
+        tipo: !a.activo ? "historica" : a.es_provisional ? "provisional" : "activa",
+      }))
+      setAsignaciones(mapped)
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
       setAsignaciones(MOCK_ASIGNACIONES)
@@ -93,23 +102,23 @@ export default function AsignacionesPage() {
 
   const handleCreate = async (data: any) => {
     try {
-      // await api.assignments.create(data)
+      await api.assignments.create(data)
       showToast("Asignación registrada exitosamente", "success")
       setIsCreateModalOpen(false)
       cargarAsignaciones()
-    } catch (err) {
-      showToast("Error al registrar asignación", "error")
+    } catch (err: any) {
+      showToast(err.message || "Error al registrar asignación", "error")
     }
   }
 
   const handleProvisional = async (data: any) => {
     try {
-      // await api.assignments.createProvisional(data)
+      await api.assignments.registrarProvisional(data)
       showToast("Asignación provisional registrada", "success")
       setIsProvisionalModalOpen(false)
       cargarAsignaciones()
-    } catch (err) {
-      showToast("Error al registrar provisional", "error")
+    } catch (err: any) {
+      showToast(err.message || "Error al registrar provisional", "error")
     }
   }
 
@@ -123,12 +132,16 @@ export default function AsignacionesPage() {
     setIsEditModalOpen(true)
   }
 
-  const handleEditAsignacion = async (data: Partial<Asignacion>) => {
+  const handleEditAsignacion = async (data: any) => {
     if (!selectedAsignacion) return
-    // await api.assignments.update(selectedAsignacion.id, data)
-    showToast("Asignación actualizada exitosamente", "success")
-    setIsEditModalOpen(false)
-    cargarAsignaciones()
+    try {
+      await api.assignments.update(selectedAsignacion.id, data)
+      showToast("Asignación actualizada exitosamente", "success")
+      setIsEditModalOpen(false)
+      cargarAsignaciones()
+    } catch (err: any) {
+      showToast(err.message || "Error al actualizar asignación", "error")
+    }
   }
 
   const handleDesactivar = (asig: Asignacion) => {
@@ -139,11 +152,11 @@ export default function AsignacionesPage() {
       onConfirm: async () => {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
         try {
-          // await api.assignments.deactivate(asig.id)
+          await api.assignments.desactivar(asig.id)
           showToast("Asignación desactivada", "success")
           cargarAsignaciones()
-        } catch (err) {
-          showToast("Error al desactivar", "error")
+        } catch (err: any) {
+          showToast(err.message || "Error al desactivar", "error")
         }
       },
     })

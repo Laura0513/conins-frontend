@@ -15,6 +15,7 @@ import ambienteRoutes from './routes/ambiente.routes.js';
 import alertaRoutes from './routes/alerta.routes.js';
 import notificacionRoutes from './routes/notificacion.routes.js';
 import catalogoRoutes from './routes/catalogo.routes.js';
+import programaRoutes from './routes/programa.routes.js';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use('/api/ambientes', ambienteRoutes);
 app.use('/api/alertas', alertaRoutes);
 app.use('/api/notificaciones', notificacionRoutes);
 app.use('/api/catalogo', catalogoRoutes);
+app.use('/api/programas', programaRoutes);
 
 // Error handler — must be last
 app.use(errorHandler);

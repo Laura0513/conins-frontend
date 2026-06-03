@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { X, Loader2 } from "lucide-react"
+import { api } from "@/lib/api"
 
 type CrearFichaModalProps = {
   isOpen: boolean
@@ -7,37 +8,35 @@ type CrearFichaModalProps = {
   onSubmit: (data: any) => Promise<void>
 }
 
-// Mock data until backend is ready
-const PROGRAMAS_MOCK = [
-  { id: 1, nombre: "ADSO" },
-  { id: 2, nombre: "Calzado" },
-  { id: 3, nombre: "Diseño" },
-  { id: 4, nombre: "HUI FORMACION" },
-]
+type Programa = { id: number; nombre: string }
 
-const INSTRUCTORES_MOCK = [
-  { id: 1, nombre: "Carlos Álvarez" },
-  { id: 2, nombre: "Ana García" },
-  { id: 3, nombre: "Luis Pérez" },
+const JORNADAS = [
+  { id: 1, nombre: "Mañana" },
+  { id: 2, nombre: "Mixta" },
+  { id: 3, nombre: "Noche" },
+  { id: 4, nombre: "Virtual" },
 ]
-
-const JORNADAS = ["Mañana", "Mixta", "Noche", "Virtual"]
-const MODALIDADES = ["Presencial", "Virtual"]
-const ETAPAS = ["Lectiva", "Productiva"]
 
 export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFichaModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [programas, setProgramas] = useState<Programa[]>([])
   const [formData, setFormData] = useState({
     numero_ficha: "",
     programa_id: "",
-    jornada: "Mañana",
-    modalidad: "Presencial",
-    etapa: "Lectiva",
-    fecha_inicio: "",
-    fecha_fin: "",
-    lider_ficha_id: "",
-    es_lider: false,
+    jornada_id: "",
+    etapa: "lectiva",
+    fecha_inicio_lectiva: "",
+    fecha_fin_lectiva: "",
+    fecha_fin_ficha: "",
   })
+
+  useEffect(() => {
+    if (isOpen) {
+      api.programs.getAll()
+        .then((res) => setProgramas(res.data))
+        .catch(() => setProgramas([]))
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -45,17 +44,24 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
     e.preventDefault()
     setSubmitting(true)
     try {
-      await onSubmit(formData)
+      const payload = {
+        numero_ficha: formData.numero_ficha,
+        programa_id: Number(formData.programa_id),
+        jornada_id: Number(formData.jornada_id),
+        etapa: formData.etapa,
+        fecha_inicio_lectiva: formData.fecha_inicio_lectiva || undefined,
+        fecha_fin_lectiva: formData.fecha_fin_lectiva || undefined,
+        fecha_fin_ficha: formData.fecha_fin_ficha || undefined,
+      }
+      await onSubmit(payload)
       setFormData({
         numero_ficha: "",
         programa_id: "",
-        jornada: "Mañana",
-        modalidad: "Presencial",
-        etapa: "Lectiva",
-        fecha_inicio: "",
-        fecha_fin: "",
-        lider_ficha_id: "",
-        es_lider: false,
+        jornada_id: "",
+        etapa: "lectiva",
+        fecha_inicio_lectiva: "",
+        fecha_fin_lectiva: "",
+        fecha_fin_ficha: "",
       })
     } finally {
       setSubmitting(false)
@@ -98,7 +104,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="">Seleccionar programa</option>
-              {PROGRAMAS_MOCK.map((p) => (
+              {programas.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre}</option>
               ))}
             </select>
@@ -108,35 +114,16 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
             <label className="block text-sm font-medium text-gray-700 mb-2">Jornada</label>
             <div className="flex flex-wrap gap-4">
               {JORNADAS.map((j) => (
-                <label key={j} className="flex items-center gap-2 cursor-pointer">
+                <label key={j.id} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
                     name="jornada"
-                    value={j}
-                    checked={formData.jornada === j}
-                    onChange={(e) => handleChange("jornada", e.target.value)}
+                    value={j.id}
+                    checked={Number(formData.jornada_id) === j.id}
+                    onChange={(e) => handleChange("jornada_id", e.target.value)}
                     className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
                   />
-                  <span className="text-sm text-gray-700">{j}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Modalidad</label>
-            <div className="flex gap-4">
-              {MODALIDADES.map((m) => (
-                <label key={m} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="modalidad"
-                    value={m}
-                    checked={formData.modalidad === m}
-                    onChange={(e) => handleChange("modalidad", e.target.value)}
-                    className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
-                  />
-                  <span className="text-sm text-gray-700">{m}</span>
+                  <span className="text-sm text-gray-700">{j.nombre}</span>
                 </label>
               ))}
             </div>
@@ -145,75 +132,60 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Etapa</label>
             <div className="flex gap-4">
-              {ETAPAS.map((e) => (
-                <label key={e} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="etapa"
-                    value={e}
-                    checked={formData.etapa === e}
-                    onChange={(ev) => handleChange("etapa", ev.target.value)}
-                    className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
-                  />
-                  <span className="text-sm text-gray-700">{e}</span>
-                </label>
-              ))}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="etapa"
+                  value="lectiva"
+                  checked={formData.etapa === "lectiva"}
+                  onChange={(e) => handleChange("etapa", e.target.value)}
+                  className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
+                />
+                <span className="text-sm text-gray-700">Lectiva</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="etapa"
+                  value="productiva"
+                  checked={formData.etapa === "productiva"}
+                  onChange={(e) => handleChange("etapa", e.target.value)}
+                  className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
+                />
+                <span className="text-sm text-gray-700">Productiva</span>
+              </label>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha inicio</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha inicio lectiva</label>
               <input
                 type="date"
-                value={formData.fecha_inicio}
-                onChange={(e) => handleChange("fecha_inicio", e.target.value)}
+                value={formData.fecha_inicio_lectiva}
+                onChange={(e) => handleChange("fecha_inicio_lectiva", e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin lectiva</label>
               <input
                 type="date"
-                value={formData.fecha_fin}
-                onChange={(e) => handleChange("fecha_fin", e.target.value)}
+                value={formData.fecha_fin_lectiva}
+                onChange={(e) => handleChange("fecha_fin_lectiva", e.target.value)}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Líder de ficha</label>
-            <select
-              value={formData.lider_ficha_id}
-              onChange={(e) => handleChange("lider_ficha_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="">Seleccionar líder</option>
-              {INSTRUCTORES_MOCK.map((i) => (
-                <option key={i.id} value={i.id}>{i.nombre}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => handleChange("es_lider", !formData.es_lider)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                formData.es_lider ? "bg-sena" : "bg-gray-200"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  formData.es_lider ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </button>
-            <div>
-              <span className="text-sm font-medium text-gray-700">Es líder de esta ficha</span>
-              <p className="text-xs text-gray-500">Función administrativa. No modifica permisos del instructor.</p>
-            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin ficha</label>
+            <input
+              type="date"
+              value={formData.fecha_fin_ficha}
+              onChange={(e) => handleChange("fecha_fin_ficha", e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+            />
           </div>
 
           <div className="pt-2 flex items-center justify-end gap-3">

@@ -51,13 +51,6 @@ export const api = {
             })
         },
 
-        register(email: string, password: string, tipo_contrato?: string, tipo_area?: string) {
-            return apiFetch('/auth/register', {
-                method: 'POST',
-                body: JSON.stringify({ email, password, tipo_contrato, tipo_area }),
-            })
-        },
-
         getPerfil() {
             return apiFetch('/auth/perfil')
         },
@@ -81,10 +74,50 @@ export const api = {
         getAll() {
             return apiFetch('/instructores')
         },
+        getOwnProfile() {
+            return apiFetch('/instructores/perfil')
+        },
+        getById(id: number) {
+            return apiFetch(`/instructores/${id}`)
+        },
+        getDetalle(id: number) {
+            return apiFetch(`/instructores/${id}/detalle`)
+        },
         create(data: any) {
             return apiFetch('/instructores', {
                 method: 'POST',
                 body: JSON.stringify(data),
+            })
+        },
+        update(id: number, data: any) {
+            return apiFetch(`/instructores/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            })
+        },
+        toggleEstado(id: number) {
+            return apiFetch(`/instructores/${id}/estado`, {
+                method: 'PATCH',
+            })
+        },
+        registrarNovedad(id: number, data: any) {
+            return apiFetch(`/instructores/${id}/novedades`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        getCompetencias(id: number) {
+            return apiFetch(`/instructores/${id}/competencias`)
+        },
+        addCompetencia(id: number, data: any) {
+            return apiFetch(`/instructores/${id}/competencias`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        removeCompetencia(id: number, competenciaId: number) {
+            return apiFetch(`/instructores/${id}/competencias/${competenciaId}`, {
+                method: 'DELETE',
             })
         },
     },
@@ -93,11 +126,39 @@ export const api = {
         getAll() {
             return apiFetch('/fichas')
         },
+        getById(id: number) {
+            return apiFetch(`/fichas/${id}`)
+        },
+        create(data: any) {
+            return apiFetch('/fichas', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        update(id: number, data: any) {
+            return apiFetch(`/fichas/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            })
+        },
+        finalizar(id: number) {
+            return apiFetch(`/fichas/${id}/finalizar`, {
+                method: 'PATCH',
+            })
+        },
+        toggleEstado(id: number) {
+            return apiFetch(`/fichas/${id}/estado`, {
+                method: 'PATCH',
+            })
+        },
     },
 
     assignments: {
         getAll() {
             return apiFetch('/asignaciones')
+        },
+        getById(id: number) {
+            return apiFetch(`/asignaciones/${id}`)
         },
         create(data: any) {
             return apiFetch('/asignaciones', {
@@ -105,9 +166,21 @@ export const api = {
                 body: JSON.stringify(data),
             })
         },
-        delete(id: number) {
+        update(id: number, data: any) {
             return apiFetch(`/asignaciones/${id}`, {
-                method: 'DELETE',
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            })
+        },
+        desactivar(id: number) {
+            return apiFetch(`/asignaciones/${id}/desactivar`, {
+                method: 'PATCH',
+            })
+        },
+        registrarProvisional(data: any) {
+            return apiFetch('/asignaciones/provisional', {
+                method: 'POST',
+                body: JSON.stringify(data),
             })
         },
     },
@@ -116,10 +189,75 @@ export const api = {
         getAll() {
             return apiFetch('/horarios')
         },
+        getById(id: number) {
+            return apiFetch(`/horarios/${id}`)
+        },
         create(data: any) {
             return apiFetch('/horarios', {
                 method: 'POST',
                 body: JSON.stringify(data),
+            })
+        },
+        update(id: number, data: any) {
+            return apiFetch(`/horarios/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            })
+        },
+        toggleActivo(id: number, motivo?: string) {
+            return apiFetch(`/horarios/${id}/estado`, {
+                method: 'PATCH',
+                body: JSON.stringify({ motivo }),
+            })
+        },
+    },
+
+    programs: {
+        getAll() {
+            return apiFetch('/programas')
+        },
+    },
+
+    catalogo: {
+        getAreas() {
+            return apiFetch('/catalogo/areas')
+        },
+        getCompetenciasByPrograma(programaId: number) {
+            return apiFetch(`/catalogo/programas/${programaId}/competencias`)
+        },
+    },
+
+    ambientes: {
+        getAll() {
+            return apiFetch('/ambientes')
+        },
+        create(data: any) {
+            return apiFetch('/ambientes', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        update(id: number, data: any) {
+            return apiFetch(`/ambientes/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            })
+        },
+        bloquear(id: number, data: any) {
+            return apiFetch(`/ambientes/${id}/bloquear`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+    },
+
+    alertas: {
+        getAll() {
+            return apiFetch('/alertas')
+        },
+        marcarAtendida(id: number) {
+            return apiFetch(`/alertas/${id}/atendida`, {
+                method: 'PATCH',
             })
         },
     },

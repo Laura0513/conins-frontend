@@ -1,12 +1,17 @@
 import pool from '../config/db.js';
 import { RowDataPacket } from 'mysql2';
 
-export interface Programa extends RowDataPacket {
+export interface ProgramaSimple extends RowDataPacket {
+  id: number;
+  nombre: string;
+}
+
+export interface ProgramaDetail extends RowDataPacket {
   id: number;
   codigo: string;
   nombre: string;
   nivel: string;
-  area_id: number;
+  area: string;
   tipo_linea: string;
   tipo_area: string;
   tipo_formacion: string;
@@ -15,18 +20,32 @@ export interface Programa extends RowDataPacket {
 }
 
 export const ProgramaModel = {
-  async findAll(): Promise<Programa[]> {
-    const [rows] = await pool.query<Programa[]>(
-      'SELECT id, codigo, nombre, nivel, area_id, tipo_linea, tipo_area, tipo_formacion, modalidad, activo FROM programas WHERE activo = TRUE ORDER BY nombre',
+  async findAll(): Promise<ProgramaDetail[]> {
+    const [rows] = await pool.query<ProgramaDetail[]>(`
+      SELECT p.id, p.codigo, p.nombre, p.nivel, a.nombre AS area,
+             p.tipo_linea, p.tipo_area, p.tipo_formacion, p.modalidad, p.activo
+      FROM programas p
+      JOIN areas a ON p.area_id = a.id
+      ORDER BY p.nombre
+    `);
+    return rows;
+  },
+
+  async findAllSimple(): Promise<ProgramaSimple[]> {
+    const [rows] = await pool.query<ProgramaSimple[]>(
+      'SELECT id, nombre FROM programas WHERE activo = TRUE ORDER BY nombre',
     );
     return rows;
   },
 
-  async findById(id: number): Promise<Programa | null> {
-    const [rows] = await pool.query<Programa[]>(
-      'SELECT id, codigo, nombre, nivel, area_id, tipo_linea, tipo_area, tipo_formacion, modalidad, activo FROM programas WHERE id = ?',
-      [id],
-    );
+  async findById(id: number): Promise<ProgramaDetail | null> {
+    const [rows] = await pool.query<ProgramaDetail[]>(`
+      SELECT p.id, p.codigo, p.nombre, p.nivel, a.nombre AS area,
+             p.tipo_linea, p.tipo_area, p.tipo_formacion, p.modalidad, p.activo
+      FROM programas p
+      JOIN areas a ON p.area_id = a.id
+      WHERE p.id = ?
+    `, [id]);
     return rows[0] ?? null;
   },
 };

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { InstructorService } from '../services/instructor.service.js';
+import { NotificacionService } from '../services/notificacion.service.js';
+import { InstructorModel } from '../models/instructor.model.js';
 
 export const getAll = asyncHandler(async (_req: Request, res: Response) => {
   const instructors = await InstructorService.getAll();
@@ -11,6 +13,11 @@ export const getAll = asyncHandler(async (_req: Request, res: Response) => {
 export const getById = asyncHandler(async (req: Request, res: Response) => {
   const instructor = await InstructorService.getById(Number(req.params.id));
   ApiResponse.success(res, instructor);
+});
+
+export const getDetalle = asyncHandler(async (req: Request, res: Response) => {
+  const detalle = await InstructorService.getDetalle(Number(req.params.id));
+  ApiResponse.success(res, detalle);
 });
 
 export const getOwnProfile = asyncHandler(async (req: Request, res: Response) => {
@@ -47,4 +54,33 @@ export const toggleEstado = asyncHandler(async (req: Request, res: Response) => 
   const result = await InstructorService.toggleEstado(Number(req.params.id));
   const message = result.activo ? 'Instructor activado' : 'Instructor desactivado';
   ApiResponse.success(res, result, message);
+});
+
+export const create = asyncHandler(async (req: Request, res: Response) => {
+  const { nombre, email, tipo_contrato, tipo_area } = req.body;
+  const result = await InstructorService.create(nombre, email, tipo_contrato, tipo_area);
+  ApiResponse.created(res, result, 'Instructor creado exitosamente');
+});
+
+export const registrarNovedad = asyncHandler(async (req: Request, res: Response) => {
+  const { tipo_novedad, fecha_inicio, fecha_regreso, observacion } = req.body;
+  const result = await InstructorService.registrarNovedad(
+    Number(req.params.id),
+    tipo_novedad,
+    fecha_inicio,
+    fecha_regreso,
+    observacion,
+  );
+
+  const instructor = await InstructorModel.findById(Number(req.params.id));
+  if (instructor) {
+    await NotificacionService.onNovedadRegistrada(
+      instructor,
+      tipo_novedad,
+      fecha_inicio,
+      fecha_regreso,
+    );
+  }
+
+  ApiResponse.created(res, result, 'Novedad registrada exitosamente');
 });

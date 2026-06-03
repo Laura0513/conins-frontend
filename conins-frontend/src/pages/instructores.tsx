@@ -90,10 +90,10 @@ export default function InstructoresPage() {
       onConfirm: async () => {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
         try {
-          // Aqui ira la llamada a la API cuando Jair tenga el endpoint listo
-          // await api.instructors.addNovedad(selectedInstructorId, data)
+          await api.instructors.registrarNovedad(selectedInstructorId, data)
           showToast("Novedad registrada exitosamente", "success")
           setIsNovedadModalOpen(false)
+          cargarInstructores()
         } catch (err) {
           showToast("Error al registrar novedad.", "error")
         }
@@ -119,10 +119,14 @@ export default function InstructoresPage() {
 
   const handleEditInstructor = async (data: Partial<Instructor>) => {
     if (!selectedInstructor) return
-    // await api.instructors.update(selectedInstructor.id, data)
-    showToast("Instructor actualizado exitosamente", "success")
-    setIsEditModalOpen(false)
-    cargarInstructores()
+    try {
+      await api.instructors.update(selectedInstructor.id, data)
+      showToast("Instructor actualizado exitosamente", "success")
+      setIsEditModalOpen(false)
+      cargarInstructores()
+    } catch (err) {
+      showToast("Error al actualizar instructor.", "error")
+    }
   }
 
   const listaFiltrada = instructores.filter((inst) => {

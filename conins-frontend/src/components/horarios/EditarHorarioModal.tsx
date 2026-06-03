@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
-import { X, Loader2, Clock } from "lucide-react"
+import { X, Loader2, Clock, User, BookOpen, Hash } from "lucide-react"
+import { api } from "@/lib/api"
 
 type Horario = {
   id: number
@@ -12,6 +13,16 @@ type Horario = {
   horas: string
   estado: string
   activo: boolean
+  dia_semana?: number
+  hora_inicio?: string
+  hora_fin?: string
+  jornada_id?: number
+  ambiente_id?: number | null
+}
+
+type Ambiente = {
+  id: number
+  nombre: string
 }
 
 type EditarHorarioModalProps = {
@@ -21,61 +32,80 @@ type EditarHorarioModalProps = {
   onSubmit: (data: any) => Promise<void>
 }
 
-// Mock data
-const FICHAS_MOCK = [
-  { id: 1, numero: "2995403", programa: "ADSO" },
-  { id: 2, numero: "2887341", programa: "Calzado" },
+const JORNADAS = [
+  { id: 1, nombre: "Mañana" },
+  { id: 2, nombre: "Mixta" },
+  { id: 3, nombre: "Noche" },
+  { id: 4, nombre: "Virtual" },
 ]
 
-const INSTRUCTORES_MOCK = [
-  { id: 1, nombre: "Carlos Álvarez" },
-  { id: 2, nombre: "Andrés Pareja" },
+const DIAS_SEMANA = [
+  { id: 1, nombre: "Lun" },
+  { id: 2, nombre: "Mar" },
+  { id: 3, nombre: "Mié" },
+  { id: 4, nombre: "Jue" },
+  { id: 5, nombre: "Vie" },
+  { id: 6, nombre: "Sáb" },
 ]
-
-const COMPETENCIAS_MOCK = [
-  { id: 1, nombre: "Bases de datos" },
-  { id: 2, nombre: "Contabilidad básica" },
-]
-
-const AMBIENTES_MOCK = [
-  { id: 1, nombre: "Aula 203" },
-  { id: 2, nombre: "Aula 207" },
-  { id: 3, nombre: "Taller T2" },
-  { id: 4, nombre: "Aula 204" },
-]
-
-const JORNADAS = ["Mañana", "Mixta", "Noche", "Virtual"]
-const DIAS_SEMANA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
 export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit }: EditarHorarioModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [ambientes, setAmbientes] = useState<Ambiente[]>([])
+  const [loading, setLoading] = useState(false)
+  
+  // El backend devuelve días como ["Lun", "Mar"], necesitamos mapear a IDs para el formulario
+  // Pero para edición simple, asumimos que el horario tiene un solo bloque o tomamos el primero.
+  // Para simplificar, permitimos cambiar el día y la hora.
+  
   const [formData, setFormData] = useState({
-    ficha_id: "",
-    instructor_id: "",
-    competencia_id: "",
-    jornada: "Mañana",
-    dias: [] as string[],
+    dia_semana: "",
     hora_inicio: "",
     hora_fin: "",
+    jornada_id: "",
     ambiente_id: "",
   })
 
   useEffect(() => {
-    if (horario) {
-      // Parse hours string "08:00 - 12:00"
-      const [start, end] = horario.horas.split(" - ")
+    if (isOpen && horario) {
+      setLoading(true)
+      api.ambientes.getAll()
+        .then((res) => setAmbientes(res.data || []))
+        .finally(() => setLoading(false))
+
+      // Intentar parsear datos existentes
+      // El backend devuelve 'dias' como array de strings ["Lun", "Mar"]
+      // Y 'horas' como string "06:00 - 12:00"
+      
+      let diaId = ""
+      if (horario.dias && horario.dias.length > 0) {
+        const diaNombre = horario.dias[0]
+        const diaObj = DIAS_SEMANA.find(d => d.nombre === diaNombre)
+        if (diaObj) diaId = String(diaObj.id)
+      }
+
+      let horaInicio = ""
+      let horaFin = ""
+      if (horario.horas) {
+        const partes = horario.horas.split(" - ")
+        if (partes.length === 2) {
+          horaInicio = partes[0]
+          horaFin = partes[1]
+        }
+      }
+
+      let jornadaId = ""
+      const jornadaObj = JORNADAS.find(j => j.nombre === horario.jornada)
+      if (jornadaObj) jornadaId = String(jornadaObj.id)
+
       setFormData({
-        ficha_id: "1", // Mock mapping
-        instructor_id: "1", // Mock mapping
-        competencia_id: "1", // Mock mapping
-        jornada: horario.jornada,
-        dias: horario.dias,
-        hora_inicio: start || "",
-        hora_fin: end || "",
-        ambiente_id: "4", // Mock mapping for Aula 204
+        dia_semana: diaId,
+        hora_inicio: horaInicio,
+        hora_fin: horaFin,
+        jornada_id: jornadaId,
+        ambiente_id: horario.ambiente_id ? String(horario.ambiente_id) : "",
       })
     }
-  }, [horario])
+  }, [isOpen, horario])
 
   if (!isOpen || !horario) return null
 
@@ -83,7 +113,14 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
     e.preventDefault()
     setSubmitting(true)
     try {
-      await onSubmit(formData)
+      const payload = {
+        dia_semana: Number(formData.dia_semana),
+        hora_inicio: formData.hora_inicio,
+        hora_fin: formData.hora_fin,
+        jornada_id: Number(formData.jornada_id),
+        ambiente_id: formData.ambiente_id ? Number(formData.ambiente_id) : null,
+      }
+      await onSubmit(payload)
     } finally {
       setSubmitting(false)
     }
@@ -91,13 +128,6 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
 
   const handleChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value })
-  }
-
-  const toggleDia = (dia: string) => {
-    const nuevosDias = formData.dias.includes(dia)
-      ? formData.dias.filter((d) => d !== dia)
-      : [...formData.dias, dia]
-    setFormData({ ...formData, dias: nuevosDias })
   }
 
   return (
@@ -111,131 +141,107 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ficha <span className="text-red-500">*</span></label>
-            <select
-              required
-              value={formData.ficha_id}
-              onChange={(e) => handleChange("ficha_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              {FICHAS_MOCK.map((f) => (
-                <option key={f.id} value={f.id}>{f.numero}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Instructor <span className="text-red-500">*</span></label>
-            <select
-              required
-              value={formData.instructor_id}
-              onChange={(e) => handleChange("instructor_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              {INSTRUCTORES_MOCK.map((i) => (
-                <option key={i.id} value={i.id}>{i.nombre}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Competencia <span className="text-red-500">*</span></label>
-            <select
-              required
-              value={formData.competencia_id}
-              onChange={(e) => handleChange("competencia_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              {COMPETENCIAS_MOCK.map((c) => (
-                <option key={c.id} value={c.id}>{c.nombre}</option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-1">Solo se muestran competencias habilitadas según contrato.</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Jornada</label>
-            <div className="flex flex-wrap gap-2">
-              {JORNADAS.map((j) => (
-                <button
-                  key={j}
-                  type="button"
-                  onClick={() => handleChange("jornada", j)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-                    formData.jornada === j
-                      ? "bg-sena text-white border-sena"
-                      : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  {j}
-                </button>
-              ))}
+          {/* Info de solo lectura */}
+          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <User className="w-4 h-4 text-gray-400" />
+              <span className="font-medium">{horario.instructor_nombre}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <Hash className="w-4 h-4 text-gray-400" />
+              <span>Ficha {horario.ficha_numero}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-700">
+              <BookOpen className="w-4 h-4 text-gray-400" />
+              <span>{horario.competencia}</span>
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Días de la semana</label>
-            <div className="flex flex-wrap gap-2">
-              {DIAS_SEMANA.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => toggleDia(d)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
-                    formData.dias.includes(d)
-                      ? "bg-sena text-white border-sena"
-                      : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  {d}
-                </button>
-              ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-4 text-gray-500">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              Cargando...
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Hora inicio</label>
-              <div className="relative">
-                <input
-                  type="time"
-                  required
-                  value={formData.hora_inicio}
-                  onChange={(e) => handleChange("hora_inicio", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                />
-                <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Día de la semana <span className="text-red-500">*</span></label>
+                <div className="flex flex-wrap gap-2">
+                  {DIAS_SEMANA.map((d) => (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => handleChange("dia_semana", String(d.id))}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
+                        Number(formData.dia_semana) === d.id
+                          ? "bg-gray-800 text-white border-gray-800"
+                          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {d.nombre}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Hora fin</label>
-              <div className="relative">
-                <input
-                  type="time"
-                  required
-                  value={formData.hora_fin}
-                  onChange={(e) => handleChange("hora_fin", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                />
-                <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente <span className="text-red-500">*</span></label>
-            <select
-              required
-              value={formData.ambiente_id}
-              onChange={(e) => handleChange("ambiente_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              {AMBIENTES_MOCK.map((a) => (
-                <option key={a.id} value={a.id}>{a.nombre}</option>
-              ))}
-            </select>
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Jornada <span className="text-red-500">*</span></label>
+                <div className="flex flex-wrap gap-2">
+                  {JORNADAS.map((j) => (
+                    <button
+                      key={j.id}
+                      type="button"
+                      onClick={() => handleChange("jornada_id", String(j.id))}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                        Number(formData.jornada_id) === j.id
+                          ? "bg-sena text-white border-sena"
+                          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {j.nombre}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Hora inicio <span className="text-red-500">*</span></label>
+                  <input
+                    type="time"
+                    required
+                    value={formData.hora_inicio}
+                    onChange={(e) => handleChange("hora_inicio", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Hora fin <span className="text-red-500">*</span></label>
+                  <input
+                    type="time"
+                    required
+                    value={formData.hora_fin}
+                    onChange={(e) => handleChange("hora_fin", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente</label>
+                <select
+                  value={formData.ambiente_id}
+                  onChange={(e) => handleChange("ambiente_id", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                >
+                  <option value="">Usar ambiente de la ficha</option>
+                  {ambientes.map((a) => (
+                    <option key={a.id} value={a.id}>{a.nombre}</option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
 
           <div className="pt-2 flex items-center justify-end gap-3">
             <button
@@ -247,11 +253,11 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || loading}
               className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Guardar
+              Guardar cambios
             </button>
           </div>
         </form>

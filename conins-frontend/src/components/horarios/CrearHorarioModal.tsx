@@ -1,5 +1,7 @@
-import { useState } from "react"
-import { X, Loader2, AlertCircle, Clock } from "lucide-react"
+import { useState, useEffect } from "react"
+import { X, Loader2, Clock, User, BookOpen, Hash } from "lucide-react"
+import { api } from "@/lib/api"
+import { useToast } from "@/lib/ToastContext"
 
 type CrearHorarioModalProps = {
   isOpen: boolean
@@ -7,43 +9,62 @@ type CrearHorarioModalProps = {
   onSubmit: (data: any) => Promise<void>
 }
 
-// Mock data
-const FICHAS_MOCK = [
-  { id: 1, numero: "2995403", programa: "ADSO" },
-  { id: 2, numero: "2887341", programa: "Calzado" },
+type Asignacion = {
+  id: number
+  instructor_nombre: string
+  ficha_numero: string
+  competencia: string
+  instructor_id: number
+  ficha_id: number
+  competencia_id: number
+  ambiente_id: number | null
+}
+
+type Ambiente = {
+  id: number
+  nombre: string
+}
+
+const JORNADAS = [
+  { id: 1, nombre: "Mañana" },
+  { id: 2, nombre: "Mixta" },
+  { id: 3, nombre: "Noche" },
+  { id: 4, nombre: "Virtual" },
 ]
 
-const INSTRUCTORES_MOCK = [
-  { id: 1, nombre: "Carlos Álvarez" },
-  { id: 2, nombre: "Andrés Pareja" },
+const DIAS_SEMANA = [
+  { id: 1, nombre: "Lun" },
+  { id: 2, nombre: "Mar" },
+  { id: 3, nombre: "Mié" },
+  { id: 4, nombre: "Jue" },
+  { id: 5, nombre: "Vie" },
+  { id: 6, nombre: "Sáb" },
 ]
-
-const COMPETENCIAS_MOCK = [
-  { id: 1, nombre: "Bases de datos" },
-  { id: 2, nombre: "Contabilidad básica" },
-]
-
-const AMBIENTES_MOCK = [
-  { id: 1, nombre: "Aula 203" },
-  { id: 2, nombre: "Aula 207" },
-  { id: 3, nombre: "Taller T2" },
-]
-
-const JORNADAS = ["Mañana", "Mixta", "Noche", "Virtual"]
-const DIAS_SEMANA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
 export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHorarioModalProps) {
+  const { showToast } = useToast()
   const [submitting, setSubmitting] = useState(false)
+  const [asignaciones, setAsignaciones] = useState<Asignacion[]>([])
+  const [ambientes, setAmbientes] = useState<Ambiente[]>([])
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    ficha_id: "",
-    instructor_id: "",
-    competencia_id: "",
-    jornada: "Mañana",
-    dias: [] as string[],
+    asignacion_id: "",
+    dias: [] as number[],
     hora_inicio: "",
     hora_fin: "",
+    jornada_id: "",
     ambiente_id: "",
   })
+
+  useEffect(() => {
+    if (isOpen) {
+      setLoading(true)
+      Promise.all([
+        api.assignments.getAll().then((res) => setAsignaciones(res.data || [])).catch(() => setAsignaciones([])),
+        api.ambientes.getAll().then((res) => setAmbientes(res.data || [])).catch(() => setAmbientes([])),
+      ]).finally(() => setLoading(false))
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -51,17 +72,45 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
     e.preventDefault()
     setSubmitting(true)
     try {
-      await onSubmit(formData)
+      const selected = asignaciones.find((a) => a.id === Number(formData.asignacion_id))
+      if (!selected) return
+
+      const finalAmbienteId = formData.ambiente_id ? Number(formData.ambiente_id) : selected.ambiente_id
+
+      if (!finalAmbienteId) {
+        showToast("Esta ficha no tiene un ambiente asignado. Por favor selecciona uno manualmente.", "error")
+        setSubmitting(false)
+        return
+      }
+
+      const now = new Date()
+      const day = now.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      const lunes = new Date(now)
+      lunes.setDate(now.getDate() + diff)
+      const semana = lunes.toISOString().split('T')[0]
+
+      const payload = {
+        ficha_id: selected.ficha_id,
+        instructor_id: selected.instructor_id,
+        competencia_id: selected.competencia_id,
+        dias: formData.dias,
+        hora_inicio: formData.hora_inicio,
+        hora_fin: formData.hora_fin,
+        jornada_id: Number(formData.jornada_id),
+        ambiente_id: finalAmbienteId,
+      }
+      await onSubmit(payload)
       setFormData({
-        ficha_id: "",
-        instructor_id: "",
-        competencia_id: "",
-        jornada: "Mañana",
+        asignacion_id: "",
         dias: [],
         hora_inicio: "",
         hora_fin: "",
+        jornada_id: "",
         ambiente_id: "",
       })
+    } catch (err: any) {
+      showToast(err.message || "Error al registrar horario", "error")
     } finally {
       setSubmitting(false)
     }
@@ -71,12 +120,14 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
     setFormData({ ...formData, [field]: value })
   }
 
-  const toggleDia = (dia: string) => {
-    const nuevosDias = formData.dias.includes(dia)
-      ? formData.dias.filter((d) => d !== dia)
-      : [...formData.dias, dia]
+  const toggleDia = (id: number) => {
+    const nuevosDias = formData.dias.includes(id)
+      ? formData.dias.filter((d) => d !== id)
+      : [...formData.dias, id]
     setFormData({ ...formData, dias: nuevosDias })
   }
+
+  const selectedAsignacion = asignaciones.find((a) => a.id === Number(formData.asignacion_id))
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -89,142 +140,126 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ficha <span className="text-red-500">*</span></label>
-            <select
-              required
-              value={formData.ficha_id}
-              onChange={(e) => handleChange("ficha_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="">Seleccionar ficha</option>
-              {FICHAS_MOCK.map((f) => (
-                <option key={f.id} value={f.id}>{f.numero}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Instructor <span className="text-red-500">*</span></label>
-            <select
-              required
-              value={formData.instructor_id}
-              onChange={(e) => handleChange("instructor_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="">Seleccionar instructor</option>
-              {INSTRUCTORES_MOCK.map((i) => (
-                <option key={i.id} value={i.id}>{i.nombre}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Competencia <span className="text-red-500">*</span></label>
-            <select
-              required
-              value={formData.competencia_id}
-              onChange={(e) => handleChange("competencia_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="">Seleccionar competencia</option>
-              {COMPETENCIAS_MOCK.map((c) => (
-                <option key={c.id} value={c.id}>{c.nombre}</option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-1">Solo se muestran competencias habilitadas según contrato.</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Jornada</label>
-            <div className="flex flex-wrap gap-2">
-              {JORNADAS.map((j) => (
-                <button
-                  key={j}
-                  type="button"
-                  onClick={() => handleChange("jornada", j)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-                    formData.jornada === j
-                      ? "bg-sena text-white border-sena"
-                      : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  {j}
-                </button>
-              ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-8 text-gray-500">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              Cargando asignaciones...
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Días de la semana</label>
-            <div className="flex flex-wrap gap-2">
-              {DIAS_SEMANA.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => toggleDia(d)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
-                    formData.dias.includes(d)
-                      ? "bg-gray-800 text-white border-gray-800"
-                      : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Hora inicio</label>
-              <div className="relative">
-                <input
-                  type="time"
+          ) : (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Asignación activa <span className="text-red-500">*</span></label>
+                <select
                   required
-                  value={formData.hora_inicio}
-                  onChange={(e) => handleChange("hora_inicio", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                />
-                <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  value={formData.asignacion_id}
+                  onChange={(e) => handleChange("asignacion_id", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                >
+                  <option value="">Seleccionar asignación</option>
+                  {asignaciones.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.instructor_nombre} — Ficha {a.ficha_numero} — {a.competencia}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Selecciona una asignación vigente para crear el horario.</p>
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Hora fin</label>
-              <div className="relative">
-                <input
-                  type="time"
-                  required
-                  value={formData.hora_fin}
-                  onChange={(e) => handleChange("hora_fin", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                />
-                <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+
+              {selectedAsignacion && (
+                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <User className="w-4 h-4 text-gray-400" />
+                    <span className="font-medium">{selectedAsignacion.instructor_nombre}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <Hash className="w-4 h-4 text-gray-400" />
+                    <span>Ficha {selectedAsignacion.ficha_numero}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <BookOpen className="w-4 h-4 text-gray-400" />
+                    <span>{selectedAsignacion.competencia}</span>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Días de la semana <span className="text-red-500">*</span></label>
+                <div className="flex flex-wrap gap-2">
+                  {DIAS_SEMANA.map((d) => (
+                    <button
+                      key={d.id}
+                      type="button"
+                      onClick={() => toggleDia(d.id)}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
+                        formData.dias.includes(d.id)
+                          ? "bg-gray-800 text-white border-gray-800"
+                          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {d.nombre}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente <span className="text-red-500">*</span></label>
-            <select
-              required
-              value={formData.ambiente_id}
-              onChange={(e) => handleChange("ambiente_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="">Seleccionar ambiente</option>
-              {AMBIENTES_MOCK.map((a) => (
-                <option key={a.id} value={a.id}>{a.nombre}</option>
-              ))}
-            </select>
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Jornada <span className="text-red-500">*</span></label>
+                <div className="flex flex-wrap gap-2">
+                  {JORNADAS.map((j) => (
+                    <button
+                      key={j.id}
+                      type="button"
+                      onClick={() => handleChange("jornada_id", String(j.id))}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                        Number(formData.jornada_id) === j.id
+                          ? "bg-sena text-white border-sena"
+                          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {j.nombre}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex gap-3 items-start">
-            <AlertCircle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
-            <p className="text-sm text-yellow-800">
-              Este ambiente ya tiene otra ficha en esta jornada. Puede continuar.
-            </p>
-          </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Hora inicio <span className="text-red-500">*</span></label>
+                  <input
+                    type="time"
+                    required
+                    value={formData.hora_inicio}
+                    onChange={(e) => handleChange("hora_inicio", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Hora fin <span className="text-red-500">*</span></label>
+                  <input
+                    type="time"
+                    required
+                    value={formData.hora_fin}
+                    onChange={(e) => handleChange("hora_fin", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente</label>
+                <select
+                  value={formData.ambiente_id}
+                  onChange={(e) => handleChange("ambiente_id", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                >
+                  <option value="">Sin asignar (usa el de la ficha)</option>
+                  {ambientes.map((a) => (
+                    <option key={a.id} value={a.id}>{a.nombre}</option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
 
           <div className="pt-2 flex items-center justify-end gap-3">
             <button
@@ -236,7 +271,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || loading}
               className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}

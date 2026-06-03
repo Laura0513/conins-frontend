@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { verifyToken } from '../middleware/auth.js';
-import * as ambienteController from '../controllers/ambiente.controller.js';
+import * as programaController from '../controllers/programa.controller.js';
 
 const router = Router();
 
 router.use(verifyToken);
 
-router.get('/', ambienteController.getAll);
+router.get('/', programaController.getAll);
 
 export default router;

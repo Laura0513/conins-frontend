@@ -1,22 +1,35 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { ApiResponse } from '../utils/response.js';
+import { FichaService } from '../services/ficha.service.js';
 
-export const listar = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'ficha.listar — TODO' });
+export const getAll = asyncHandler(async (_req: Request, res: Response) => {
+  const fichas = await FichaService.getAll();
+  ApiResponse.success(res, fichas);
 });
 
-export const crear = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'ficha.crear — TODO' });
+export const getById = asyncHandler(async (req: Request, res: Response) => {
+  const ficha = await FichaService.getById(Number(req.params.id));
+  ApiResponse.success(res, ficha);
 });
 
-export const actualizar = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'ficha.actualizar — TODO' });
+export const create = asyncHandler(async (req: Request, res: Response) => {
+  const ficha = await FichaService.create(req.body);
+  ApiResponse.created(res, ficha, 'Ficha creada exitosamente');
 });
 
-export const deshabilitar = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'ficha.deshabilitar — TODO' });
+export const update = asyncHandler(async (req: Request, res: Response) => {
+  const ficha = await FichaService.update(Number(req.params.id), req.body);
+  ApiResponse.success(res, ficha, 'Ficha actualizada exitosamente');
 });
 
-export const getDetalle = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'ficha.getDetalle — TODO' });
+export const finalizar = asyncHandler(async (req: Request, res: Response) => {
+  const ficha = await FichaService.finalizar(Number(req.params.id));
+  ApiResponse.success(res, ficha, 'Ficha finalizada exitosamente');
+});
+
+export const toggleEstado = asyncHandler(async (req: Request, res: Response) => {
+  const result = await FichaService.toggleEstado(Number(req.params.id));
+  const message = result.activo ? 'Ficha activada' : 'Ficha desactivada';
+  ApiResponse.success(res, result, message);
 });

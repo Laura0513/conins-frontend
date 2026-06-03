@@ -1,54 +1,60 @@
 import { useState, useEffect } from "react"
 import { X, Loader2 } from "lucide-react"
+import { api } from "@/lib/api"
 
 type Asignacion = {
   id: number
+  instructor_id: number
+  ficha_id: number
+  competencia_id: number
   instructor_nombre: string
   ficha_numero: string
   competencia: string
   ambiente: string
   jornada: string
   es_lider: boolean
-  tipo: "activa" | "provisional" | "historica"
+  es_provisional: boolean
+  activo: boolean
 }
+
+type Competencia = { id: number; nombre: string }
+type Ambiente = { id: number; nombre: string }
 
 type EditAsignacionModalProps = {
   isOpen: boolean
   onClose: () => void
   asignacion: Asignacion | null
-  onSubmit: (data: Partial<Asignacion>) => Promise<void>
+  onSubmit: (data: any) => Promise<void>
 }
-
-const COMPETENCIAS_MOCK = [
-  { id: 1, nombre: "Bases de datos" },
-  { id: 2, nombre: "Contabilidad general" },
-  { id: 3, nombre: "Logística inversa" },
-]
-
-const AMBIENTES_MOCK = [
-  { id: 0, nombre: "Sin asignar" },
-  { id: 1, nombre: "Aula 203" },
-  { id: 2, nombre: "Aula 207" },
-  { id: 3, nombre: "Taller T2" },
-]
 
 export default function EditAsignacionModal({ isOpen, onClose, asignacion, onSubmit }: EditAsignacionModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [competencias, setCompetencias] = useState<Competencia[]>([])
+  const [ambientes, setAmbientes] = useState<Ambiente[]>([])
   const [formData, setFormData] = useState({
-    competencia: "",
-    ambiente: "",
-    es_lider: false,
+    competencia_id: "",
+    ambiente_excepcion_id: "",
+    es_lider_ficha: false,
   })
 
   useEffect(() => {
-    if (asignacion) {
+    if (isOpen && asignacion) {
       setFormData({
-        competencia: asignacion.competencia,
-        ambiente: asignacion.ambiente,
-        es_lider: asignacion.es_lider,
+        competencia_id: String(asignacion.competencia_id),
+        ambiente_excepcion_id: "",
+        es_lider_ficha: asignacion.es_lider,
       })
+      
+      // Cargar competencias del programa de la ficha
+      api.catalogo.getCompetenciasByPrograma(asignacion.ficha_id)
+        .then((res) => setCompetencias(res.data || []))
+        .catch(() => setCompetencias([]))
+
+      api.ambientes.getAll()
+        .then((res) => setAmbientes(res.data || []))
+        .catch(() => setAmbientes([]))
     }
-  }, [asignacion])
+  }, [isOpen, asignacion])
 
   if (!isOpen || !asignacion) return null
 
@@ -56,7 +62,12 @@ export default function EditAsignacionModal({ isOpen, onClose, asignacion, onSub
     e.preventDefault()
     setSubmitting(true)
     try {
-      await onSubmit(formData)
+      const payload = {
+        competencia_id: Number(formData.competencia_id),
+        ambiente_excepcion_id: formData.ambiente_excepcion_id ? Number(formData.ambiente_excepcion_id) : null,
+        es_lider_ficha: formData.es_lider_ficha,
+      }
+      await onSubmit(payload)
     } finally {
       setSubmitting(false)
     }
@@ -91,40 +102,42 @@ export default function EditAsignacionModal({ isOpen, onClose, asignacion, onSub
             <label className="block text-sm font-medium text-gray-700 mb-1">Competencia</label>
             <select
               required
-              value={formData.competencia}
-              onChange={(e) => handleChange("competencia", e.target.value)}
+              value={formData.competencia_id}
+              onChange={(e) => handleChange("competencia_id", e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
-              {COMPETENCIAS_MOCK.map((c) => (
-                <option key={c.id} value={c.nombre}>{c.nombre}</option>
+              {competencias.map((c) => (
+                <option key={c.id} value={c.id}>{c.nombre}</option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente (Excepción)</label>
             <select
-              value={formData.ambiente}
-              onChange={(e) => handleChange("ambiente", e.target.value)}
+              value={formData.ambiente_excepcion_id}
+              onChange={(e) => handleChange("ambiente_excepcion_id", e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
-              {AMBIENTES_MOCK.map((a) => (
-                <option key={a.id} value={a.nombre}>{a.nombre}</option>
+              <option value="">Usar ambiente de la ficha</option>
+              {ambientes.map((a) => (
+                <option key={a.id} value={a.id}>{a.nombre}</option>
               ))}
             </select>
+            <p className="text-xs text-gray-500 mt-1">Deja en blanco para usar el aula asignada a la ficha.</p>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => handleChange("es_lider", !formData.es_lider)}
+              onClick={() => handleChange("es_lider_ficha", !formData.es_lider_ficha)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                formData.es_lider ? "bg-sena" : "bg-gray-200"
+                formData.es_lider_ficha ? "bg-sena" : "bg-gray-200"
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  formData.es_lider ? "translate-x-6" : "translate-x-1"
+                  formData.es_lider_ficha ? "translate-x-6" : "translate-x-1"
                 }`}
               />
             </button>

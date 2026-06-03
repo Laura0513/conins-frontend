@@ -1,26 +1,45 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { ApiResponse } from '../utils/response.js';
+import { HorarioService } from '../services/horario.service.js';
 
-export const crear = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'horario.crear — TODO' });
+export const getAll = asyncHandler(async (_req: Request, res: Response) => {
+  const horarios = await HorarioService.getAll();
+  ApiResponse.success(res, horarios);
 });
 
-export const listar = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'horario.listar — TODO' });
+export const getById = asyncHandler(async (req: Request, res: Response) => {
+  const horario = await HorarioService.getById(Number(req.params.id));
+  ApiResponse.success(res, horario);
 });
 
-export const actualizar = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'horario.actualizar — TODO' });
+export const create = asyncHandler(async (req: Request, res: Response) => {
+  const result = await HorarioService.create(req.body);
+
+  const alertas: string[] = [];
+  if (result.alerta_ambiente_ocupado) alertas.push('AMBIENTE_OCUPADO');
+  if (result.alerta_jornada_restringida) alertas.push('JORNADA_RESTRINGIDA');
+
+  if (alertas.length > 0) {
+    return res.status(201).json({
+      success: true,
+      message: `Horario registrado con alertas: ${alertas.join(', ')}`,
+      data: result,
+      alertas,
+    });
+  }
+
+  ApiResponse.created(res, result, 'Horario registrado exitosamente');
 });
 
-export const deshabilitar = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'horario.deshabilitar — TODO' });
+export const update = asyncHandler(async (req: Request, res: Response) => {
+  const horario = await HorarioService.update(Number(req.params.id), req.body);
+  ApiResponse.success(res, horario, 'Horario actualizado exitosamente');
 });
 
-export const getMalla = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'horario.getMalla — TODO' });
-});
-
-export const suspender = asyncHandler(async (_req: Request, res: Response) => {
-  res.json({ message: 'horario.suspender — TODO' });
+export const toggleActivo = asyncHandler(async (req: Request, res: Response) => {
+  const { motivo } = req.body;
+  const result = await HorarioService.toggleActivo(Number(req.params.id), motivo);
+  const message = result.activo ? 'Horario habilitado' : 'Horario deshabilitado';
+  ApiResponse.success(res, result, message);
 });

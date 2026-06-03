@@ -1,10 +1,33 @@
 import { InstructorModel } from '../models/instructor.model.js';
 import { CompetenciaModel } from '../models/competencia.model.js';
-import { NotFoundError, ForbiddenError, ValidationError } from '../utils/errors.js';
+import { UsuarioModel } from '../models/usuario.model.js';
+import { NotFoundError, ForbiddenError, ValidationError, ConflictError } from '../utils/errors.js';
+import pool from '../config/db.js';
+
+function getLunesSemanaActual(): string {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const lunes = new Date(now);
+  lunes.setDate(now.getDate() + diff);
+  return lunes.toISOString().split('T')[0];
+}
 
 export const InstructorService = {
   async getAll() {
-    return InstructorModel.findAll();
+    const instructors = await InstructorModel.findAll();
+    const semana = getLunesSemanaActual();
+    const horasMap = await InstructorModel.getHorasSemanalesTodos(semana);
+    const result = [];
+    for (const i of instructors) {
+      const tieneNovedad = await InstructorModel.tieneNovedadActiva(i.usuario_id);
+      result.push({
+        ...i,
+        horas_semana: horasMap.get(i.id) ?? 0,
+        tiene_novedad: tieneNovedad,
+      });
+    }
+    return result;
   },
 
   async getById(id: number) {
@@ -77,5 +100,69 @@ export const InstructorService = {
 
     await InstructorModel.removeCompetencia(instructorId, competenciaId);
     return InstructorModel.getCompetenciasHabilitadas(instructorId);
+  },
+
+  async create(nombre: string, email: string, tipoContrato: string, tipoArea: string) {
+    const exists = await UsuarioModel.emailExists(email);
+    if (exists) throw new ConflictError('Ya existe un usuario con ese email');
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      const [userResult] = await conn.query(
+        'INSERT INTO usuarios (nombre, email) VALUES (?, ?)',
+        [nombre, email],
+      );
+      const usuarioId = (userResult as any).insertId;
+
+      await conn.query(
+        'INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (?, ?)',
+        [usuarioId, 5],
+      );
+
+      const [instResult] = await conn.query(
+        'INSERT INTO instructores (usuario_id, tipo_contrato, tipo_area) VALUES (?, ?, ?)',
+        [usuarioId, tipoContrato, tipoArea],
+      );
+
+      await conn.commit();
+      return { id: (instResult as any).insertId, usuario_id: usuarioId };
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  },
+
+  async registrarNovedad(
+    instructorId: number,
+    tipoNovedad: string,
+    fechaInicio: string,
+    fechaRegreso: string,
+    observacion?: string,
+  ) {
+    const instructor = await InstructorModel.findById(instructorId);
+    if (!instructor) throw new NotFoundError('Instructor no encontrado');
+
+    if (new Date(fechaRegreso) < new Date(fechaInicio)) {
+      throw new ValidationError('La fecha de regreso debe ser posterior a la fecha de inicio');
+    }
+
+    const novedadId = await InstructorModel.crearNovedad(
+      instructorId,
+      tipoNovedad,
+      fechaInicio,
+      fechaRegreso,
+      observacion,
+    );
+    return { id: novedadId, instructor_id: instructorId };
+  },
+
+  async getDetalle(instructorId: number) {
+    const detalle = await InstructorModel.getDetalle(instructorId);
+    if (!detalle) throw new NotFoundError('Instructor no encontrado');
+    return detalle;
   },
 };

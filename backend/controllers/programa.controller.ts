@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
-import pool from '../config/db.js';
+import { ProgramaModel } from '../models/programa.model.js';
 
 export const getAll = asyncHandler(async (_req: Request, res: Response) => {
-  const [rows] = await pool.query('SELECT id, nombre, tipo, capacidad FROM ambientes WHERE activo = TRUE ORDER BY nombre');
-  ApiResponse.success(res, rows);
+  const programas = await ProgramaModel.findAllSimple();
+  ApiResponse.success(res, programas);
 });
