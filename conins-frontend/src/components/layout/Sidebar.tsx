@@ -20,7 +20,7 @@ const menuItems = [
   { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
   { name: "Horarios", href: "/horarios", icon: Calendar },
   { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
-  { name: "Consultas", href: "/consultas", icon: Search },
+  { name: "Reportes", href: "/consultas", icon: Search },
   { name: "Usuarios", href: "/usuarios", icon: UserCog },
 ]
 
