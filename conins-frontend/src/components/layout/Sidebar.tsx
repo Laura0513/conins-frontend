@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 
 const menuItems = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Inicio", href: "/", icon: LayoutDashboard },
   { name: "Instructores", href: "/instructores", icon: Users },
   { name: "Ambientes", href: "/ambientes", icon: Building2 },
   { name: "Fichas", href: "/fichas", icon: BookOpen },
