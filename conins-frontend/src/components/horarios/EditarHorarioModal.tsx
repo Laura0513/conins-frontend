@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { X, Loader2, Clock, User, BookOpen, Hash } from "lucide-react"
 import { api } from "@/lib/api"
+import { useToast } from "@/lib/ToastContext"
 
 type Horario = {
   id: number
@@ -49,6 +50,7 @@ const DIAS_SEMANA = [
 ]
 
 export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit }: EditarHorarioModalProps) {
+  const { showToast } = useToast()
   const [submitting, setSubmitting] = useState(false)
   const [ambientes, setAmbientes] = useState<Ambiente[]>([])
   const [loading, setLoading] = useState(false)
@@ -58,7 +60,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
   // Para simplificar, permitimos cambiar el día y la hora.
   
   const [formData, setFormData] = useState({
-    dia_semana: "",
+    dia_ids: [] as number[],
     hora_inicio: "",
     hora_fin: "",
     jornada_id: "",
@@ -72,15 +74,13 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
         .then((res) => setAmbientes(res.data || []))
         .finally(() => setLoading(false))
 
-      // Intentar parsear datos existentes
-      // El backend devuelve 'dias' como array de strings ["Lun", "Mar"]
-      // Y 'horas' como string "06:00 - 12:00"
-      
-      let diaId = ""
+      // Mapear días del string a IDs
+      const selectedDayIds: number[] = []
       if (horario.dias && horario.dias.length > 0) {
-        const diaNombre = horario.dias[0]
-        const diaObj = DIAS_SEMANA.find(d => d.nombre === diaNombre)
-        if (diaObj) diaId = String(diaObj.id)
+        horario.dias.forEach(diaNombre => {
+          const diaObj = DIAS_SEMANA.find(d => d.nombre === diaNombre)
+          if (diaObj) selectedDayIds.push(diaObj.id)
+        })
       }
 
       let horaInicio = ""
@@ -98,7 +98,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
       if (jornadaObj) jornadaId = String(jornadaObj.id)
 
       setFormData({
-        dia_semana: diaId,
+        dia_ids: selectedDayIds,
         hora_inicio: horaInicio,
         hora_fin: horaFin,
         jornada_id: jornadaId,
@@ -111,10 +111,14 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (formData.dia_ids.length === 0) {
+      showToast("Selecciona al menos un día", "error")
+      return
+    }
     setSubmitting(true)
     try {
       const payload = {
-        dia_semana: Number(formData.dia_semana),
+        dia_ids: formData.dia_ids,
         hora_inicio: formData.hora_inicio,
         hora_fin: formData.hora_fin,
         jornada_id: Number(formData.jornada_id),
@@ -124,6 +128,15 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const toggleDay = (diaId: number) => {
+    setFormData(prev => ({
+      ...prev,
+      dia_ids: prev.dia_ids.includes(diaId)
+        ? prev.dia_ids.filter(id => id !== diaId)
+        : [...prev.dia_ids, diaId].sort()
+    }))
   }
 
   const handleChange = (field: string, value: any) => {
@@ -165,15 +178,15 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
           ) : (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Día de la semana <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Días de la semana <span className="text-red-500">*</span></label>
                 <div className="flex flex-wrap gap-2">
                   {DIAS_SEMANA.map((d) => (
                     <button
                       key={d.id}
                       type="button"
-                      onClick={() => handleChange("dia_semana", String(d.id))}
+                      onClick={() => toggleDay(d.id)}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
-                        Number(formData.dia_semana) === d.id
+                        formData.dia_ids.includes(d.id)
                           ? "bg-gray-800 text-white border-gray-800"
                           : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
                       }`}
@@ -182,6 +195,9 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
                     </button>
                   ))}
                 </div>
+                {formData.dia_ids.length === 0 && (
+                  <p className="text-xs text-red-500 mt-1">Selecciona al menos un día</p>
+                )}
               </div>
 
               <div>

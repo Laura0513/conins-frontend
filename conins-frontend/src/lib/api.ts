@@ -26,6 +26,13 @@ async function apiFetch(path: string, options: RequestInit = {}) {
         },
     })
 
+    // Verificar si la respuesta es JSON antes de intentar parsearla
+    const contentType = response.headers.get('content-type')
+    if (!contentType || !contentType.includes('application/json')) {
+        // Si el backend devuelve HTML (ej: error 404/500 no manejado), lanzamos error controlado
+        throw new Error('El servidor no respondió con datos válidos (Backend no disponible o ruta inexistente)')
+    }
+
     const data = await response.json()
 
     if (!response.ok) {
