@@ -32,14 +32,14 @@ export default function Sidebar({ alertasViewed }: SidebarProps) {
   const router = useRouter()
 
   return (
-    <aside className="w-64 bg-sena text-white flex flex-col h-screen fixed left-0 top-0">
+    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0">
       {/* Logo y titulo */}
-      <div className="p-6 border-b border-white/20">
+      <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
           <img src="/logoSena.png" alt="SENA" className="w-12 h-auto" />
           <div>
-            <h1 className="font-bold text-lg leading-tight">CONINS</h1>
-            <p className="text-xs text-white/80">CDMC · SENA</p>
+            <h1 className="font-bold text-lg leading-tight text-gray-900">CONINS</h1>
+            <p className="text-xs text-gray-500">CDMC · SENA</p>
           </div>
         </div>
       </div>
@@ -56,14 +56,14 @@ export default function Sidebar({ alertasViewed }: SidebarProps) {
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-white/20 text-white shadow-sm"
-                  : "text-white/80 hover:bg-white/10 hover:text-white"
+                  ? "bg-sena/10 text-sena shadow-sm"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               }`}
             >
               <Icon className="w-5 h-5" />
               <span>{item.name}</span>
               {item.badge && !alertasViewed && (
-                <span className="ml-auto bg-white text-sena text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="ml-auto bg-sena text-white text-xs font-bold px-2 py-0.5 rounded-full">
                   {item.badge}
                 </span>
               )}
@@ -73,8 +73,8 @@ export default function Sidebar({ alertasViewed }: SidebarProps) {
       </nav>
 
       {/* Footer del sidebar */}
-      <div className="p-4 border-t border-white/20">
-        <p className="text-xs text-white/60 text-center">
+      <div className="p-4 border-t border-gray-200">
+        <p className="text-xs text-gray-400 text-center">
           CONINS v0.1 · CDMC SENA
         </p>
       </div>
