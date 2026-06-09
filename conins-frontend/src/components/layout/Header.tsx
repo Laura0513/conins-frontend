@@ -50,7 +50,7 @@ export default function Header({ alertasViewed, onViewAlertas }: HeaderProps) {
       <div className="flex items-center gap-2 text-sm text-gray-500">
         <span>CONINS</span>
         <span>·</span>
-        <span className="text-gray-900 font-semibold">Dashboard</span>
+        <span className="text-gray-900 font-semibold">Inicio</span>
       </div>
 
       <div className="flex items-center gap-6">
