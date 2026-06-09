@@ -261,6 +261,18 @@ export const api = {
             })
         },
     },
+
+    consultas: {
+        getCargaHoraria() {
+            return apiFetch('/consultas/carga-horaria')
+        },
+        getHorariosPorFicha() {
+            return apiFetch('/consultas/horarios-ficha')
+        },
+        getOcupacionAmbientes() {
+            return apiFetch('/consultas/ocupacion-ambientes')
+        },
+    },
 }
 
 export type ApiResponse<T = unknown> = {
