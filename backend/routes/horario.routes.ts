@@ -31,4 +31,10 @@ router.patch(
   horarioController.toggleActivo,
 );
 
+router.put(
+  '/:id',
+  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR, ROLES.COORDINADOR_TRANSVERSAL]),
+  horarioController.updateMultiDia,
+);
+
 export default router;

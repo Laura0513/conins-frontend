@@ -1,7 +1,7 @@
 -- ============================================================
 -- CONINS - Control Instructores SENA CDMC
 -- Base de datos: conIns
--- Schema: v4
+-- Schema: v5 — con auditoria, triggers, procedures, vistas, utf8mb4
 -- ============================================================
 
 CREATE DATABASE IF NOT EXISTS conIns
@@ -94,13 +94,6 @@ CREATE TABLE IF NOT EXISTS usuario_roles (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (rol_id)     REFERENCES roles(id)    ON DELETE RESTRICT
 ) ENGINE=InnoDB;
-
--- Admin inicial: password = 'Admin2026!' (bcrypt)
-INSERT IGNORE INTO usuarios (id, nombre, email, password) VALUES
-(1, 'Administrador', 'admin@conins.sena', '$2b$10$6SGt41o5yycSr3yLoDLcG.sfVJ3R411abaYXvNPPbLoAFH.wW7PS.');
-
--- Admin tiene rol Subdirector por defecto
-INSERT IGNORE INTO usuario_roles (usuario_id, rol_id) VALUES (1, 1);
 
 -- ============================================================
 -- 5. INSTRUCTORES (perfil extendido de usuarios)
@@ -303,6 +296,7 @@ CREATE TABLE IF NOT EXISTS horarios (
     ficha_id      INT NOT NULL,
     instructor_id INT NOT NULL,
     competencia_id INT NOT NULL,
+    ambiente_id   INT NULL COMMENT 'NULL para fichas virtuales (RN-14)',
     dia_semana    TINYINT UNSIGNED NOT NULL COMMENT '1=Lunes ... 7=Domingo',
     hora_inicio   TIME NOT NULL,
     hora_fin      TIME NOT NULL,
@@ -313,6 +307,7 @@ CREATE TABLE IF NOT EXISTS horarios (
     FOREIGN KEY (ficha_id)       REFERENCES fichas(id)       ON DELETE CASCADE,
     FOREIGN KEY (instructor_id)  REFERENCES instructores(id) ON DELETE CASCADE,
     FOREIGN KEY (competencia_id) REFERENCES competencias(id) ON DELETE RESTRICT,
+    FOREIGN KEY (ambiente_id)    REFERENCES ambientes(id)    ON DELETE SET NULL,
     FOREIGN KEY (jornada_id)     REFERENCES jornadas(id)     ON DELETE RESTRICT,
     INDEX idx_semana_instructor (semana, instructor_id)
 ) ENGINE=InnoDB;
@@ -334,6 +329,7 @@ CREATE TABLE IF NOT EXISTS alertas (
     semana        DATE         NOT NULL COMMENT 'Fecha del lunes de la semana afectada',
     total_horas   DECIMAL(5,2) NOT NULL,
     atendida      BOOLEAN NOT NULL DEFAULT FALSE,
+    leida         BOOLEAN NOT NULL DEFAULT FALSE,
     created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_alerta_semana_tipo (instructor_id, semana, tipo),
     FOREIGN KEY (instructor_id) REFERENCES instructores(id) ON DELETE CASCADE
@@ -387,3 +383,771 @@ CREATE TABLE IF NOT EXISTS notificaciones (
     INDEX idx_usuario_leida (usuario_id, leida)
 ) ENGINE=InnoDB;
 
+
+-- ============================================================
+-- 20. AUDITORIA (Bitácora del sistema)
+-- Registra todas las operaciones CRUD en tablas críticas.
+-- datos_anteriores/datos_nuevos: JSON con el estado antes/después.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS auditoria (
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id       INT NULL COMMENT 'NULL si es acción del sistema/trigger',
+    accion           ENUM('INSERT','UPDATE','DELETE') NOT NULL,
+    tabla_afectada   VARCHAR(60) NOT NULL,
+    registro_id      INT NULL COMMENT 'ID del registro afectado',
+    datos_anteriores JSON NULL COMMENT 'Estado antes del cambio (UPDATE/DELETE)',
+    datos_nuevos     JSON NULL COMMENT 'Estado después del cambio (INSERT/UPDATE)',
+    ip               VARCHAR(45) NULL COMMENT 'IPv4 o IPv6 del cliente',
+    user_agent       VARCHAR(255) NULL COMMENT 'Navegador/cliente HTTP',
+    fecha            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_usuario_fecha (usuario_id, fecha),
+    INDEX idx_tabla_fecha (tabla_afectada, fecha),
+    INDEX idx_fecha (fecha)
+) ENGINE=InnoDB;
+
+-- ============================================================
+-- 21. TRIGGERS DE AUDITORÍA
+-- Generan registros automáticos en la tabla auditoria.
+-- ============================================================
+
+-- --- Instructores ---
+DROP TRIGGER IF EXISTS tr_instructores_after_insert;
+DELIMITER $$
+CREATE TRIGGER tr_instructores_after_insert
+AFTER INSERT ON instructores
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
+    VALUES (@audit_usuario_id, 'INSERT', 'instructores', NEW.id,
+            JSON_OBJECT('usuario_id', NEW.usuario_id, 'tipo_contrato', NEW.tipo_contrato, 'tipo_area', NEW.tipo_area, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_instructores_after_update;
+DELIMITER $$
+CREATE TRIGGER tr_instructores_after_update
+AFTER UPDATE ON instructores
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
+    VALUES (@audit_usuario_id, 'UPDATE', 'instructores', NEW.id,
+            JSON_OBJECT('usuario_id', OLD.usuario_id, 'tipo_contrato', OLD.tipo_contrato, 'tipo_area', OLD.tipo_area, 'activo', OLD.activo),
+            JSON_OBJECT('usuario_id', NEW.usuario_id, 'tipo_contrato', NEW.tipo_contrato, 'tipo_area', NEW.tipo_area, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_instructores_after_delete;
+DELIMITER $$
+CREATE TRIGGER tr_instructores_after_delete
+AFTER DELETE ON instructores
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
+    VALUES (@audit_usuario_id, 'DELETE', 'instructores', OLD.id,
+            JSON_OBJECT('usuario_id', OLD.usuario_id, 'tipo_contrato', OLD.tipo_contrato, 'tipo_area', OLD.tipo_area, 'activo', OLD.activo));
+END$$
+DELIMITER ;
+
+-- --- Usuarios ---
+DROP TRIGGER IF EXISTS tr_usuarios_after_insert;
+DELIMITER $$
+CREATE TRIGGER tr_usuarios_after_insert
+AFTER INSERT ON usuarios
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
+    VALUES (@audit_usuario_id, 'INSERT', 'usuarios', NEW.id,
+            JSON_OBJECT('nombre', NEW.nombre, 'email', NEW.email, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_usuarios_after_update;
+DELIMITER $$
+CREATE TRIGGER tr_usuarios_after_update
+AFTER UPDATE ON usuarios
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
+    VALUES (@audit_usuario_id, 'UPDATE', 'usuarios', NEW.id,
+            JSON_OBJECT('nombre', OLD.nombre, 'email', OLD.email, 'activo', OLD.activo),
+            JSON_OBJECT('nombre', NEW.nombre, 'email', NEW.email, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_usuarios_after_delete;
+DELIMITER $$
+CREATE TRIGGER tr_usuarios_after_delete
+AFTER DELETE ON usuarios
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
+    VALUES (@audit_usuario_id, 'DELETE', 'usuarios', OLD.id,
+            JSON_OBJECT('nombre', OLD.nombre, 'email', OLD.email, 'activo', OLD.activo));
+END$$
+DELIMITER ;
+
+-- --- Asignacion ---
+DROP TRIGGER IF EXISTS tr_asignacion_after_insert;
+DELIMITER $$
+CREATE TRIGGER tr_asignacion_after_insert
+AFTER INSERT ON asignacion
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
+    VALUES (@audit_usuario_id, 'INSERT', 'asignacion', NEW.id,
+            JSON_OBJECT('instructor_id', NEW.instructor_id, 'ficha_id', NEW.ficha_id, 'es_lider_ficha', NEW.es_lider_ficha, 'es_provisional', NEW.es_provisional, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_asignacion_after_update;
+DELIMITER $$
+CREATE TRIGGER tr_asignacion_after_update
+AFTER UPDATE ON asignacion
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
+    VALUES (@audit_usuario_id, 'UPDATE', 'asignacion', NEW.id,
+            JSON_OBJECT('instructor_id', OLD.instructor_id, 'ficha_id', OLD.ficha_id, 'es_lider_ficha', OLD.es_lider_ficha, 'es_provisional', OLD.es_provisional, 'activo', OLD.activo),
+            JSON_OBJECT('instructor_id', NEW.instructor_id, 'ficha_id', NEW.ficha_id, 'es_lider_ficha', NEW.es_lider_ficha, 'es_provisional', NEW.es_provisional, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_asignacion_after_delete;
+DELIMITER $$
+CREATE TRIGGER tr_asignacion_after_delete
+AFTER DELETE ON asignacion
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
+    VALUES (@audit_usuario_id, 'DELETE', 'asignacion', OLD.id,
+            JSON_OBJECT('instructor_id', OLD.instructor_id, 'ficha_id', OLD.ficha_id, 'es_lider_ficha', OLD.es_lider_ficha, 'es_provisional', OLD.es_provisional, 'activo', OLD.activo));
+END$$
+DELIMITER ;
+
+-- --- Horarios ---
+DROP TRIGGER IF EXISTS tr_horarios_after_insert;
+DELIMITER $$
+CREATE TRIGGER tr_horarios_after_insert
+AFTER INSERT ON horarios
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
+    VALUES (@audit_usuario_id, 'INSERT', 'horarios', NEW.id,
+            JSON_OBJECT('ficha_id', NEW.ficha_id, 'instructor_id', NEW.instructor_id, 'competencia_id', NEW.competencia_id, 'ambiente_id', NEW.ambiente_id, 'dia_semana', NEW.dia_semana, 'hora_inicio', NEW.hora_inicio, 'hora_fin', NEW.hora_fin, 'jornada_id', NEW.jornada_id, 'semana', NEW.semana, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_horarios_after_update;
+DELIMITER $$
+CREATE TRIGGER tr_horarios_after_update
+AFTER UPDATE ON horarios
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
+    VALUES (@audit_usuario_id, 'UPDATE', 'horarios', NEW.id,
+            JSON_OBJECT('ficha_id', OLD.ficha_id, 'instructor_id', OLD.instructor_id, 'competencia_id', OLD.competencia_id, 'ambiente_id', OLD.ambiente_id, 'dia_semana', OLD.dia_semana, 'hora_inicio', OLD.hora_inicio, 'hora_fin', OLD.hora_fin, 'jornada_id', OLD.jornada_id, 'semana', OLD.semana, 'activo', OLD.activo, 'motivo_suspension', OLD.motivo_suspension),
+            JSON_OBJECT('ficha_id', NEW.ficha_id, 'instructor_id', NEW.instructor_id, 'competencia_id', NEW.competencia_id, 'ambiente_id', NEW.ambiente_id, 'dia_semana', NEW.dia_semana, 'hora_inicio', NEW.hora_inicio, 'hora_fin', NEW.hora_fin, 'jornada_id', NEW.jornada_id, 'semana', NEW.semana, 'activo', NEW.activo, 'motivo_suspension', NEW.motivo_suspension));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_horarios_after_delete;
+DELIMITER $$
+CREATE TRIGGER tr_horarios_after_delete
+AFTER DELETE ON horarios
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
+    VALUES (@audit_usuario_id, 'DELETE', 'horarios', OLD.id,
+            JSON_OBJECT('ficha_id', OLD.ficha_id, 'instructor_id', OLD.instructor_id, 'competencia_id', OLD.competencia_id, 'ambiente_id', OLD.ambiente_id, 'dia_semana', OLD.dia_semana, 'hora_inicio', OLD.hora_inicio, 'hora_fin', OLD.hora_fin, 'jornada_id', OLD.jornada_id, 'semana', OLD.semana, 'activo', OLD.activo));
+END$$
+DELIMITER ;
+
+-- --- Fichas ---
+DROP TRIGGER IF EXISTS tr_fichas_after_insert;
+DELIMITER $$
+CREATE TRIGGER tr_fichas_after_insert
+AFTER INSERT ON fichas
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
+    VALUES (@audit_usuario_id, 'INSERT', 'fichas', NEW.id,
+            JSON_OBJECT('numero_ficha', NEW.numero_ficha, 'programa_id', NEW.programa_id, 'jornada_id', NEW.jornada_id, 'ambiente_id', NEW.ambiente_id, 'etapa', NEW.etapa, 'estado', NEW.estado, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_fichas_after_update;
+DELIMITER $$
+CREATE TRIGGER tr_fichas_after_update
+AFTER UPDATE ON fichas
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
+    VALUES (@audit_usuario_id, 'UPDATE', 'fichas', NEW.id,
+            JSON_OBJECT('numero_ficha', OLD.numero_ficha, 'programa_id', OLD.programa_id, 'jornada_id', OLD.jornada_id, 'ambiente_id', OLD.ambiente_id, 'etapa', OLD.etapa, 'estado', OLD.estado, 'activo', OLD.activo),
+            JSON_OBJECT('numero_ficha', NEW.numero_ficha, 'programa_id', NEW.programa_id, 'jornada_id', NEW.jornada_id, 'ambiente_id', NEW.ambiente_id, 'etapa', NEW.etapa, 'estado', NEW.estado, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_fichas_after_delete;
+DELIMITER $$
+CREATE TRIGGER tr_fichas_after_delete
+AFTER DELETE ON fichas
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
+    VALUES (@audit_usuario_id, 'DELETE', 'fichas', OLD.id,
+            JSON_OBJECT('numero_ficha', OLD.numero_ficha, 'programa_id', OLD.programa_id, 'jornada_id', OLD.jornada_id, 'ambiente_id', OLD.ambiente_id, 'etapa', OLD.etapa, 'estado', OLD.estado, 'activo', OLD.activo));
+END$$
+DELIMITER ;
+
+-- --- Ambientes ---
+DROP TRIGGER IF EXISTS tr_ambientes_after_insert;
+DELIMITER $$
+CREATE TRIGGER tr_ambientes_after_insert
+AFTER INSERT ON ambientes
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
+    VALUES (@audit_usuario_id, 'INSERT', 'ambientes', NEW.id,
+            JSON_OBJECT('nombre', NEW.nombre, 'tipo', NEW.tipo, 'capacidad', NEW.capacidad, 'area_id', NEW.area_id, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_ambientes_after_update;
+DELIMITER $$
+CREATE TRIGGER tr_ambientes_after_update
+AFTER UPDATE ON ambientes
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
+    VALUES (@audit_usuario_id, 'UPDATE', 'ambientes', NEW.id,
+            JSON_OBJECT('nombre', OLD.nombre, 'tipo', OLD.tipo, 'capacidad', OLD.capacidad, 'area_id', OLD.area_id, 'activo', OLD.activo),
+            JSON_OBJECT('nombre', NEW.nombre, 'tipo', NEW.tipo, 'capacidad', NEW.capacidad, 'area_id', NEW.area_id, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_ambientes_after_delete;
+DELIMITER $$
+CREATE TRIGGER tr_ambientes_after_delete
+AFTER DELETE ON ambientes
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
+    VALUES (@audit_usuario_id, 'DELETE', 'ambientes', OLD.id,
+            JSON_OBJECT('nombre', OLD.nombre, 'tipo', OLD.tipo, 'capacidad', OLD.capacidad, 'area_id', OLD.area_id, 'activo', OLD.activo));
+END$$
+DELIMITER ;
+
+-- --- Asignacion Competencia ---
+DROP TRIGGER IF EXISTS tr_asignacion_competencia_after_insert;
+DELIMITER $$
+CREATE TRIGGER tr_asignacion_competencia_after_insert
+AFTER INSERT ON asignacion_competencia
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
+    VALUES (@audit_usuario_id, 'INSERT', 'asignacion_competencia', NEW.id,
+            JSON_OBJECT('asignacion_id', NEW.asignacion_id, 'competencia_id', NEW.competencia_id, 'instructor_anterior_id', NEW.instructor_anterior_id, 'fecha_cambio', NEW.fecha_cambio, 'ambiente_excepcion_id', NEW.ambiente_excepcion_id, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_asignacion_competencia_after_update;
+DELIMITER $$
+CREATE TRIGGER tr_asignacion_competencia_after_update
+AFTER UPDATE ON asignacion_competencia
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
+    VALUES (@audit_usuario_id, 'UPDATE', 'asignacion_competencia', NEW.id,
+            JSON_OBJECT('asignacion_id', OLD.asignacion_id, 'competencia_id', OLD.competencia_id, 'instructor_anterior_id', OLD.instructor_anterior_id, 'fecha_cambio', OLD.fecha_cambio, 'ambiente_excepcion_id', OLD.ambiente_excepcion_id, 'activo', OLD.activo),
+            JSON_OBJECT('asignacion_id', NEW.asignacion_id, 'competencia_id', NEW.competencia_id, 'instructor_anterior_id', NEW.instructor_anterior_id, 'fecha_cambio', NEW.fecha_cambio, 'ambiente_excepcion_id', NEW.ambiente_excepcion_id, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_asignacion_competencia_after_delete;
+DELIMITER $$
+CREATE TRIGGER tr_asignacion_competencia_after_delete
+AFTER DELETE ON asignacion_competencia
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
+    VALUES (@audit_usuario_id, 'DELETE', 'asignacion_competencia', OLD.id,
+            JSON_OBJECT('asignacion_id', OLD.asignacion_id, 'competencia_id', OLD.competencia_id, 'instructor_anterior_id', OLD.instructor_anterior_id, 'fecha_cambio', OLD.fecha_cambio, 'ambiente_excepcion_id', OLD.ambiente_excepcion_id, 'activo', OLD.activo));
+END$$
+DELIMITER ;
+
+-- --- Instructor Novedades ---
+DROP TRIGGER IF EXISTS tr_instructor_novedades_after_insert;
+DELIMITER $$
+CREATE TRIGGER tr_instructor_novedades_after_insert
+AFTER INSERT ON instructor_novedades
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
+    VALUES (@audit_usuario_id, 'INSERT', 'instructor_novedades', NEW.id,
+            JSON_OBJECT('instructor_id', NEW.instructor_id, 'tipo_novedad', NEW.tipo_novedad, 'fecha_inicio', NEW.fecha_inicio, 'fecha_regreso', NEW.fecha_regreso, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_instructor_novedades_after_update;
+DELIMITER $$
+CREATE TRIGGER tr_instructor_novedades_after_update
+AFTER UPDATE ON instructor_novedades
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
+    VALUES (@audit_usuario_id, 'UPDATE', 'instructor_novedades', NEW.id,
+            JSON_OBJECT('instructor_id', OLD.instructor_id, 'tipo_novedad', OLD.tipo_novedad, 'fecha_inicio', OLD.fecha_inicio, 'fecha_regreso', OLD.fecha_regreso, 'activo', OLD.activo),
+            JSON_OBJECT('instructor_id', NEW.instructor_id, 'tipo_novedad', NEW.tipo_novedad, 'fecha_inicio', NEW.fecha_inicio, 'fecha_regreso', NEW.fecha_regreso, 'activo', NEW.activo));
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_instructor_novedades_after_delete;
+DELIMITER $$
+CREATE TRIGGER tr_instructor_novedades_after_delete
+AFTER DELETE ON instructor_novedades
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
+    VALUES (@audit_usuario_id, 'DELETE', 'instructor_novedades', OLD.id,
+            JSON_OBJECT('instructor_id', OLD.instructor_id, 'tipo_novedad', OLD.tipo_novedad, 'fecha_inicio', OLD.fecha_inicio, 'fecha_regreso', OLD.fecha_regreso, 'activo', OLD.activo));
+END$$
+DELIMITER ;
+
+-- ============================================================
+-- 22. TRIGGERS DE VALIDACIÓN
+-- Bloquean operaciones que violan reglas de negocio.
+-- ============================================================
+
+-- --- Validar solapamiento de horarios (RN-04) ---
+DROP TRIGGER IF EXISTS tr_validar_solapamiento_before_insert;
+DELIMITER $$
+CREATE TRIGGER tr_validar_solapamiento_before_insert
+BEFORE INSERT ON horarios
+FOR EACH ROW
+BEGIN
+    DECLARE overlap_count INT;
+    SELECT COUNT(*) INTO overlap_count
+    FROM horarios
+    WHERE instructor_id = NEW.instructor_id
+      AND dia_semana = NEW.dia_semana
+      AND semana = NEW.semana
+      AND activo = TRUE
+      AND hora_inicio < NEW.hora_fin
+      AND hora_fin > NEW.hora_inicio;
+    IF overlap_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'RN-04: El instructor ya tiene un horario en ese día y franja horaria';
+    END IF;
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_validar_solapamiento_before_update;
+DELIMITER $$
+CREATE TRIGGER tr_validar_solapamiento_before_update
+BEFORE UPDATE ON horarios
+FOR EACH ROW
+BEGIN
+    DECLARE overlap_count INT;
+    SELECT COUNT(*) INTO overlap_count
+    FROM horarios
+    WHERE instructor_id = NEW.instructor_id
+      AND dia_semana = NEW.dia_semana
+      AND semana = NEW.semana
+      AND activo = TRUE
+      AND id != NEW.id
+      AND hora_inicio < NEW.hora_fin
+      AND hora_fin > NEW.hora_inicio;
+    IF overlap_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'RN-04: El instructor ya tiene un horario en ese día y franja horaria';
+    END IF;
+END$$
+DELIMITER ;
+
+-- --- Validar ambiente ocupado (RN-05) ---
+DROP TRIGGER IF EXISTS tr_validar_ambiente_ocupado_before_insert;
+DELIMITER $$
+CREATE TRIGGER tr_validar_ambiente_ocupado_before_insert
+BEFORE INSERT ON horarios
+FOR EACH ROW
+BEGIN
+    DECLARE ocupado_count INT;
+    IF NEW.ambiente_id IS NOT NULL THEN
+        SELECT COUNT(*) INTO ocupado_count
+        FROM horarios
+        WHERE ambiente_id = NEW.ambiente_id
+          AND dia_semana = NEW.dia_semana
+          AND jornada_id = NEW.jornada_id
+          AND semana = NEW.semana
+          AND activo = TRUE;
+        IF ocupado_count > 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'RN-05: El ambiente ya está ocupado en esa jornada y día';
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS tr_validar_ambiente_ocupado_before_update;
+DELIMITER $$
+CREATE TRIGGER tr_validar_ambiente_ocupado_before_update
+BEFORE UPDATE ON horarios
+FOR EACH ROW
+BEGIN
+    DECLARE ocupado_count INT;
+    IF NEW.ambiente_id IS NOT NULL THEN
+        SELECT COUNT(*) INTO ocupado_count
+        FROM horarios
+        WHERE ambiente_id = NEW.ambiente_id
+          AND dia_semana = NEW.dia_semana
+          AND jornada_id = NEW.jornada_id
+          AND semana = NEW.semana
+          AND activo = TRUE
+          AND id != NEW.id;
+        IF ocupado_count > 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'RN-05: El ambiente ya está ocupado en esa jornada y día';
+        END IF;
+    END IF;
+END$$
+DELIMITER ;
+
+-- ============================================================
+-- 23. PROCEDIMIENTOS ALMACENADOS
+-- ============================================================
+
+-- --- sp_crear_instructor: Crea usuario + instructor en transacción ---
+DROP PROCEDURE IF EXISTS sp_crear_instructor;
+DELIMITER $$
+CREATE PROCEDURE sp_crear_instructor(
+    IN p_nombre VARCHAR(100),
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_tipo_contrato VARCHAR(20),
+    IN p_tipo_area VARCHAR(20),
+    OUT p_usuario_id INT,
+    OUT p_instructor_id INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO usuarios (nombre, email, password)
+    VALUES (p_nombre, p_email, p_password);
+    SET p_usuario_id = LAST_INSERT_ID();
+
+    INSERT INTO instructores (usuario_id, tipo_contrato, tipo_area)
+    VALUES (p_usuario_id, p_tipo_contrato, p_tipo_area);
+    SET p_instructor_id = LAST_INSERT_ID();
+
+    INSERT INTO usuario_roles (usuario_id, rol_id)
+    VALUES (p_usuario_id, 5);
+
+    COMMIT;
+END$$
+DELIMITER ;
+
+-- --- sp_asignar_competencias: Asigna competencias a una asignación ---
+DROP PROCEDURE IF EXISTS sp_asignar_competencias;
+DELIMITER $$
+CREATE PROCEDURE sp_asignar_competencias(
+    IN p_instructor_id INT,
+    IN p_ficha_id INT,
+    IN p_competencia_ids JSON,
+    IN p_es_lider_ficha BOOLEAN,
+    OUT p_asignacion_id INT
+)
+BEGIN
+    DECLARE v_i INT DEFAULT 0;
+    DECLARE v_count INT;
+    DECLARE v_comp_id INT;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO asignacion (instructor_id, ficha_id, es_lider_ficha, fecha_asignacion)
+    VALUES (p_instructor_id, p_ficha_id, p_es_lider_ficha, CURDATE());
+    SET p_asignacion_id = LAST_INSERT_ID();
+
+    SET v_count = JSON_LENGTH(p_competencia_ids);
+
+    WHILE v_i < v_count DO
+        SET v_comp_id = JSON_EXTRACT(p_competencia_ids, CONCAT('$[', v_i, ']'));
+        INSERT INTO asignacion_competencia (asignacion_id, competencia_id)
+        VALUES (p_asignacion_id, v_comp_id);
+        SET v_i = v_i + 1;
+    END WHILE;
+
+    COMMIT;
+END$$
+DELIMITER ;
+
+-- --- sp_registrar_novedad: Registra novedad + desactiva horarios ---
+DROP PROCEDURE IF EXISTS sp_registrar_novedad;
+DELIMITER $$
+CREATE PROCEDURE sp_registrar_novedad(
+    IN p_instructor_id INT,
+    IN p_tipo_novedad VARCHAR(20),
+    IN p_fecha_inicio DATE,
+    IN p_fecha_regreso DATE,
+    IN p_observacion TEXT,
+    OUT p_novedad_id INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    INSERT INTO instructor_novedades (instructor_id, tipo_novedad, fecha_inicio, fecha_regreso, observacion)
+    VALUES (p_instructor_id, p_tipo_novedad, p_fecha_inicio, p_fecha_regreso, p_observacion);
+    SET p_novedad_id = LAST_INSERT_ID();
+
+    UPDATE horarios
+    SET activo = FALSE, motivo_suspension = CONCAT('Novedad: ', p_tipo_novedad)
+    WHERE instructor_id = p_instructor_id
+      AND activo = TRUE
+      AND semana >= p_fecha_inicio
+      AND semana <= p_fecha_regreso;
+
+    COMMIT;
+END$$
+DELIMITER ;
+
+-- --- sp_desactivar_asignacion: Desactiva asignación + competencias + trazabilidad ---
+DROP PROCEDURE IF EXISTS sp_desactivar_asignacion;
+DELIMITER $$
+CREATE PROCEDURE sp_desactivar_asignacion(
+    IN p_asignacion_id INT,
+    IN p_motivo TEXT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE asignacion_competencia
+    SET activo = FALSE, observacion = COALESCE(observacion, p_motivo)
+    WHERE asignacion_id = p_asignacion_id AND activo = TRUE;
+
+    UPDATE asignacion
+    SET activo = FALSE
+    WHERE id = p_asignacion_id;
+
+    UPDATE horarios
+    SET activo = FALSE, motivo_suspension = COALESCE(motivo_suspension, p_motivo)
+    WHERE ficha_id = (SELECT ficha_id FROM asignacion WHERE id = p_asignacion_id)
+      AND instructor_id = (SELECT instructor_id FROM asignacion WHERE id = p_asignacion_id)
+      AND activo = TRUE;
+
+    COMMIT;
+END$$
+DELIMITER ;
+
+-- --- sp_finalizar_ficha: Finaliza ficha + desactiva asignaciones ---
+DROP PROCEDURE IF EXISTS sp_finalizar_ficha;
+DELIMITER $$
+CREATE PROCEDURE sp_finalizar_ficha(
+    IN p_ficha_id INT
+)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    UPDATE fichas
+    SET estado = 'Finalizada', fecha_fin_ficha = CURDATE()
+    WHERE id = p_ficha_id;
+
+    UPDATE asignacion
+    SET activo = FALSE
+    WHERE ficha_id = p_ficha_id AND activo = TRUE;
+
+    UPDATE asignacion_competencia ac
+    JOIN asignacion a ON ac.asignacion_id = a.id
+    SET ac.activo = FALSE
+    WHERE a.ficha_id = p_ficha_id AND ac.activo = TRUE;
+
+    UPDATE horarios
+    SET activo = FALSE
+    WHERE ficha_id = p_ficha_id AND activo = TRUE;
+
+    COMMIT;
+END$$
+DELIMITER ;
+
+-- ============================================================
+-- 24. VISTAS
+-- Consultas predefinidas para reportes y dashboards.
+-- ============================================================
+
+-- --- vw_carga_horaria_instructor: Horas semanales por instructor ---
+CREATE OR REPLACE VIEW vw_carga_horaria_instructor AS
+SELECT
+    i.id AS instructor_id,
+    u.nombre AS instructor_nombre,
+    i.tipo_contrato,
+    i.tipo_area,
+    h.semana,
+    COUNT(DISTINCT h.dia_semana) AS dias_trabajados,
+    COALESCE(SUM(TIMESTAMPDIFF(MINUTE, h.hora_inicio, h.hora_fin)) / 60, 0) AS total_horas_semana,
+    COUNT(DISTINCT h.ficha_id) AS fichas_asignadas,
+    i.activo AS instructor_activo
+FROM instructores i
+JOIN usuarios u ON i.usuario_id = u.id
+LEFT JOIN horarios h ON h.instructor_id = i.id AND h.activo = TRUE
+GROUP BY i.id, u.nombre, i.tipo_contrato, i.tipo_area, h.semana, i.activo;
+
+-- --- vw_ambientes_ocupados: Ambientes con horarios activos ---
+CREATE OR REPLACE VIEW vw_ambientes_ocupados AS
+SELECT
+    ab.id AS ambiente_id,
+    ab.nombre AS ambiente_nombre,
+    ab.tipo AS ambiente_tipo,
+    ab.capacidad,
+    h.dia_semana,
+    j.nombre AS jornada_nombre,
+    h.hora_inicio,
+    h.hora_fin,
+    h.ficha_id,
+    f.numero_ficha,
+    h.instructor_id,
+    u.nombre AS instructor_nombre,
+    h.semana
+FROM ambientes ab
+JOIN horarios h ON h.ambiente_id = ab.id AND h.activo = TRUE
+JOIN jornadas j ON h.jornada_id = j.id
+JOIN fichas f ON h.ficha_id = f.id
+JOIN instructores i ON h.instructor_id = i.id
+JOIN usuarios u ON i.usuario_id = u.id
+WHERE ab.activo = TRUE;
+
+-- --- vw_asignaciones_activas: Asignaciones activas con detalle ---
+CREATE OR REPLACE VIEW vw_asignaciones_activas AS
+SELECT
+    a.id AS asignacion_id,
+    u.nombre AS instructor_nombre,
+    i.tipo_contrato,
+    f.numero_ficha,
+    p.nombre AS programa_nombre,
+    p.tipo_linea,
+    c.nombre AS competencia_nombre,
+    COALESCE(ab.nombre, 'Sin asignar') AS ambiente_nombre,
+    j.nombre AS jornada_nombre,
+    a.es_lider_ficha,
+    a.es_provisional,
+    a.fecha_asignacion,
+    a.activo
+FROM asignacion a
+JOIN instructores i ON a.instructor_id = i.id
+JOIN usuarios u ON i.usuario_id = u.id
+JOIN fichas f ON a.ficha_id = f.id
+JOIN programas p ON f.programa_id = p.id
+JOIN asignacion_competencia ac ON ac.asignacion_id = a.id AND ac.activo = TRUE
+JOIN competencias c ON ac.competencia_id = c.id
+JOIN jornadas j ON f.jornada_id = j.id
+LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
+WHERE a.activo = TRUE;
+
+-- --- vw_instructores_con_novedad: Instructores con novedad vigente ---
+CREATE OR REPLACE VIEW vw_instructores_con_novedad AS
+SELECT
+    i.id AS instructor_id,
+    u.nombre AS instructor_nombre,
+    u.email AS instructor_email,
+    n.tipo_novedad,
+    n.fecha_inicio,
+    n.fecha_regreso,
+    n.observacion,
+    DATEDIFF(n.fecha_regreso, n.fecha_inicio) + 1 AS dias_novedad,
+    n.activo AS novedad_activa
+FROM instructores i
+JOIN usuarios u ON i.usuario_id = u.id
+JOIN instructor_novedades n ON n.instructor_id = i.id
+WHERE n.activo = TRUE
+  AND n.fecha_inicio <= CURDATE()
+  AND n.fecha_regreso >= CURDATE();
+
+-- --- vw_alertas_pendientes: Alertas no atendidas con prioridad ---
+CREATE OR REPLACE VIEW vw_alertas_pendientes AS
+SELECT
+    al.id AS alerta_id,
+    u.nombre AS instructor_nombre,
+    al.tipo AS alerta_tipo,
+    al.mensaje,
+    al.semana,
+    al.total_horas,
+    al.atendida,
+    al.leida,
+    al.created_at,
+    CASE
+        WHEN al.tipo = 'HORAS_EXCEDIDAS' THEN 'alta'
+        WHEN al.tipo = 'INSTRUCTOR_PLANTA_JORNADA_NOCTURNA' THEN 'alta'
+        WHEN al.tipo = 'AMBIENTE_OCUPADO' THEN 'media'
+        ELSE 'baja'
+    END AS prioridad
+FROM alertas al
+JOIN instructores i ON al.instructor_id = i.id
+JOIN usuarios u ON i.usuario_id = u.id
+WHERE al.atendida = FALSE
+ORDER BY
+    FIELD(CASE
+        WHEN al.tipo = 'HORAS_EXCEDIDAS' THEN 'alta'
+        WHEN al.tipo = 'INSTRUCTOR_PLANTA_JORNADA_NOCTURNA' THEN 'alta'
+        WHEN al.tipo = 'AMBIENTE_OCUPADO' THEN 'media'
+        ELSE 'baja'
+    END, 'alta', 'media', 'baja'),
+    al.created_at DESC;
+
+-- ============================================================
+-- FIN DEL SCHEMA
+-- ============================================================
+-- ============================================================
+-- 25. UTF-8 COLLATION
+-- Todas las tablas en utf8mb4_general_ci para caracteres especiales
+-- ============================================================
+
+ALTER DATABASE conIns CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+ALTER TABLE jornadas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE roles CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE areas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE usuarios CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE usuario_roles CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE instructores CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE programas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE competencias CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE raps CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE ambientes CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE fichas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE asignacion CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE asignacion_competencia CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE lider_programa CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE instructor_competencias_habilitadas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE horarios CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE alertas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE instructor_novedades CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE ambiente_bloqueos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE notificaciones CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE auditoria CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

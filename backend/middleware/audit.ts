@@ -1,20 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
+import pool from '../config/db.js';
 
-export const auditLogger = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const start = Date.now();
+export const auditLogger = async (req: Request, _res: Response, next: NextFunction) => {
+  const userId = (req as any).user?.id ?? null;
+  const ip = req.ip ?? req.socket.remoteAddress ?? null;
+  const userAgent = req.headers['user-agent'] ?? null;
 
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    const userId = req.user?.id ?? 'anon';
-    const timestamp = new Date().toISOString();
-    console.log(
-      `[AUDIT] ${timestamp} | user:${userId} | ${req.method} ${req.originalUrl} | ${req.ip} | ${res.statusCode} | ${duration}ms`,
+  try {
+    await pool.query(
+      `SET @audit_usuario_id = ?`,
+      [userId],
     );
-  });
+
+    await pool.query(
+      `INSERT INTO auditoria (usuario_id, accion, tabla_afectada, ip, user_agent)
+       VALUES (?, 'API_CALL', ?, ?, ?)`,
+      [userId, `${req.method} ${req.path}`, ip, userAgent],
+    );
+  } catch {
+    // Silently fail — audit should never block a request
+  }
 
   next();
 };

@@ -78,11 +78,18 @@ export const NotificacionService = {
       enviarCorreo: true,
     });
 
-    await this.notificarLideresPrograma(
-      instructor.id,
-      'NOVEDAD_REGISTRADA',
-      `El instructor ${instructor.nombre} tiene una novedad de tipo ${tipoNovedad}`,
+    const [fichasRows] = await pool.query(
+      `SELECT DISTINCT a.ficha_id FROM asignacion a
+       WHERE a.instructor_id = ? AND a.activo = TRUE`,
+      [instructor.id],
     );
+    for (const fichaRow of fichasRows as any[]) {
+      await this.notificarLideresPrograma(
+        fichaRow.ficha_id,
+        'NOVEDAD_REGISTRADA',
+        `El instructor ${instructor.nombre} tiene una novedad de tipo ${tipoNovedad}`,
+      );
+    }
 
     await this.notificarCoordinadoresYSubdirector(
       'NOVEDAD_REGISTRADA',

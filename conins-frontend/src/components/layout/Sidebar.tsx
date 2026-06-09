@@ -36,7 +36,7 @@ export default function Sidebar({ alertasViewed }: SidebarProps) {
       {/* Logo y titulo */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <img src="/logoSena.png" alt="SENA" className="w-12 h-auto" />
+          <img src="/logoSena.png" alt="SENA" className="w-12 h-12 object-contain" />
           <div>
             <h1 className="font-bold text-lg leading-tight text-gray-900">CONINS</h1>
             <p className="text-xs text-gray-500">CDMC · SENA</p>

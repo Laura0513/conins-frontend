@@ -3,15 +3,7 @@ import { CompetenciaModel } from '../models/competencia.model.js';
 import { UsuarioModel } from '../models/usuario.model.js';
 import { NotFoundError, ForbiddenError, ValidationError, ConflictError } from '../utils/errors.js';
 import pool from '../config/db.js';
-
-function getLunesSemanaActual(): string {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  const lunes = new Date(now);
-  lunes.setDate(now.getDate() + diff);
-  return lunes.toISOString().split('T')[0];
-}
+import { getLunesSemanaActual } from '../utils/date.js';
 
 export const InstructorService = {
   async getAll() {

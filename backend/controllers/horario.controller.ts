@@ -43,3 +43,15 @@ export const toggleActivo = asyncHandler(async (req: Request, res: Response) => 
   const message = result.activo ? 'Horario habilitado' : 'Horario deshabilitado';
   ApiResponse.success(res, result, message);
 });
+
+export const updateMultiDia = asyncHandler(async (req: Request, res: Response) => {
+  const { dia_ids, hora_inicio, hora_fin, jornada_id, ambiente_id } = req.body;
+  const result = await HorarioService.updateMultiDia(Number(req.params.id), {
+    dia_ids,
+    hora_inicio,
+    hora_fin,
+    jornada_id,
+    ambiente_id,
+  });
+  ApiResponse.success(res, result, 'Horario actualizado exitosamente');
+});

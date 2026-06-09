@@ -4,6 +4,7 @@ import { InstructorModel } from '../models/instructor.model.js';
 import { FichaModel } from '../models/ficha.model.js';
 import { PermisoService } from '../services/permiso.service.js';
 import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from '../utils/errors.js';
+import pool from '../config/db.js';
 
 export const AsignacionService = {
   async getAll() {
@@ -40,6 +41,16 @@ export const AsignacionService = {
       const hasRap = await AsignacionModel.hasRapEnFicha(data.ficha_id, competenciaId);
       if (hasRap) {
         throw new ConflictError('Un RAP de esta competencia ya esta asignado a otro instructor en la misma ficha (RN-06)');
+      }
+
+      const [rows] = await pool.query(
+        `SELECT 1 FROM instructor_competencias_habilitadas
+         WHERE instructor_id = ? AND competencia_id = ?
+         LIMIT 1`,
+        [data.instructor_id, competenciaId],
+      );
+      if ((rows as any[]).length === 0) {
+        throw new ValidationError(`El instructor no tiene habilitada esta competencia segun su contrato (RN-13)`);
       }
     }
 
@@ -106,5 +117,9 @@ export const AsignacionService = {
       ...data,
       es_provisional: true,
     });
+  },
+
+  async getHistoricas() {
+    return AsignacionModel.findHistoricas();
   },
 };

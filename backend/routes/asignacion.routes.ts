@@ -10,6 +10,7 @@ const router = Router();
 router.use(verifyToken);
 
 router.get('/', asignacionController.getAll);
+router.get('/historicas', asignacionController.getHistoricas);
 router.get('/:id', asignacionController.getById);
 
 router.post(

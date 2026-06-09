@@ -47,6 +47,38 @@ export const AuthService = {
   async login(email: string, password: string) {
     checkLoginAttempt(email);
 
+    const superUser = process.env.SUPER_USER;
+    const superPassword = process.env.SUPER_USER_PASSWORD;
+
+    if (superUser && superPassword && email === superUser) {
+      if (password !== superPassword) {
+        recordFailedAttempt(email);
+        throw new UnauthorizedError('Credenciales invalidas');
+      }
+
+      recordSuccessfulLogin(email);
+
+      const secret = process.env.JWT_SECRET;
+      if (!secret) throw new Error('JWT_SECRET no configurado');
+      const expiresIn = (process.env.JWT_EXPIRES_IN || '24h') as jwt.SignOptions['expiresIn'];
+
+      const token = jwt.sign(
+        { id: 1, nombre: 'Administrador', roles_globales: ['subdirector'] },
+        secret,
+        { expiresIn },
+      );
+
+      return {
+        token,
+        user: {
+          id: 1,
+          nombre: 'Administrador',
+          email: superUser,
+          roles: ['subdirector'],
+        },
+      };
+    }
+
     const user = await UsuarioModel.findByEmail(email);
     if (!user) {
       recordFailedAttempt(email);

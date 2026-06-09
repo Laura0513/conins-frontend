@@ -25,5 +25,3 @@ export const errorHandler = (
     message: 'Error interno del servidor',
   });
 };
-
-export default errorHandler;

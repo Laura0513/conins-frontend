@@ -1,16 +1,10 @@
 import { HorarioModel } from '../models/horario.model.js';
 import { InstructorModel } from '../models/instructor.model.js';
 import { FichaModel } from '../models/ficha.model.js';
+import { AmbienteModel } from '../models/ambiente.model.js';
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors.js';
-
-function getLunesSemanaActual(): string {
-  const now = new Date();
-  const day = now.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  const lunes = new Date(now);
-  lunes.setDate(now.getDate() + diff);
-  return lunes.toISOString().split('T')[0];
-}
+import { getLunesSemanaActual } from '../utils/date.js';
+import pool from '../config/db.js';
 
 export const HorarioService = {
   async getAll() {
@@ -69,6 +63,11 @@ export const HorarioService = {
         data.jornada_id,
         semana,
       );
+
+      const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(data.ambiente_id, semana);
+      if (tieneBloqueo) {
+        throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+      }
     }
 
     let alertaJornadaRestringida = false;
@@ -115,6 +114,15 @@ export const HorarioService = {
     const existing = await HorarioModel.findById(id);
     if (data.dia_semana || data.hora_inicio || data.hora_fin) {
       const semana = getLunesSemanaActual();
+
+      const ambienteId = data.ambiente_id ?? (existing as any).ambiente_id;
+      if (ambienteId) {
+        const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(ambienteId, semana);
+        if (tieneBloqueo) {
+          throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+        }
+      }
+
       const hasOverlap = await HorarioModel.hasOverlap(
         (existing as any).instructor_id,
         data.dia_semana ?? (existing as any).dia_semana,
@@ -138,5 +146,78 @@ export const HorarioService = {
 
     const nuevoEstado = await HorarioModel.toggleActivo(id, motivo);
     return { activo: nuevoEstado };
+  },
+
+  async updateMultiDia(id: number, data: {
+    dia_ids: number[];
+    hora_inicio: string;
+    hora_fin: string;
+    jornada_id: number;
+    ambiente_id?: number | null;
+  }) {
+    const existing = await HorarioModel.findById(id);
+    if (!existing) throw new NotFoundError('Horario no encontrado');
+
+    const existingRecord = await pool.query(
+      'SELECT ficha_id, instructor_id, competencia_id, dia_semana, hora_inicio, hora_fin, jornada_id, ambiente_id, semana FROM horarios WHERE id = ?',
+      [id],
+    );
+    const base = (existingRecord as any[])[0];
+    if (!base) throw new NotFoundError('Horario no encontrado');
+
+    const currentDias = await pool.query(
+      'SELECT id, dia_semana FROM horarios WHERE ficha_id = ? AND instructor_id = ? AND competencia_id = ? AND hora_inicio = ? AND hora_fin = ? AND jornada_id = ? AND semana = ? AND activo = TRUE',
+      [base.ficha_id, base.instructor_id, base.competencia_id, base.hora_inicio, base.hora_fin, base.jornada_id, base.semana],
+    );
+    const currentDiasRows = (currentDias as any[])[0] as any[];
+    const currentDiaIds = new Set(currentDiasRows.map((r: any) => r.dia_semana));
+    const currentDiaRecords = currentDiasRows;
+    const newDias = new Set(data.dia_ids);
+
+    const diasToRemove = currentDiasRows.filter((r: any) => !newDias.has(r.dia_semana));
+    const diasToAdd = data.dia_ids.filter((d: number) => !currentDiaIds.has(d));
+    const diasToUpdate = data.dia_ids.filter((d: number) => currentDiaIds.has(d));
+
+    for (const record of diasToRemove as any[]) {
+      await pool.query('UPDATE horarios SET activo = FALSE WHERE id = ?', [record.id]);
+    }
+
+    for (const dia of diasToAdd) {
+      const hasOverlap = await HorarioModel.hasOverlap(
+        base.instructor_id,
+        dia,
+        data.hora_inicio,
+        data.hora_fin,
+        base.semana,
+      );
+      if (hasOverlap) {
+        throw new ConflictError(`El instructor tiene un horario superpuesto el dia ${dia} (RN-04)`);
+      }
+
+      const ambienteId = data.ambiente_id ?? base.ambiente_id;
+      if (ambienteId) {
+        const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(ambienteId, base.semana);
+        if (tieneBloqueo) {
+          throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+        }
+      }
+
+      await pool.query(
+        'INSERT INTO horarios (ficha_id, instructor_id, competencia_id, ambiente_id, dia_semana, hora_inicio, hora_fin, jornada_id, semana) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [base.ficha_id, base.instructor_id, base.competencia_id, data.ambiente_id ?? base.ambiente_id, dia, data.hora_inicio, data.hora_fin, data.jornada_id, base.semana],
+      );
+    }
+
+    for (const dia of diasToUpdate) {
+      const record = currentDiaRecords.find((r: any) => r.dia_semana === dia);
+      if (record) {
+        await pool.query(
+          'UPDATE horarios SET hora_inicio = ?, hora_fin = ?, jornada_id = ?, ambiente_id = ? WHERE id = ?',
+          [data.hora_inicio, data.hora_fin, data.jornada_id, data.ambiente_id ?? base.ambiente_id, record.id],
+        );
+      }
+    }
+
+    return HorarioModel.findAll();
   },
 };

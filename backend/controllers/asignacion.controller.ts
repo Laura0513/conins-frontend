@@ -57,3 +57,8 @@ export const registrarProvisional = asyncHandler(async (req: Request, res: Respo
 
   ApiResponse.created(res, asignacion, 'Asignacion provisional registrada exitosamente');
 });
+
+export const getHistoricas = asyncHandler(async (_req: Request, res: Response) => {
+  const historicas = await AsignacionService.getHistoricas();
+  ApiResponse.success(res, historicas);
+});

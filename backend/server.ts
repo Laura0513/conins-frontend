@@ -16,6 +16,8 @@ import alertaRoutes from './routes/alerta.routes.js';
 import notificacionRoutes from './routes/notificacion.routes.js';
 import catalogoRoutes from './routes/catalogo.routes.js';
 import programaRoutes from './routes/programa.routes.js';
+import auditoriaRoutes from './routes/auditoria.routes.js';
+import consultaRoutes from './routes/consulta.routes.js';
 
 dotenv.config();
 
@@ -41,6 +43,9 @@ app.use(
 
 app.use(express.json({ limit: '10kb' }));
 
+// Audit logger — tracks all API calls
+app.use(auditLogger);
+
 // Auth routes with strict rate limiting
 app.use('/api/auth/login', authRateLimiter);
 app.use('/api/auth/crear-password', authRateLimiter);
@@ -56,6 +61,8 @@ app.use('/api/alertas', alertaRoutes);
 app.use('/api/notificaciones', notificacionRoutes);
 app.use('/api/catalogo', catalogoRoutes);
 app.use('/api/programas', programaRoutes);
+app.use('/api/auditoria', auditoriaRoutes);
+app.use('/api/consultas', consultaRoutes);
 
 // Error handler — must be last
 app.use(errorHandler);

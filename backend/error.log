@@ -1,110 +1,117 @@
-[2026-05-22T18:26:14.470Z] Error: Credenciales invalidas
-Error: Credenciales invalidas
-    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:53:13)
-    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
-    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+[2026-05-21T18:33:41.988Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (D:\2_ConIns\ConIns_Project\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:117:3)
+    at handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:295:15
+    at processParams (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:582:12)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:291:5)
+    at verifyToken (D:\2_ConIns\ConIns_Project\backend\middleware\auth.ts:39:5)
 ---
-[2026-05-25T12:12:35.771Z] Error: Token invalido o expirado
-Error: Token invalido o expirado
-    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
-    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
-    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
-    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+[2026-05-21T18:35:11.066Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (D:\2_ConIns\ConIns_Project\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:117:3)
+    at handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:295:15
+    at processParams (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:582:12)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:291:5)
+    at verifyToken (D:\2_ConIns\ConIns_Project\backend\middleware\auth.ts:39:5)
 ---
-[2026-05-25T19:15:52.704Z] AggregateError: 
-AggregateError: 
-    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
-    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:7:28)
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:7:47)
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
----
-[2026-05-25T19:15:52.714Z] AggregateError: 
-AggregateError: 
-    at Object.findById (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:34:31)
-    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:166:37)
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:37)
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
----
-[2026-05-25T19:24:29.200Z] Error: Token no proporcionado
+[2026-05-26T00:25:00.794Z] Error: Token no proporcionado
 Error: Token no proporcionado
-    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:29:11)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
-    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
-    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
-    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
-    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at verifyToken (D:\2_ConIns\ConIns_Project\backend\middleware\auth.ts:29:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:342:13)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:297:9
+    at processParams (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:582:12)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:291:5)
+    at router.handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:186:3)
+    at router (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:342:13)
 ---
-[2026-05-25T22:15:32.494Z] Error: password: Minimo 6 caracteres
-Error: password: Minimo 6 caracteres
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:15:15)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
-    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
-    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
-    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+[2026-05-26T00:39:23.380Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (D:\2_ConIns\ConIns_Project\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:342:13)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:297:9
+    at processParams (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:582:12)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:291:5)
+    at router.handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:186:3)
+    at router (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:342:13)
 ---
-[2026-05-25T22:15:33.279Z] Error: password: Minimo 6 caracteres
-Error: password: Minimo 6 caracteres
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:15:15)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
-    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
-    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
-    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+[2026-05-26T00:39:23.387Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (D:\2_ConIns\ConIns_Project\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:117:3)
+    at handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:295:15
+    at processParams (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:582:12)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:291:5)
+    at router.handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:186:3)
 ---
-[2026-05-25T22:15:33.827Z] Error: password: Minimo 6 caracteres
-Error: password: Minimo 6 caracteres
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:15:15)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
-    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
-    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
-    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+[2026-05-28T20:21:16.360Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (D:\2_ConIns\ConIns_Project\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:117:3)
+    at handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:295:15
+    at processParams (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:582:12)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:291:5)
+    at router.handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:186:3)
 ---
-[2026-05-25T22:15:36.700Z] Error: password: Minimo 6 caracteres
-Error: password: Minimo 6 caracteres
-    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:15:15)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
-    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
-    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
-    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
-    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
-    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
-    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
-    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+[2026-05-28T20:22:12.412Z] Error: Expression #4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'conins.c.nombre' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+Error: Expression #4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'conins.c.nombre' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+    at Object.findAll (D:\2_ConIns\ConIns_Project\backend\models\asignacion.model.ts:31:31)
+    at Object.getAll (D:\2_ConIns\ConIns_Project\backend\services\asignacion.service.ts:10:28)
+    at <anonymous> (D:\2_ConIns\ConIns_Project\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (D:\2_ConIns\ConIns_Project\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:117:3)
+    at handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:295:15
+---
+[2026-05-28T20:22:12.424Z] Error: Expression #4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'conins.c.nombre' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+Error: Expression #4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'conins.c.nombre' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+    at Object.findAll (D:\2_ConIns\ConIns_Project\backend\models\asignacion.model.ts:31:31)
+    at Object.getAll (D:\2_ConIns\ConIns_Project\backend\services\asignacion.service.ts:10:28)
+    at <anonymous> (D:\2_ConIns\ConIns_Project\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (D:\2_ConIns\ConIns_Project\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:117:3)
+    at handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:295:15
+---
+[2026-05-28T20:22:18.026Z] Error: Expression #4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'conins.c.nombre' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+Error: Expression #4 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'conins.c.nombre' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+    at Object.findAll (D:\2_ConIns\ConIns_Project\backend\models\asignacion.model.ts:31:31)
+    at Object.getAll (D:\2_ConIns\ConIns_Project\backend\services\asignacion.service.ts:10:28)
+    at <anonymous> (D:\2_ConIns\ConIns_Project\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (D:\2_ConIns\ConIns_Project\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at next (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\route.js:117:3)
+    at handle (D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (D:\2_ConIns\ConIns_Project\backend\node_modules\router\lib\layer.js:152:17)
+    at D:\2_ConIns\ConIns_Project\backend\node_modules\router\index.js:295:15
 ---
