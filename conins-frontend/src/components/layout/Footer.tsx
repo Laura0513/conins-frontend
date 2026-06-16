@@ -7,7 +7,7 @@ export default function Footer() {
         bottom: '0', 
         left: '0', 
         right: '0', 
-        borderTop: '4px solid #39A900' 
+        borderTop: '2px solid #39A900' 
       }}
     >
       <p>© {new Date().getFullYear()} CONINS · CDMC SENA · Todos los derechos reservados</p>
