@@ -1,12 +1,13 @@
 export default function Footer() {
   return (
     <footer 
-      className="z-50 bg-white text-gray-600 py-3 px-6 text-center text-xs md:text-sm"
+      className="z-50 text-gray-600 py-3 px-6 text-center text-xs md:text-sm"
       style={{ 
         position: 'fixed', 
         bottom: '0', 
         left: '0', 
         right: '0', 
+        backgroundColor: '#ebf6e6',
         borderTop: '2px solid #39A900' 
       }}
     >
