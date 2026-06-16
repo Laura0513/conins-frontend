@@ -2,6 +2,7 @@ import { Bell, LogOut, Menu } from "lucide-react"
 import { useRouter } from "next/router"
 import { useAuth } from "@/lib/AuthContext"
 import { useState, useRef, useEffect } from "react"
+import PerfilModal from "@/components/ui/PerfilModal"
 
 type Notificacion = {
   id: number
@@ -24,6 +25,7 @@ export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }
   const { user, logout } = useAuth()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const [isPerfilOpen, setIsPerfilOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -115,27 +117,34 @@ export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }
         </div>
 
         <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
-          <div className="text-right">
-            <p className="text-sm font-semibold text-gray-900">
-              {user?.nombre || "Usuario"}
-            </p>
-            <p className="text-xs text-gray-500">
-              {user?.roles?.[0] || "Rol"}
-            </p>
-          </div>
-          <div className="w-9 h-9 bg-sena/10 rounded-full flex items-center justify-center text-sena font-semibold text-sm">
-            {user?.nombre?.charAt(0) || "U"}
-          </div>
+          <button
+            onClick={() => setIsPerfilOpen(true)}
+            className="flex items-center gap-3 hover:bg-gray-50 p-1.5 rounded-lg transition-colors"
+          >
+            <div className="text-right">
+              <p className="text-sm font-semibold text-gray-900">
+                {user?.nombre || "Usuario"}
+              </p>
+              <p className="text-xs text-gray-500">
+                {user?.roles?.[0] || "Rol"}
+              </p>
+            </div>
+            <div className="w-9 h-9 bg-sena/10 rounded-full flex items-center justify-center text-sena font-semibold text-sm">
+              {user?.nombre?.charAt(0) || "U"}
+            </div>
+          </button>
           
           <button
             onClick={handleLogout}
-            className="ml-2 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             title="Cerrar sesión"
           >
             <LogOut className="w-5 h-5" />
           </button>
         </div>
       </div>
+
+      <PerfilModal isOpen={isPerfilOpen} onClose={() => setIsPerfilOpen(false)} />
     </header>
   )
 }
