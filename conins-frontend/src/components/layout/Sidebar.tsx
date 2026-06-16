@@ -26,13 +26,20 @@ const menuItems = [
 
 type SidebarProps = {
   alertasViewed: boolean
+  isOpen: boolean
+  onClose: () => void
 }
 
-export default function Sidebar({ alertasViewed }: SidebarProps) {
+export default function Sidebar({ alertasViewed, isOpen, onClose }: SidebarProps) {
   const router = useRouter()
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0">
+    <aside className={`
+      w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 z-50
+      transition-transform duration-300 ease-in-out
+      -translate-x-full md:translate-x-0
+      ${isOpen ? 'translate-x-0' : ''}
+    `}>
       {/* Logo y titulo */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3">

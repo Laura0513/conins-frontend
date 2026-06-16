@@ -10,6 +10,9 @@ export default function DashboardLayout({
 }) {
   const router = useRouter()
   
+  // State for mobile sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  
   // Inicializar estado desde localStorage para que persista entre cambios de página
   const [alertasViewed, setAlertasViewed] = useState(() => {
     if (typeof window !== "undefined") {
@@ -30,15 +33,32 @@ export default function DashboardLayout({
     }
   }, [router.pathname])
 
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
+  const closeSidebar = () => setIsSidebarOpen(false)
+
   return (
     <div className="min-h-screen bg-gray-100">
-      <Sidebar alertasViewed={alertasViewed} />
-      <div className="ml-64 flex flex-col min-h-screen">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+      
+      <Sidebar 
+        alertasViewed={alertasViewed} 
+        isOpen={isSidebarOpen} 
+        onClose={closeSidebar} 
+      />
+      
+      <div className="flex flex-col min-h-screen md:ml-64">
         <Header
           alertasViewed={alertasViewed}
           onViewAlertas={() => setAlertasViewed(true)}
+          onToggleSidebar={toggleSidebar}
         />
-        <main className="flex-1 p-8">{children}</main>
+        <main className="flex-1 p-4 md:p-8">{children}</main>
       </div>
     </div>
   )

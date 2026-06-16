@@ -1,4 +1,4 @@
-import { Bell, LogOut } from "lucide-react"
+import { Bell, LogOut, Menu } from "lucide-react"
 import { useRouter } from "next/router"
 import { useAuth } from "@/lib/AuthContext"
 import { useState, useRef, useEffect } from "react"
@@ -17,9 +17,10 @@ const NOTIFICACIONES_MOCK: Notificacion[] = [
 type HeaderProps = {
   alertasViewed: boolean
   onViewAlertas: () => void
+  onToggleSidebar: () => void
 }
 
-export default function Header({ alertasViewed, onViewAlertas }: HeaderProps) {
+export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }: HeaderProps) {
   const { user, logout } = useAuth()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
@@ -46,11 +47,21 @@ export default function Header({ alertasViewed, onViewAlertas }: HeaderProps) {
   }
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <span>CONINS</span>
-        <span>·</span>
-        <span className="text-gray-900 font-semibold">Inicio</span>
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
+      <div className="flex items-center gap-3">
+        {/* Hamburger Menu Button (Mobile Only) */}
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg md:hidden"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+        
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <span className="hidden sm:inline">CONINS</span>
+          <span className="hidden sm:inline">·</span>
+          <span className="text-gray-900 font-semibold">Inicio</span>
+        </div>
       </div>
 
       <div className="flex items-center gap-6">
