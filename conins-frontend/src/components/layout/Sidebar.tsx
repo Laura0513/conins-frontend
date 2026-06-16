@@ -78,13 +78,6 @@ export default function Sidebar({ alertasViewed, isOpen, onClose }: SidebarProps
           )
         })}
       </nav>
-
-      {/* Footer del sidebar */}
-      <div className="p-4 border-t border-gray-200">
-        <p className="text-xs text-gray-400 text-center">
-          CONINS v0.1 · CDMC SENA
-        </p>
-      </div>
     </aside>
   )
 }

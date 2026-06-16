@@ -59,7 +59,7 @@ export default function DashboardLayout({
           onViewAlertas={() => setAlertasViewed(true)}
           onToggleSidebar={toggleSidebar}
         />
-        <main className="flex-1 p-4 md:p-8 pb-16">{children}</main>
+        <main className="flex-1 p-4 md:p-8">{children}</main>
         <Footer />
       </div>
     </div>
