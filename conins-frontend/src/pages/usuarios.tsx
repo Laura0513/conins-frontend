@@ -4,6 +4,7 @@ import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import CrearUsuarioModal from "@/components/usuarios/CrearUsuarioModal"
+import EditarUsuarioModal from "@/components/usuarios/EditarUsuarioModal"
 import {
   Search,
   Plus,
@@ -36,6 +37,8 @@ export default function UsuariosPage() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedUsuario, setSelectedUsuario] = useState<Usuario | null>(null)
 
   const [search, setSearch] = useState("")
   const [filtroRol, setFiltroRol] = useState("todos")
@@ -84,6 +87,23 @@ export default function UsuariosPage() {
       cargarUsuarios()
     } catch (err: any) {
       showToast(err.message || "Error al cambiar estado", "error")
+    }
+  }
+
+  const openEditModal = (usuario: Usuario) => {
+    setSelectedUsuario(usuario)
+    setIsEditModalOpen(true)
+  }
+
+  const handleEdit = async (data: any) => {
+    if (!selectedUsuario) return
+    try {
+      await api.users.update(selectedUsuario.id, data)
+      showToast("Usuario actualizado exitosamente", "success")
+      setIsEditModalOpen(false)
+      cargarUsuarios()
+    } catch (err: any) {
+      showToast(err.message || "Error al actualizar usuario", "error")
     }
   }
 
@@ -201,6 +221,7 @@ export default function UsuariosPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
+                            onClick={() => openEditModal(u)}
                             className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                             title="Editar"
                           >
@@ -243,6 +264,13 @@ export default function UsuariosPage() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreate}
+      />
+
+      <EditarUsuarioModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        usuario={selectedUsuario}
+        onSubmit={handleEdit}
       />
     </DashboardLayout>
   )
