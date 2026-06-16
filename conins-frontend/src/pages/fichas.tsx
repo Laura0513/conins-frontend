@@ -181,7 +181,7 @@ export default function FichasPage() {
             />
           </div>
 
-          <div className="flex flex-wrap gap-3 w-full md:w-auto">
+          <div className="grid grid-cols-2 gap-3 w-full md:flex md:flex-wrap md:w-auto">
             <select
               value={filtroPrograma}
               onChange={(e) => setFiltroPrograma(e.target.value)}
