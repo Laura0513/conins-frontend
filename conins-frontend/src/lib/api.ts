@@ -283,22 +283,22 @@ export const api = {
 
     users: {
         getAll() {
-            return apiFetch('/usuarios')
+            return apiFetch('/auth/usuarios')
         },
         create(data: any) {
-            return apiFetch('/usuarios', {
+            return apiFetch('/auth/register', {
                 method: 'POST',
                 body: JSON.stringify(data),
             })
         },
         update(id: number, data: any) {
-            return apiFetch(`/usuarios/${id}`, {
-                method: 'PATCH',
+            return apiFetch(`/auth/usuarios/${id}`, {
+                method: 'PUT',
                 body: JSON.stringify(data),
             })
         },
         toggleEstado(id: number) {
-            return apiFetch(`/usuarios/${id}/estado`, {
+            return apiFetch(`/auth/usuarios/${id}/estado`, {
                 method: 'PATCH',
             })
         },
