@@ -47,20 +47,20 @@ export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }
   }
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10">
+    <header className="h-16 bg-sena text-white border-b border-white/10 flex items-center justify-between px-4 md:px-8 sticky top-0 z-10 shadow-sm">
       <div className="flex items-center gap-3">
         {/* Hamburger Menu Button (Mobile Only) */}
         <button
           onClick={onToggleSidebar}
-          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg md:hidden"
+          className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg md:hidden"
         >
           <Menu className="w-6 h-6" />
         </button>
         
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <span className="hidden sm:inline">CONINS</span>
+        <div className="flex items-center gap-2 text-sm text-white/80">
+          <span className="hidden sm:inline font-medium">CONINS</span>
           <span className="hidden sm:inline">·</span>
-          <span className="text-gray-900 font-semibold">Inicio</span>
+          <span className="text-white font-semibold">Inicio</span>
         </div>
       </div>
 
@@ -68,11 +68,11 @@ export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={handleToggle}
-            className="relative text-gray-500 hover:text-gray-700 transition-colors"
+            className="relative text-white/80 hover:text-white transition-colors"
           >
             <Bell className="w-5 h-5" />
             {!alertasViewed && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-sena text-[10px] font-bold rounded-full flex items-center justify-center">
                 {NOTIFICACIONES_MOCK.length}
               </span>
             )}
@@ -111,22 +111,22 @@ export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }
           )}
         </div>
 
-        <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
+        <div className="flex items-center gap-3 pl-6 border-l border-white/20">
           <div className="text-right">
-            <p className="text-sm font-semibold text-gray-900">
+            <p className="text-sm font-semibold text-white">
               {user?.nombre || "Usuario"}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-white/70">
               {user?.roles?.[0] || "Rol"}
             </p>
           </div>
-          <div className="w-9 h-9 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-semibold text-sm">
+          <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-white font-semibold text-sm">
             {user?.nombre?.charAt(0) || "U"}
           </div>
           
           <button
             onClick={handleLogout}
-            className="ml-2 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="ml-2 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
             title="Cerrar sesión"
           >
             <LogOut className="w-5 h-5" />

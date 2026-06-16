@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import Sidebar from "@/components/layout/Sidebar"
 import Header from "@/components/layout/Header"
+import Footer from "@/components/layout/Footer"
 
 export default function DashboardLayout({
   children,
@@ -37,7 +38,7 @@ export default function DashboardLayout({
   const closeSidebar = () => setIsSidebarOpen(false)
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
@@ -52,13 +53,14 @@ export default function DashboardLayout({
         onClose={closeSidebar} 
       />
       
-      <div className="flex flex-col min-h-screen md:ml-64">
+      <div className="flex flex-col flex-1 md:ml-64">
         <Header
           alertasViewed={alertasViewed}
           onViewAlertas={() => setAlertasViewed(true)}
           onToggleSidebar={toggleSidebar}
         />
         <main className="flex-1 p-4 md:p-8">{children}</main>
+        <Footer />
       </div>
     </div>
   )
