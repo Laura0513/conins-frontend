@@ -47,7 +47,10 @@ export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }
   }
 
   return (
-    <header className="h-16 bg-white border-b-2 border-sena flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shadow-sm">
+    <header 
+      className="h-16 border-b-2 border-sena flex items-center justify-between px-4 md:px-8 sticky top-0 z-50 shadow-sm"
+      style={{ backgroundColor: '#ffffff' }}
+    >
       <div className="flex items-center gap-3">
         {/* Hamburger Menu Button (Mobile Only) */}
         <button
