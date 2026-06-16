@@ -280,6 +280,29 @@ export const api = {
             return apiFetch('/consultas/ocupacion-ambientes')
         },
     },
+
+    users: {
+        getAll() {
+            return apiFetch('/usuarios')
+        },
+        create(data: any) {
+            return apiFetch('/usuarios', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        update(id: number, data: any) {
+            return apiFetch(`/usuarios/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            })
+        },
+        toggleEstado(id: number) {
+            return apiFetch(`/usuarios/${id}/estado`, {
+                method: 'PATCH',
+            })
+        },
+    },
 }
 
 export type ApiResponse<T = unknown> = {
