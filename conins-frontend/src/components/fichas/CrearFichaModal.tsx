@@ -82,7 +82,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5 max-h-[70vh] overflow-y-auto">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Número de ficha</label>
             <input

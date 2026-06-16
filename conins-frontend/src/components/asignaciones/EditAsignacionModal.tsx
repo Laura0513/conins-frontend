@@ -87,7 +87,7 @@ export default function EditAsignacionModal({ isOpen, onClose, asignacion, onSub
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5">
           <div className="bg-gray-50 p-3 rounded-lg flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-sena/10 flex items-center justify-center">
               <span className="text-xs font-bold text-sena">{asignacion.instructor_nombre.charAt(0)}</span>

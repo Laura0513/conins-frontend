@@ -48,7 +48,7 @@ export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFicha
           </button>
         </div>
 
-        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+        <div className="p-4 md:p-6 space-y-6 overflow-y-auto flex-1">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-sena/10 flex items-center justify-center">
               <BookOpen className="w-8 h-8 text-sena" />

@@ -153,7 +153,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5 overflow-y-auto flex-1">
           {/* Info de solo lectura */}
           <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
             <div className="flex items-center gap-2 text-sm text-gray-700">

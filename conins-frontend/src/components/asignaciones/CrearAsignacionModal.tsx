@@ -102,7 +102,7 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5 max-h-[70vh] overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-8 text-gray-500">
               <Loader2 className="w-5 h-5 animate-spin mr-2" />

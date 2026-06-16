@@ -66,7 +66,7 @@ export default function EditInstructorModal({ isOpen, onClose, instructor, onSub
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
             <input

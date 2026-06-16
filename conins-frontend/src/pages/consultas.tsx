@@ -202,21 +202,21 @@ export default function ConsultasPage() {
                   <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                       <tr>
-                        <th className="px-6 py-4">Instructor</th>
-                        <th className="px-6 py-4 text-center">Total Horas</th>
-                        <th className="px-6 py-4 text-center">Fichas</th>
-                        <th className="px-6 py-4 text-center">Competencias</th>
-                        <th className="px-6 py-4 text-center">Estado</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4">Instructor</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Total Horas</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Fichas</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Competencias</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {carga.filter(c => c.instructor_nombre.toLowerCase().includes(search.toLowerCase())).map((c) => (
                         <tr key={c.instructor_id} className="hover:bg-gray-50/50">
-                          <td className="px-6 py-4 font-medium text-gray-900">{c.instructor_nombre}</td>
-                          <td className="px-6 py-4 text-center font-semibold text-gray-700">{c.total_horas}h</td>
-                          <td className="px-6 py-4 text-center text-gray-600">{c.fichas_count}</td>
-                          <td className="px-6 py-4 text-center text-gray-600">{c.competencias_count}</td>
-                          <td className="px-6 py-4 text-center">
+                          <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{c.instructor_nombre}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center font-semibold text-gray-700">{c.total_horas}h</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{c.fichas_count}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{c.competencias_count}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                               c.estado === "Sobrecarga" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
                             }`}>
@@ -228,7 +228,7 @@ export default function ConsultasPage() {
                       ))}
                     </tbody>
                   </table>
-                  <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-between text-sm text-gray-500">
+                  <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 bg-gray-50 flex justify-between text-sm text-gray-500">
                     <span>Total instructores: {carga.length}</span>
                     <span>Horas totales: {carga.reduce((sum, c) => sum + c.total_horas, 0)}h</span>
                   </div>
@@ -256,27 +256,27 @@ export default function ConsultasPage() {
                   <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                       <tr>
-                        <th className="px-6 py-4">Ficha</th>
-                        <th className="px-6 py-4">Programa</th>
-                        <th className="px-6 py-4 text-center">Lun</th>
-                        <th className="px-6 py-4 text-center">Mar</th>
-                        <th className="px-6 py-4 text-center">Mié</th>
-                        <th className="px-6 py-4 text-center">Jue</th>
-                        <th className="px-6 py-4 text-center">Vie</th>
-                        <th className="px-6 py-4 text-center">Sáb</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Lun</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Mar</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Mié</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Jue</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Vie</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Sáb</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {horariosFicha.filter(h => h.ficha_numero.includes(filtroFicha)).map((h) => (
                         <tr key={h.ficha_numero} className="hover:bg-gray-50/50">
-                          <td className="px-6 py-4 font-medium text-sena">{h.ficha_numero}</td>
-                          <td className="px-6 py-4 text-gray-600">{h.programa}</td>
-                          <td className="px-6 py-4 text-center text-xs">{h.lunes}</td>
-                          <td className="px-6 py-4 text-center text-xs">{h.martes}</td>
-                          <td className="px-6 py-4 text-center text-xs">{h.miercoles}</td>
-                          <td className="px-6 py-4 text-center text-xs">{h.jueves}</td>
-                          <td className="px-6 py-4 text-center text-xs">{h.viernes}</td>
-                          <td className="px-6 py-4 text-center text-xs">{h.sabado}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-sena">{h.ficha_numero}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-gray-600">{h.programa}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.lunes}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.martes}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.miercoles}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.jueves}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.viernes}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.sabado}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -292,21 +292,21 @@ export default function ConsultasPage() {
                   <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                       <tr>
-                        <th className="px-6 py-4">Ambiente</th>
-                        <th className="px-6 py-4 text-center">Tipo</th>
-                        <th className="px-6 py-4 text-center">Capacidad</th>
-                        <th className="px-6 py-4 text-center">Horas Ocupadas</th>
-                        <th className="px-6 py-4 text-center">Ocupación</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Tipo</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Capacidad</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Horas Ocupadas</th>
+                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Ocupación</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {ocupacion.map((o) => (
                         <tr key={o.ambiente_nombre} className="hover:bg-gray-50/50">
-                          <td className="px-6 py-4 font-medium text-gray-900">{o.ambiente_nombre}</td>
-                          <td className="px-6 py-4 text-center text-gray-600">{o.tipo}</td>
-                          <td className="px-6 py-4 text-center text-gray-600">{o.capacidad}</td>
-                          <td className="px-6 py-4 text-center text-gray-600">{o.horas_ocupadas}h / {o.horas_totales}h</td>
-                          <td className="px-6 py-4 text-center">
+                          <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{o.ambiente_nombre}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{o.tipo}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{o.capacidad}</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{o.horas_ocupadas}h / {o.horas_totales}h</td>
+                          <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                             <div className="flex items-center justify-center gap-2">
                               <div className="w-24 bg-gray-200 rounded-full h-2.5 overflow-hidden">
                                 <div

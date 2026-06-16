@@ -270,32 +270,32 @@ export default function HorariosPage() {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4">Ficha</th>
-                    <th className="px-6 py-4">Instructor</th>
-                    <th className="px-6 py-4">Competencia</th>
-                    <th className="px-6 py-4">Ambiente</th>
-                    <th className="px-6 py-4">Jornada</th>
-                    <th className="px-6 py-4">Días</th>
-                    <th className="px-6 py-4">Horas</th>
-                    <th className="px-6 py-4 text-center">Estado</th>
-                    <th className="px-6 py-4 text-center">Acciones</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Instructor</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Competencia</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Jornada</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Días</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Horas</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {listaFiltrada.map((h) => (
                     <tr key={h.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">{h.ficha_numero}</td>
-                      <td className="px-6 py-4 text-gray-700">{h.instructor_nombre}</td>
-                      <td className="px-6 py-4 text-gray-500">{h.competencia}</td>
-                      <td className="px-6 py-4 text-gray-500">{h.ambiente}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{h.ficha_numero}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{h.instructor_nombre}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{h.competencia}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{h.ambiente}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           h.jornada === 'Mañana' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
                           {h.jornada}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-3 md:px-6 md:py-4">
                         <div className="flex flex-wrap gap-1">
                           {h.dias.map((d) => (
                             <span key={d} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
@@ -304,15 +304,15 @@ export default function HorariosPage() {
                           ))}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-700 whitespace-nowrap">{h.horas}</td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700 whitespace-nowrap">{h.horas}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           h.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {h.estado}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => openEditModal(h)}
@@ -337,7 +337,7 @@ export default function HorariosPage() {
             </div>
           )}
 
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+          <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <span className="text-sm text-gray-500">
               Mostrando {listaFiltrada.length} de {horarios.length}
             </span>

@@ -277,29 +277,29 @@ export default function AsignacionesPage() {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4">Instructor</th>
-                    <th className="px-6 py-4">Ficha</th>
-                    <th className="px-6 py-4">Competencia</th>
-                    <th className="px-6 py-4">Ambiente</th>
-                    <th className="px-6 py-4">Jornada</th>
-                    <th className="px-6 py-4 text-center">Líder</th>
-                    <th className="px-6 py-4 text-center">Acciones</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Instructor</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Competencia</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Jornada</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Líder</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {listaFiltrada.map((asig) => (
                     <tr key={asig.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">{asig.instructor_nombre}</td>
-                      <td className="px-6 py-4 text-gray-700">{asig.ficha_numero}</td>
-                      <td className="px-6 py-4 text-gray-500">{asig.competencia}</td>
-                      <td className="px-6 py-4 text-gray-500">{asig.ambiente}</td>
-                      <td className="px-6 py-4 text-gray-500">{asig.jornada}</td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{asig.instructor_nombre}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{asig.ficha_numero}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{asig.competencia}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{asig.ambiente}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{asig.jornada}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         {asig.es_lider && (
                           <Star className="w-5 h-5 text-sena fill-sena mx-auto" />
                         )}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => openDetailModal(asig)}
@@ -331,7 +331,7 @@ export default function AsignacionesPage() {
             </div>
           )}
 
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+          <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <span className="text-sm text-gray-500">
               Mostrando {listaFiltrada.length} de {asignaciones.length}
             </span>

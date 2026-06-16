@@ -242,29 +242,29 @@ export default function InstructoresPage() {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4">Nombre</th>
-                    <th className="px-6 py-4">Correo</th>
-                    <th className="px-6 py-4">Contrato</th>
-                    <th className="px-6 py-4">Area</th>
-                    <th className="px-6 py-4">Horas/sem</th>
-                    <th className="px-6 py-4 text-center">Estado</th>
-                    <th className="px-6 py-4 text-center">Acciones</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Nombre</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Correo</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Contrato</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Area</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Horas/sem</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {listaFiltrada.map((inst) => (
                     <tr key={inst.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">{inst.nombre}</td>
-                      <td className="px-6 py-4 text-gray-500">{inst.email}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{inst.nombre}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{inst.email}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           inst.tipo_contrato === 'de_planta' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
                           {inst.tipo_contrato === 'de_planta' ? 'Planta' : 'Contratista'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-gray-700 capitalize">{inst.tipo_area}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700 capitalize">{inst.tipo_area}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4">
                         {(() => {
                           const horas = inst.horas_semana ?? getMockHoras(inst.id)
                           const limite = 40
@@ -293,14 +293,14 @@ export default function InstructoresPage() {
                           )
                         })()}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           inst.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {inst.activo ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => openDetailModal(inst)}
@@ -332,7 +332,7 @@ export default function InstructoresPage() {
             </div>
           )}
 
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+          <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <span className="text-sm text-gray-500">
               Mostrando {listaFiltrada.length} de {instructores.length}
             </span>

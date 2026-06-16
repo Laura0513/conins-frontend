@@ -46,7 +46,7 @@ export default function VerAgendaAmbienteModal({ isOpen, onClose, ambiente }: Ve
           </button>
         </div>
 
-        <div className="p-6 space-y-4 overflow-y-auto flex-1">
+        <div className="p-4 md:p-6 space-y-4 overflow-y-auto flex-1">
           {MOCK_HORARIOS.length > 0 ? (
             <div className="space-y-3">
               {MOCK_HORARIOS.map((h) => (

@@ -212,21 +212,21 @@ export default function AmbientesPage() {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4">Nombre</th>
-                    <th className="px-6 py-4">Tipo</th>
-                    <th className="px-6 py-4 text-center">Capacidad</th>
-                    <th className="px-6 py-4">Estado</th>
-                    <th className="px-6 py-4">Ocupante Actual</th>
-                    <th className="px-6 py-4 text-center">Acciones</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Nombre</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Tipo</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Capacidad</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Estado</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Ocupante Actual</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {listaFiltrada.map((amb) => (
                     <tr key={amb.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-gray-900">{amb.nombre}</td>
-                      <td className="px-6 py-4 text-gray-500">{amb.tipo}</td>
-                      <td className="px-6 py-4 text-center text-gray-700">{amb.capacidad} pax</td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{amb.nombre}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{amb.tipo}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-700">{amb.capacidad} pax</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           !amb.activo ? 'bg-red-100 text-red-800' :
                           amb.ocupante_actual ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
@@ -235,7 +235,7 @@ export default function AmbientesPage() {
                            amb.ocupante_actual ? 'Ocupado' : 'Disponible'}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-3 md:px-6 md:py-4">
                         {amb.ocupante_actual ? (
                           <div className="text-sm">
                             <p className="font-medium text-gray-900">{amb.ocupante_actual.instructor}</p>
@@ -245,7 +245,7 @@ export default function AmbientesPage() {
                           <span className="text-xs text-gray-400">-</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => openAgendaModal(amb)}
@@ -277,7 +277,7 @@ export default function AmbientesPage() {
             </div>
           )}
 
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+          <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <span className="text-sm text-gray-500">
               Mostrando {listaFiltrada.length} de {ambientes.length}
             </span>
