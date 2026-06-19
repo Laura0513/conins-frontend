@@ -15,6 +15,9 @@ import {
   ChevronRight,
   Loader2,
   AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Clock,
 } from "lucide-react"
 
 type Horario = {
@@ -31,10 +34,10 @@ type Horario = {
 }
 
 const MOCK_HORARIOS: Horario[] = [
-  { id: 1, ficha_numero: "2995403", instructor_nombre: "Carlos Álvarez", competencia: "Bases de datos", ambiente: "Aula 203", jornada: "Mañana", dias: ["Lun", "Mié", "Vie"], horas: "06:00 - 12:00", estado: "Activo", activo: true },
-  { id: 2, ficha_numero: "2887341", instructor_nombre: "Andrés Pareja", competencia: "Contabilidad básica", ambiente: "Aula 207", jornada: "Mixta", dias: ["Mar", "Jue"], horas: "10:00 - 16:00", estado: "Activo", activo: true },
-  { id: 3, ficha_numero: "3012456", instructor_nombre: "William Ramírez", competencia: "Logística empresarial", ambiente: "Taller T2", jornada: "Noche", dias: ["Lun", "Mar", "Mié", "Jue"], horas: "18:00 - 22:00", estado: "Activo", activo: true },
-  { id: 4, ficha_numero: "2995403", instructor_nombre: "Carlos Álvarez", competencia: "Análisis y diseño de software", ambiente: "Aula 204", jornada: "Mañana", dias: ["Mar", "Jue"], horas: "08:00 - 12:00", estado: "Deshabilitado", activo: false },
+  { id: 1, ficha_numero: "2995403", instructor_nombre: "Carlos Álvarez", competencia: "Bases de datos", ambiente: "Aula 203", jornada: "Mañana", dias: ["Lun", "Mié", "Vie"], horas: "06:00 - 12:00", estado: "Aprobado", activo: true },
+  { id: 2, ficha_numero: "2887341", instructor_nombre: "Andrés Pareja", competencia: "Contabilidad básica", ambiente: "Aula 207", jornada: "Mixta", dias: ["Mar", "Jue"], horas: "10:00 - 16:00", estado: "Pendiente", activo: true },
+  { id: 3, ficha_numero: "3012456", instructor_nombre: "William Ramírez", competencia: "Logística empresarial", ambiente: "Taller T2", jornada: "Noche", dias: ["Lun", "Mar", "Mié", "Jue"], horas: "18:00 - 22:00", estado: "Aprobado", activo: true },
+  { id: 4, ficha_numero: "2995403", instructor_nombre: "Carlos Álvarez", competencia: "Análisis y diseño de software", ambiente: "Aula 204", jornada: "Mañana", dias: ["Mar", "Jue"], horas: "08:00 - 12:00", estado: "Rechazado", activo: false },
 ]
 
 export default function HorariosPage() {
@@ -148,6 +151,43 @@ export default function HorariosPage() {
     }
   }
 
+  const handleAprobar = async (horario: Horario) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: "Aprobar horario",
+      message: `¿Estas seguro de aprobar el horario de ${horario.instructor_nombre}? Quedará activo oficialmente.`,
+      onConfirm: async () => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false })
+        try {
+          await api.horarios.aprobar(horario.id)
+          showToast("Horario aprobado exitosamente", "success")
+          cargarHorarios()
+        } catch (err: any) {
+          showToast(err.message || "Error al aprobar horario", "error")
+        }
+      },
+    })
+  }
+
+  const handleRechazar = (horario: Horario) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: "Rechazar horario",
+      message: `¿Estas seguro de rechazar el horario de ${horario.instructor_nombre}?`,
+      showMotivo: true,
+      onConfirm: async (motivo?: string) => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false })
+        try {
+          await api.horarios.rechazar(horario.id, motivo || "Sin motivo especificado")
+          showToast("Horario rechazado", "success")
+          cargarHorarios()
+        } catch (err: any) {
+          showToast(err.message || "Error al rechazar horario", "error")
+        }
+      },
+    })
+  }
+
   const handleDesactivar = (horario: Horario) => {
     setConfirmDialog({
       isOpen: true,
@@ -249,8 +289,9 @@ export default function HorariosPage() {
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="todos">Estado: Todos</option>
-              <option value="Activo">Activo</option>
-              <option value="Deshabilitado">Deshabilitado</option>
+              <option value="Aprobado">Aprobado</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Rechazado">Rechazado</option>
             </select>
           </div>
         </div>
@@ -307,27 +348,51 @@ export default function HorariosPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700 whitespace-nowrap">{h.horas}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          h.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          h.estado === 'Aprobado' ? 'bg-green-100 text-green-800' :
+                          h.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
                         }`}>
+                          {h.estado === 'Pendiente' && <Clock className="w-3 h-3 mr-1" />}
                           {h.estado}
                         </span>
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openEditModal(h)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDesactivar(h)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title={h.activo ? "Deshabilitar" : "Habilitar"}
-                          >
-                            <Power className="w-4 h-4" />
-                          </button>
+                          {h.estado === 'Pendiente' ? (
+                            <>
+                              <button
+                                onClick={() => handleAprobar(h)}
+                                className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
+                                title="Aprobar"
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleRechazar(h)}
+                                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                title="Rechazar"
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => openEditModal(h)}
+                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                title="Editar"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDesactivar(h)}
+                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                title={h.activo ? "Deshabilitar" : "Habilitar"}
+                              >
+                                <Power className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>

@@ -217,6 +217,17 @@ export const api = {
                 body: JSON.stringify({ motivo }),
             })
         },
+        aprobar(id: number) {
+            return apiFetch(`/horarios/${id}/aprobar`, {
+                method: 'PATCH',
+            })
+        },
+        rechazar(id: number, motivo: string) {
+            return apiFetch(`/horarios/${id}/rechazar`, {
+                method: 'PATCH',
+                body: JSON.stringify({ motivo }),
+            })
+        },
     },
 
     programs: {
