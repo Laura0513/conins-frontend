@@ -16,7 +16,7 @@ export default function AuthPage() {
           alt="Logo SENA"
           width={80}
           height={80}
-          className="mb-4"
+          className="mb-4 object-contain"
         />
         <h1 className="text-3xl font-bold text-gray-900">Bienvenido a CONINS</h1>
         <p className="text-gray-500 mt-1">Control de Instructores · CDMC SENA</p>
