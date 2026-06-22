@@ -35,7 +35,7 @@ export default function Sidebar({ alertasViewed, isOpen, onClose }: SidebarProps
 
   return (
     <aside className={`
-      w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 z-50
+      w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 z-40
       transition-transform duration-300 ease-in-out
       -translate-x-full md:translate-x-0
       ${isOpen ? 'translate-x-0' : ''}
