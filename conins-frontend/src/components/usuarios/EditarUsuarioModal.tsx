@@ -6,13 +6,15 @@ type Usuario = {
   nombre: string
   email: string
   rol: string
+  tipo_documento?: string
+  documento?: string
 }
 
 type EditarUsuarioModalProps = {
   isOpen: boolean
   onClose: () => void
   usuario: Usuario | null
-  onSubmit: (data: { nombre: string; email: string; rol: string }) => Promise<void>
+  onSubmit: (data: { nombre: string; email: string; rol: string; tipo_documento: string; documento: string }) => Promise<void>
 }
 
 export default function EditarUsuarioModal({ isOpen, onClose, usuario, onSubmit }: EditarUsuarioModalProps) {
@@ -21,6 +23,8 @@ export default function EditarUsuarioModal({ isOpen, onClose, usuario, onSubmit 
     nombre: "",
     email: "",
     rol: "Instructor",
+    tipo_documento: "cc",
+    documento: "",
   })
 
   useEffect(() => {
@@ -29,6 +33,8 @@ export default function EditarUsuarioModal({ isOpen, onClose, usuario, onSubmit 
         nombre: usuario.nombre,
         email: usuario.email,
         rol: usuario.rol,
+        tipo_documento: usuario.tipo_documento || "cc",
+        documento: usuario.documento || "",
       })
     }
   }, [isOpen, usuario])
@@ -82,6 +88,35 @@ export default function EditarUsuarioModal({ isOpen, onClose, usuario, onSubmit 
               onChange={handleInputChange}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de documento</label>
+              <select
+                name="tipo_documento"
+                value={formData.tipo_documento}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              >
+                <option value="cc">Cédula de Ciudadanía</option>
+                <option value="ce">Cédula de Extranjería</option>
+                <option value="ti">Tarjeta de Identidad</option>
+                <option value="pasaporte">Pasaporte</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Número de documento</label>
+              <input
+                name="documento"
+                type="text"
+                required
+                value={formData.documento}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                placeholder="1234567890"
+              />
+            </div>
           </div>
 
           <div>

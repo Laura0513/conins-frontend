@@ -4,7 +4,7 @@ import { X, Loader2 } from "lucide-react"
 type CrearUsuarioModalProps = {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: { nombre: string; email: string; rol: string }) => Promise<void>
+  onSubmit: (data: { nombre: string; email: string; rol: string; tipo_documento: string; documento: string }) => Promise<void>
 }
 
 export default function CrearUsuarioModal({ isOpen, onClose, onSubmit }: CrearUsuarioModalProps) {
@@ -13,6 +13,8 @@ export default function CrearUsuarioModal({ isOpen, onClose, onSubmit }: CrearUs
     nombre: "",
     email: "",
     rol: "Instructor",
+    tipo_documento: "cc",
+    documento: "",
   })
 
   if (!isOpen) return null
@@ -22,7 +24,7 @@ export default function CrearUsuarioModal({ isOpen, onClose, onSubmit }: CrearUs
     setSubmitting(true)
     try {
       await onSubmit(formData)
-      setFormData({ nombre: "", email: "", rol: "Instructor" })
+      setFormData({ nombre: "", email: "", rol: "Instructor", tipo_documento: "cc", documento: "" })
     } finally {
       setSubmitting(false)
     }
@@ -67,6 +69,35 @@ export default function CrearUsuarioModal({ isOpen, onClose, onSubmit }: CrearUs
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
               placeholder="correo@sena.edu.co"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de documento</label>
+              <select
+                name="tipo_documento"
+                value={formData.tipo_documento}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              >
+                <option value="cc">Cédula de Ciudadanía</option>
+                <option value="ce">Cédula de Extranjería</option>
+                <option value="ti">Tarjeta de Identidad</option>
+                <option value="pasaporte">Pasaporte</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Número de documento</label>
+              <input
+                name="documento"
+                type="text"
+                required
+                value={formData.documento}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                placeholder="1234567890"
+              />
+            </div>
           </div>
 
           <div>

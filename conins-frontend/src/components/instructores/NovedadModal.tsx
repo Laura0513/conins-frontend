@@ -1,8 +1,15 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { X, Loader2, AlertTriangle } from "lucide-react"
+import { api } from "@/lib/api"
+
+type TipoNovedad = {
+  id: number
+  nombre: string
+  descripcion?: string
+}
 
 type NovedadData = {
-  tipo: string
+  tipo_novedad_id: number
   fecha_inicio: string
   fecha_regreso: string
   observacion: string
@@ -17,12 +24,38 @@ type NovedadModalProps = {
 
 export default function NovedadModal({ isOpen, onClose, onSubmit, instructorName }: NovedadModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [tiposNovedad, setTiposNovedad] = useState<TipoNovedad[]>([])
+  
   const [novedadData, setNovedadData] = useState<NovedadData>({
-    tipo: "licencia",
+    tipo_novedad_id: 0,
     fecha_inicio: "",
     fecha_regreso: "",
     observacion: "",
   })
+
+  useEffect(() => {
+    if (isOpen) {
+      setLoading(true)
+      api.catalogo.getTiposNovedadInstructor()
+        .then((res) => {
+          setTiposNovedad(res.data || [])
+          if (res.data && res.data.length > 0) {
+            setNovedadData(prev => ({ ...prev, tipo_novedad_id: res.data[0].id }))
+          }
+        })
+        .catch((err) => {
+          console.error("Error cargando tipos de novedad:", err)
+          // Fallback en caso de error
+          setTiposNovedad([
+            { id: 1, nombre: "licencia" },
+            { id: 2, nombre: "incapacidad" },
+            { id: 3, nombre: "comision" }
+          ])
+        })
+        .finally(() => setLoading(false))
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -31,7 +64,7 @@ export default function NovedadModal({ isOpen, onClose, onSubmit, instructorName
     setSubmitting(true)
     try {
       await onSubmit(novedadData)
-      setNovedadData({ tipo: "licencia", fecha_inicio: "", fecha_regreso: "", observacion: "" })
+      setNovedadData({ tipo_novedad_id: tiposNovedad[0]?.id || 0, fecha_inicio: "", fecha_regreso: "", observacion: "" })
     } finally {
       setSubmitting(false)
     }
@@ -56,16 +89,24 @@ export default function NovedadModal({ isOpen, onClose, onSubmit, instructorName
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-            <select
-              value={novedadData.tipo}
-              onChange={(e) => setNovedadData({ ...novedadData, tipo: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="licencia">Licencia</option>
-              <option value="incapacidad">Incapacidad</option>
-              <option value="comision">Comision</option>
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de novedad</label>
+            {loading ? (
+              <div className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-500 bg-gray-50 flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Cargando tipos...
+              </div>
+            ) : (
+              <select
+                value={novedadData.tipo_novedad_id}
+                onChange={(e) => setNovedadData({ ...novedadData, tipo_novedad_id: Number(e.target.value) })}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              >
+                {tiposNovedad.map((tipo) => (
+                  <option key={tipo.id} value={tipo.id}>
+                    {tipo.nombre.charAt(0).toUpperCase() + tipo.nombre.slice(1)}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

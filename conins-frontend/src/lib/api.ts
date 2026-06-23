@@ -243,6 +243,9 @@ export const api = {
         getCompetenciasByPrograma(programaId: number) {
             return apiFetch(`/catalogo/programas/${programaId}/competencias`)
         },
+        getTiposNovedadInstructor() {
+            return apiFetch('/catalogo/tipos-novedad-instructor')
+        },
     },
 
     ambientes: {

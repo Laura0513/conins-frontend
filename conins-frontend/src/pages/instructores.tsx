@@ -80,7 +80,7 @@ export default function InstructoresPage() {
     cargarInstructores()
   }
 
-  const handleNovedadSubmit = async (data: { tipo: string; fecha_inicio: string; fecha_regreso: string; observacion: string }) => {
+  const handleNovedadSubmit = async (data: { tipo_novedad_id: number; fecha_inicio: string; fecha_regreso: string; observacion: string }) => {
     if (!selectedInstructorId) return
 
     setConfirmDialog({
