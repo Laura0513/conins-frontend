@@ -1,5 +1,12 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { X, Loader2, AlertTriangle } from "lucide-react"
+import { api } from "@/lib/api"
+
+type TipoNovedadAmbiente = {
+  id: number
+  nombre: string
+  descripcion?: string
+}
 
 type Ambiente = {
   id: number
@@ -17,11 +24,36 @@ type BloquearAmbienteModalProps = {
 
 export default function BloquearAmbienteModal({ isOpen, onClose, ambiente, onSubmit }: BloquearAmbienteModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [tiposNovedad, setTiposNovedad] = useState<TipoNovedadAmbiente[]>([])
   const [formData, setFormData] = useState({
+    tipo_novedad_id: 0,
     fecha_inicio: "",
     fecha_fin: "",
-    motivo: "",
+    observacion: "",
   })
+
+  useEffect(() => {
+    if (isOpen) {
+      setLoading(true)
+      api.catalogo.getTiposNovedadAmbiente()
+        .then((res) => {
+          setTiposNovedad(res.data || [])
+          if (res.data && res.data.length > 0) {
+            setFormData(prev => ({ ...prev, tipo_novedad_id: res.data[0].id }))
+          }
+        })
+        .catch((err) => {
+          console.error("Error cargando tipos de novedad de ambiente:", err)
+          setTiposNovedad([
+            { id: 1, nombre: "mantenimiento" },
+            { id: 2, nombre: "evento institucional" },
+            { id: 3, nombre: "cerramiento temporal" }
+          ])
+        })
+        .finally(() => setLoading(false))
+    }
+  }, [isOpen])
 
   if (!isOpen || !ambiente) return null
 
@@ -30,7 +62,7 @@ export default function BloquearAmbienteModal({ isOpen, onClose, ambiente, onSub
     setSubmitting(true)
     try {
       await onSubmit(formData)
-      setFormData({ fecha_inicio: "", fecha_fin: "", motivo: "" })
+      setFormData({ tipo_novedad_id: tiposNovedad[0]?.id || 0, fecha_inicio: "", fecha_fin: "", observacion: "" })
     } finally {
       setSubmitting(false)
     }
@@ -54,11 +86,32 @@ export default function BloquearAmbienteModal({ isOpen, onClose, ambiente, onSub
           <AlertTriangle className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
           <div className="text-sm text-orange-800">
             <p className="font-medium">Ambiente: {ambiente.nombre}</p>
-            <p className="text-orange-700/80">El ambiente no podrá ser asignado durante el período de bloqueo.</p>
+            <p className="text-orange-700/80">El ambiente no podra ser asignado durante el periodo de bloqueo.</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de novedad</label>
+            {loading ? (
+              <div className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-500 bg-gray-50 flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" /> Cargando tipos...
+              </div>
+            ) : (
+              <select
+                value={formData.tipo_novedad_id}
+                onChange={(e) => handleChange("tipo_novedad_id", Number(e.target.value))}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              >
+                {tiposNovedad.map((tipo) => (
+                  <option key={tipo.id} value={tipo.id}>
+                    {tipo.nombre.charAt(0).toUpperCase() + tipo.nombre.slice(1)}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Fecha inicio <span className="text-red-500">*</span></label>
@@ -83,13 +136,12 @@ export default function BloquearAmbienteModal({ isOpen, onClose, ambiente, onSub
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Motivo <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Observacion</label>
             <textarea
-              required
               rows={3}
-              value={formData.motivo}
-              onChange={(e) => handleChange("motivo", e.target.value)}
-              placeholder="Ej: Mantenimiento preventivo, reparación de equipos..."
+              value={formData.observacion}
+              onChange={(e) => handleChange("observacion", e.target.value)}
+              placeholder="Ej: Mantenimiento preventivo, reparacion de equipos..."
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 resize-none"
             />
           </div>

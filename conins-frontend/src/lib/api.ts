@@ -246,6 +246,9 @@ export const api = {
         getTiposNovedadInstructor() {
             return apiFetch('/catalogo/tipos-novedad-instructor')
         },
+        getTiposNovedadAmbiente() {
+            return apiFetch('/catalogo/tipos-novedad-ambiente')
+        },
     },
 
     ambientes: {
