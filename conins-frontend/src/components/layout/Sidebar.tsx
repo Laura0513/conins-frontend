@@ -10,6 +10,7 @@ import {
   Bell,
   Search,
   UserCog,
+  FileText,
 } from "lucide-react"
 
 const menuItems = [
@@ -17,6 +18,7 @@ const menuItems = [
   { name: "Instructores", href: "/instructores", icon: Users },
   { name: "Ambientes", href: "/ambientes", icon: Building2 },
   { name: "Fichas", href: "/fichas", icon: BookOpen },
+  { name: "Novedades Fichas", href: "/ficha-novedades", icon: FileText },
   { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
   { name: "Horarios", href: "/horarios", icon: Calendar },
   { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },

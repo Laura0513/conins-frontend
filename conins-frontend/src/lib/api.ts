@@ -160,6 +160,18 @@ export const api = {
         },
     },
 
+    fichaNovedades: {
+        getAll() {
+            return apiFetch('/ficha-novedades')
+        },
+        create(data: any) {
+            return apiFetch('/ficha-novedades', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+    },
+
     assignments: {
         getAll() {
             return apiFetch('/asignaciones')
@@ -248,6 +260,9 @@ export const api = {
         },
         getTiposNovedadAmbiente() {
             return apiFetch('/catalogo/tipos-novedad-ambiente')
+        },
+        getTiposNovedadFicha() {
+            return apiFetch('/catalogo/tipos-novedad-ficha')
         },
     },
 
