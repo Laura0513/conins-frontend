@@ -3,6 +3,7 @@ import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
+import { exportarHorariosPDF } from "@/lib/exportPDF"
 import CrearHorarioModal from "@/components/horarios/CrearHorarioModal"
 import EditarHorarioModal from "@/components/horarios/EditarHorarioModal"
 import ConfirmDialog from "@/components/ui/ConfirmDialog"
@@ -19,6 +20,7 @@ import {
   XCircle,
   Clock,
   Ban,
+  FileDown,
 } from "lucide-react"
 
 type Horario = {
@@ -247,13 +249,22 @@ export default function HorariosPage() {
             <h1 className="text-2xl font-bold text-gray-900">Horarios</h1>
             <p className="text-gray-500 text-sm">Listado de horarios registrados del CDMC</p>
           </div>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Registrar horario
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => exportarHorariosPDF(listaFiltrada)}
+              className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <FileDown className="w-4 h-4" />
+              Exportar PDF
+            </button>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Registrar horario
+            </button>
+          </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
