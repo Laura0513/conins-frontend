@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { X, Loader2 } from "lucide-react"
+import { api } from "@/lib/api"
 
 type Ficha = {
   id: number
@@ -33,6 +34,7 @@ const ETAPAS = ["Lectiva", "Productiva"]
 
 export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: EditFichaModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [lideres, setLideres] = useState<{ id: number; nombre: string }[]>([])
   const [formData, setFormData] = useState({
     numero_ficha: "",
     programa_id: "",
@@ -59,7 +61,17 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
         es_lider: false,
       })
     }
-  }, [ficha])
+    if (isOpen) {
+      api.users.getAll()
+        .then((res) => {
+          const lideresList = (res.data || []).filter(
+            (u: any) => u.rol === "Lider de Programa"
+          )
+          setLideres(lideresList)
+        })
+        .catch(() => setLideres([]))
+    }
+  }, [isOpen, ficha])
 
   if (!isOpen || !ficha) return null
 
@@ -110,6 +122,20 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
               <option value="">Seleccionar programa</option>
               {PROGRAMAS_MOCK.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Lider de programa</label>
+            <select
+              value={formData.lider_ficha_id}
+              onChange={(e) => handleChange("lider_ficha_id", e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+            >
+              <option value="">Sin asignar</option>
+              {lideres.map((l) => (
+                <option key={l.id} value={l.id}>{l.nombre}</option>
               ))}
             </select>
           </div>

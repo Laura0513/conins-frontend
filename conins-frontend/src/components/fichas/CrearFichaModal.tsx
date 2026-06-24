@@ -9,6 +9,7 @@ type CrearFichaModalProps = {
 }
 
 type Programa = { id: number; nombre: string }
+type Lider = { id: number; nombre: string }
 
 const JORNADAS = [
   { id: 1, nombre: "Mañana" },
@@ -20,11 +21,13 @@ const JORNADAS = [
 export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFichaModalProps) {
   const [submitting, setSubmitting] = useState(false)
   const [programas, setProgramas] = useState<Programa[]>([])
+  const [lideres, setLideres] = useState<Lider[]>([])
   const [formData, setFormData] = useState({
     numero_ficha: "",
     programa_id: "",
     jornada_id: "",
     etapa: "lectiva",
+    lider_id: "",
     fecha_inicio_lectiva: "",
     fecha_fin_lectiva: "",
     fecha_fin_ficha: "",
@@ -32,9 +35,21 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
 
   useEffect(() => {
     if (isOpen) {
-      api.programs.getAll()
-        .then((res) => setProgramas(res.data))
-        .catch(() => setProgramas([]))
+      Promise.all([
+        api.programs.getAll(),
+        api.users.getAll(),
+      ])
+        .then(([programsRes, usersRes]) => {
+          setProgramas(programsRes.data || [])
+          const lideresList = (usersRes.data || []).filter(
+            (u: any) => u.rol === "Lider de Programa"
+          )
+          setLideres(lideresList)
+        })
+        .catch(() => {
+          setProgramas([])
+          setLideres([])
+        })
     }
   }, [isOpen])
 
@@ -49,6 +64,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
         programa_id: Number(formData.programa_id),
         jornada_id: Number(formData.jornada_id),
         etapa: formData.etapa,
+        lider_id: Number(formData.lider_id) || null,
         fecha_inicio_lectiva: formData.fecha_inicio_lectiva || undefined,
         fecha_fin_lectiva: formData.fecha_fin_lectiva || undefined,
         fecha_fin_ficha: formData.fecha_fin_ficha || undefined,
@@ -59,6 +75,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
         programa_id: "",
         jornada_id: "",
         etapa: "lectiva",
+        lider_id: "",
         fecha_inicio_lectiva: "",
         fecha_fin_lectiva: "",
         fecha_fin_ficha: "",
@@ -106,6 +123,20 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
               <option value="">Seleccionar programa</option>
               {programas.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Lider de programa</label>
+            <select
+              value={formData.lider_id}
+              onChange={(e) => handleChange("lider_id", e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+            >
+              <option value="">Sin asignar</option>
+              {lideres.map((l) => (
+                <option key={l.id} value={l.id}>{l.nombre}</option>
               ))}
             </select>
           </div>

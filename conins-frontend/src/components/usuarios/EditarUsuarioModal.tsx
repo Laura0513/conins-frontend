@@ -128,6 +128,7 @@ export default function EditarUsuarioModal({ isOpen, onClose, usuario, onSubmit 
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="Instructor">Instructor</option>
+              <option value="Lider de Programa">Lider de Programa</option>
               <option value="Coordinador">Coordinador</option>
               <option value="Subdirector">Subdirector</option>
             </select>

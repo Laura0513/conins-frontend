@@ -203,7 +203,8 @@ export default function UsuariosPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           u.rol === 'Subdirector' ? 'bg-purple-100 text-purple-800' : 
-                          u.rol === 'Coordinador' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                          u.rol === 'Coordinador' ? 'bg-blue-100 text-blue-800' :
+                          u.rol === 'Lider de Programa' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'
                         }`}>
                           {u.rol}
                         </span>
