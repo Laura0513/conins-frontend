@@ -3,6 +3,7 @@ import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import { useToast } from "@/lib/ToastContext"
+import { exportarCargaHorariaPDF, exportarHorarioFichaPDF, exportarOcupacionPDF } from "@/lib/exportPDF"
 import {
   Search,
   FileDown,
@@ -110,9 +111,14 @@ export default function ConsultasPage() {
     }
   }
 
-  const handleDownloadPDF = () => {
-    showToast("Preparando reporte para descarga...", "info")
-    setTimeout(() => window.print(), 500)
+  const handleExport = () => {
+    if (activeTab === "carga") {
+      exportarCargaHorariaPDF(carga)
+    } else if (activeTab === "ficha") {
+      exportarHorarioFichaPDF(horariosFicha)
+    } else if (activeTab === "ocupacion") {
+      exportarOcupacionPDF(ocupacion)
+    }
   }
 
   if (authLoading || !user) {
@@ -137,7 +143,7 @@ export default function ConsultasPage() {
             <p className="text-gray-500 text-sm">Vistas consolidadas para gestión académica</p>
           </div>
           <button
-            onClick={handleDownloadPDF}
+            onClick={handleExport}
             className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
           >
             <FileDown className="w-4 h-4" />
@@ -328,23 +334,7 @@ export default function ConsultasPage() {
             )}
           </>
         )}
-
-        {/* Footer impresión */}
-        <div className="hidden print:block mt-8 text-xs text-gray-500 text-center">
-          <p>Reporte generado automáticamente por CONINS · CDMC SENA</p>
-          <p>Fecha de emisión: {new Date().toLocaleDateString("es-CO")}</p>
-        </div>
       </div>
-
-      {/* Estilos impresión */}
-      <style jsx global>{`
-        @media print {
-          body * { visibility: hidden; }
-          .print\\:hidden { display: none !important; }
-          main { position: absolute; left: 0; top: 0; width: 100%; }
-          main * { visibility: visible; }
-        }
-      `}</style>
     </DashboardLayout>
   )
 }
