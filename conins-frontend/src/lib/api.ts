@@ -334,6 +334,12 @@ export const api = {
                 method: 'PATCH',
             })
         },
+        asignarProgramas(liderId: number, programaIds: number[]) {
+            return apiFetch(`/auth/usuarios/${liderId}/programas`, {
+                method: 'PUT',
+                body: JSON.stringify({ programa_ids: programaIds }),
+            })
+        },
     },
 }
 

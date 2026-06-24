@@ -5,6 +5,7 @@ import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import CrearUsuarioModal from "@/components/usuarios/CrearUsuarioModal"
 import EditarUsuarioModal from "@/components/usuarios/EditarUsuarioModal"
+import AsignarProgramasLiderModal from "@/components/usuarios/AsignarProgramasLiderModal"
 import {
   Search,
   Plus,
@@ -13,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  BookOpen,
 } from "lucide-react"
 
 type Usuario = {
@@ -38,6 +40,7 @@ export default function UsuariosPage() {
   const [loading, setLoading] = useState(true)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isAsignarProgramasModalOpen, setIsAsignarProgramasModalOpen] = useState(false)
   const [selectedUsuario, setSelectedUsuario] = useState<Usuario | null>(null)
 
   const [search, setSearch] = useState("")
@@ -93,6 +96,21 @@ export default function UsuariosPage() {
   const openEditModal = (usuario: Usuario) => {
     setSelectedUsuario(usuario)
     setIsEditModalOpen(true)
+  }
+
+  const openAsignarProgramasModal = (usuario: Usuario) => {
+    setSelectedUsuario(usuario)
+    setIsAsignarProgramasModalOpen(true)
+  }
+
+  const handleAsignarProgramas = async (liderId: number, programaIds: number[]) => {
+    try {
+      await api.users.asignarProgramas(liderId, programaIds)
+      showToast("Programas asignados exitosamente", "success")
+      setIsAsignarProgramasModalOpen(false)
+    } catch (err: any) {
+      showToast(err.message || "Error al asignar programas", "error")
+    }
   }
 
   const handleEdit = async (data: any) => {
@@ -157,6 +175,7 @@ export default function UsuariosPage() {
               <option value="todos">Rol: Todos</option>
               <option value="Subdirector">Subdirector</option>
               <option value="Coordinador">Coordinador</option>
+              <option value="Lider de Programa">Lider de Programa</option>
               <option value="Instructor">Instructor</option>
             </select>
 
@@ -228,6 +247,15 @@ export default function UsuariosPage() {
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
+                          {u.rol === "Lider de Programa" && (
+                            <button
+                              onClick={() => openAsignarProgramasModal(u)}
+                              className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                              title="Asignar programas"
+                            >
+                              <BookOpen className="w-4 h-4" />
+                            </button>
+                          )}
                           <button
                             onClick={() => handleToggleEstado(u)}
                             className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -272,6 +300,13 @@ export default function UsuariosPage() {
         onClose={() => setIsEditModalOpen(false)}
         usuario={selectedUsuario}
         onSubmit={handleEdit}
+      />
+
+      <AsignarProgramasLiderModal
+        isOpen={isAsignarProgramasModalOpen}
+        onClose={() => setIsAsignarProgramasModalOpen(false)}
+        lider={selectedUsuario ? { id: selectedUsuario.id, nombre: selectedUsuario.nombre } : null}
+        onSubmit={handleAsignarProgramas}
       />
     </DashboardLayout>
   )
