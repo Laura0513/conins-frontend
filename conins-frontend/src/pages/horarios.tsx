@@ -18,6 +18,7 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Ban,
 } from "lucide-react"
 
 type Horario = {
@@ -207,6 +208,25 @@ export default function HorariosPage() {
     })
   }
 
+  const handleSuspender = (horario: Horario) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: "Suspender horario",
+      message: `¿Estas seguro de suspender el horario de ${horario.instructor_nombre}? Se registrara la trazabilidad del cambio.`,
+      showMotivo: true,
+      onConfirm: async (motivo?: string) => {
+        setConfirmDialog({ ...confirmDialog, isOpen: false })
+        try {
+          await api.horarios.suspender(horario.id, motivo || "Sin motivo especificado")
+          showToast("Horario suspendido exitosamente", "success")
+          cargarHorarios()
+        } catch (err: any) {
+          showToast(err.message || "Error al suspender horario", "error")
+        }
+      },
+    })
+  }
+
   if (authLoading || !user) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -383,6 +403,13 @@ export default function HorariosPage() {
                                 title="Editar"
                               >
                                 <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleSuspender(h)}
+                                className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                                title="Suspender"
+                              >
+                                <Ban className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDesactivar(h)}

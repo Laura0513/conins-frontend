@@ -240,6 +240,12 @@ export const api = {
                 body: JSON.stringify({ motivo }),
             })
         },
+        suspender(id: number, motivo: string) {
+            return apiFetch(`/horarios/${id}/suspender`, {
+                method: 'PATCH',
+                body: JSON.stringify({ motivo }),
+            })
+        },
     },
 
     programs: {
