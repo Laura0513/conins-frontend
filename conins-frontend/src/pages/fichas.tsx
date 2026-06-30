@@ -315,7 +315,13 @@ export default function FichasPage() {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-400">-</span>
+                          <button
+                            onClick={() => openDetailModal(ficha)}
+                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                            title="Ver detalle"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
                         )}
                       </td>
                     </tr>

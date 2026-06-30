@@ -106,6 +106,46 @@ export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFicha
 
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-sena" />
+              Competencias asignadas
+            </h4>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-900">Bases de datos relacionales</p>
+                <span className="text-xs text-gray-500">20h</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm font-medium text-gray-900">Análisis y diseño de software</p>
+                <span className="text-xs text-gray-500">15h</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-sena" />
+              Horario semanal
+            </h4>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Lunes, Miércoles, Viernes</p>
+                  <p className="text-xs text-gray-500">Aula 203</p>
+                </div>
+                <span className="text-sm font-medium text-sena">06:00 - 12:00</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Martes, Jueves</p>
+                  <p className="text-xs text-gray-500">Aula 204</p>
+                </div>
+                <span className="text-sm font-medium text-sena">08:00 - 12:00</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Users className="w-4 h-4 text-sena" />
               Instructores asignados ({MOCK_INSTRUCTORES.length})
             </h4>
