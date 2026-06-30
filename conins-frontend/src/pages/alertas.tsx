@@ -100,6 +100,8 @@ export default function AlertasPage() {
   const [filtroTipo, setFiltroTipo] = useState("todas")
   const [filtroEstado, setFiltroEstado] = useState("todas")
 
+  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+
   useEffect(() => {
     cargarAlertas()
   }, [])
@@ -108,10 +110,13 @@ export default function AlertasPage() {
     setLoading(true)
     try {
       const res = await api.alertas.getAll()
-      setAlertas(res.data)
+      const data = res.data || []
+      const filtrado = esAdmin ? data : data.filter((a: Alerta) => a.instructor_nombre === user?.nombre)
+      setAlertas(filtrado)
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
-      setAlertas(MOCK_ALERTAS)
+      const filtrado = esAdmin ? MOCK_ALERTAS : MOCK_ALERTAS.filter((a) => a.instructor_nombre === user?.nombre)
+      setAlertas(filtrado)
     } finally {
       setLoading(false)
     }
@@ -164,7 +169,7 @@ export default function AlertasPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Alertas</h1>
-            <p className="text-gray-500 text-sm">Gestion de alertas del sistema</p>
+            <p className="text-gray-500 text-sm">{esAdmin ? "Gestion de alertas del sistema" : "Tus notificaciones y alertas"}</p>
           </div>
         </div>
 
