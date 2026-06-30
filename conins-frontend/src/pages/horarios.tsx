@@ -6,6 +6,7 @@ import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import { exportarHorariosPDF } from "@/lib/exportPDF"
 import CrearHorarioModal from "@/components/horarios/CrearHorarioModal"
 import EditarHorarioModal from "@/components/horarios/EditarHorarioModal"
+import GrillaHorarios from "@/components/horarios/GrillaHorarios"
 import ConfirmDialog from "@/components/ui/ConfirmDialog"
 import {
   Search,
@@ -21,6 +22,8 @@ import {
   Clock,
   Ban,
   FileDown,
+  LayoutGrid,
+  List,
 } from "lucide-react"
 
 type Horario = {
@@ -65,6 +68,7 @@ export default function HorariosPage() {
   const [filtroInstructor, setFiltroInstructor] = useState("todos")
   const [filtroJornada, setFiltroJornada] = useState("todas")
   const [filtroEstado, setFiltroEstado] = useState("todos")
+  const [vistaGrilla, setVistaGrilla] = useState(false)
 
   useEffect(() => {
     cargarHorarios()
@@ -251,6 +255,13 @@ export default function HorariosPage() {
           </div>
           <div className="flex gap-3">
             <button
+              onClick={() => setVistaGrilla(!vistaGrilla)}
+              className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+            >
+              {vistaGrilla ? <List className="w-4 h-4" /> : <LayoutGrid className="w-4 h-4" />}
+              {vistaGrilla ? "Ver tabla" : "Ver grilla"}
+            </button>
+            <button
               onClick={() => exportarHorariosPDF(listaFiltrada)}
               className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
             >
@@ -327,6 +338,9 @@ export default function HorariosPage() {
           </div>
         </div>
 
+        {vistaGrilla ? (
+          <GrillaHorarios horarios={listaFiltrada} />
+        ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
             <div className="p-12 flex flex-col items-center justify-center text-gray-500">
@@ -455,6 +469,7 @@ export default function HorariosPage() {
             </div>
           </div>
         </div>
+        )}
       </div>
 
       <CrearHorarioModal

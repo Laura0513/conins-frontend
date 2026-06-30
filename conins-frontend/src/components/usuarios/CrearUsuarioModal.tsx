@@ -15,6 +15,8 @@ export default function CrearUsuarioModal({ isOpen, onClose, onSubmit }: CrearUs
     rol: "Instructor",
     tipo_documento: "cc",
     documento: "",
+    cargo: "",
+    area: "",
   })
 
   if (!isOpen) return null
@@ -24,7 +26,7 @@ export default function CrearUsuarioModal({ isOpen, onClose, onSubmit }: CrearUs
     setSubmitting(true)
     try {
       await onSubmit(formData)
-      setFormData({ nombre: "", email: "", rol: "Instructor", tipo_documento: "cc", documento: "" })
+      setFormData({ nombre: "", email: "", rol: "Instructor", tipo_documento: "cc", documento: "", cargo: "", area: "" })
     } finally {
       setSubmitting(false)
     }
@@ -113,6 +115,34 @@ export default function CrearUsuarioModal({ isOpen, onClose, onSubmit }: CrearUs
               <option value="Coordinador">Coordinador</option>
               <option value="Subdirector">Subdirector</option>
             </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
+              <input
+                name="cargo"
+                type="text"
+                value={formData.cargo}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                placeholder="Ej: Instructor"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Area</label>
+              <select
+                name="area"
+                value={formData.area}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              >
+                <option value="">Seleccionar</option>
+                <option value="Tecnica">Tecnica</option>
+                <option value="Transversal">Transversal</option>
+                <option value="Administrativa">Administrativa</option>
+              </select>
+            </div>
           </div>
 
           <div className="pt-2 flex items-center justify-end gap-3">
