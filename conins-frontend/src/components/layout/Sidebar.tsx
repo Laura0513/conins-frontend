@@ -43,10 +43,11 @@ const MENU_LIDER = [
 ]
 
 function getMenuItems(rol: string) {
-  switch (rol) {
-    case "Instructor":
+  const rolNormalized = rol?.trim().toLowerCase()
+  switch (rolNormalized) {
+    case "instructor":
       return MENU_INSTRUCTOR
-    case "Lider de Programa":
+    case "lider de programa":
       return MENU_LIDER
     default:
       return MENU_ADMIN
