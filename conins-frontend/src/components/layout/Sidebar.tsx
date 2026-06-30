@@ -29,6 +29,9 @@ const MENU_INSTRUCTOR = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   { name: "Mis Horarios", href: "/horarios", icon: Calendar },
   { name: "Mis Asignaciones", href: "/asignaciones", icon: ClipboardList },
+  { name: "Mis Fichas", href: "/fichas", icon: BookOpen },
+  { name: "Mis Competencias", href: "/competencias", icon: Users },
+  { name: "Mis Ambientes", href: "/ambientes", icon: Building2 },
   { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
 ]
 

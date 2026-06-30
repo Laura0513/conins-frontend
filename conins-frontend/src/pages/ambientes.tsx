@@ -37,7 +37,7 @@ const MOCK_AMBIENTES: Ambiente[] = [
   { id: 1, nombre: "Aula 200", tipo: "aula", capacidad: 30, area_id: null, activo: true },
   { id: 2, nombre: "Aula 201", tipo: "aula", capacidad: 30, area_id: null, activo: true },
   { id: 3, nombre: "Aula 203", tipo: "aula", capacidad: 35, area_id: null, activo: true, ocupante_actual: { instructor: "Carlos Álvarez", ficha: "2995403", competencia: "Bases de datos" } },
-  { id: 4, nombre: "Taller T1", tipo: "taller", capacidad: 20, area_id: null, activo: true, ocupante_actual: { instructor: "Ana García", ficha: "2887341", competencia: "Calzado" } },
+  { id: 4, nombre: "Taller T1", tipo: "taller", capacidad: 20, area_id: null, activo: true, ocupante_actual: { instructor: "Instructor Prueba", ficha: "2760123", competencia: "HUI FORMACION" } },
   { id: 5, nombre: "Lab 101", tipo: "laboratorio", capacidad: 25, area_id: null, activo: false },
 ]
 
@@ -56,6 +56,8 @@ export default function AmbientesPage() {
   const [filtroTipo, setFiltroTipo] = useState("todos")
   const [filtroEstado, setFiltroEstado] = useState("todos")
 
+  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+
   useEffect(() => {
     cargarAmbientes()
   }, [])
@@ -64,10 +66,13 @@ export default function AmbientesPage() {
     setLoading(true)
     try {
       const res = await api.ambientes.getAll()
-      setAmbientes(res.data)
+      const data = res.data || []
+      const filtrado = esAdmin ? data : data.filter((a: Ambiente) => a.ocupante_actual?.instructor === user?.nombre)
+      setAmbientes(filtrado)
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
-      setAmbientes(MOCK_AMBIENTES)
+      const filtrado = esAdmin ? MOCK_AMBIENTES : MOCK_AMBIENTES.filter((a) => a.ocupante_actual?.instructor === user?.nombre)
+      setAmbientes(filtrado)
     } finally {
       setLoading(false)
     }
@@ -149,15 +154,17 @@ export default function AmbientesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Ambientes</h1>
-            <p className="text-gray-500 text-sm">Aulas y talleres del CDMC</p>
+            <p className="text-gray-500 text-sm">{esAdmin ? "Aulas y talleres del CDMC" : "Mis ambientes asignados"}</p>
           </div>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Registrar ambiente
-          </button>
+          {esAdmin && (
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Registrar ambiente
+            </button>
+          )}
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -217,7 +224,7 @@ export default function AmbientesPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Capacidad</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Estado</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Ocupante Actual</th>
-                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
+                    {esAdmin && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -246,29 +253,33 @@ export default function AmbientesPage() {
                         )}
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openAgendaModal(amb)}
-                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
-                            title="Ver agenda"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => openBloqueoModal(amb)}
-                            className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
-                            title="Registrar bloqueo"
-                          >
-                            <Lock className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => openEditModal(amb)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                        </div>
+                        {esAdmin ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => openAgendaModal(amb)}
+                              className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                              title="Ver agenda"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => openBloqueoModal(amb)}
+                              className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                              title="Registrar bloqueo"
+                            >
+                              <Lock className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => openEditModal(amb)}
+                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                              title="Editar"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
                       </td>
                     </tr>
                   ))}

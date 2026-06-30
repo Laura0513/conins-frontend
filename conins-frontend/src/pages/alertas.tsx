@@ -99,6 +99,7 @@ export default function AlertasPage() {
   const [search, setSearch] = useState("")
   const [filtroTipo, setFiltroTipo] = useState("todas")
   const [filtroEstado, setFiltroEstado] = useState("todas")
+  const [activeTab, setActiveTab] = useState<"pendientes" | "historial">("pendientes")
 
   const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
 
@@ -122,6 +123,11 @@ export default function AlertasPage() {
     }
   }
 
+  const tabs = [
+    { id: "pendientes", label: "Pendientes", count: alertas.filter(a => !a.atendida).length },
+    { id: "historial", label: "Historial", count: alertas.filter(a => a.atendida).length },
+  ]
+
   const handleMarcarAtendida = async (alerta: Alerta) => {
     try {
       await api.alertas.marcarAtendida(alerta.id)
@@ -136,6 +142,7 @@ export default function AlertasPage() {
   }
 
   const listaFiltrada = alertas.filter((a) => {
+    const coincideTab = activeTab === "pendientes" ? !a.atendida : a.atendida
     const texto = search.toLowerCase()
     const coincideBusqueda =
       a.mensaje.toLowerCase().includes(texto) ||
@@ -145,7 +152,7 @@ export default function AlertasPage() {
       filtroEstado === "todas" ||
       (filtroEstado === "pendiente" && !a.atendida) ||
       (filtroEstado === "atendida" && a.atendida)
-    return coincideBusqueda && coincideTipo && coincideEstado
+    return coincideTab && coincideBusqueda && coincideTipo && coincideEstado
   })
 
   const pendientes = alertas.filter((a) => !a.atendida).length
@@ -171,6 +178,23 @@ export default function AlertasPage() {
             <h1 className="text-2xl font-bold text-gray-900">Alertas</h1>
             <p className="text-gray-500 text-sm">{esAdmin ? "Gestion de alertas del sistema" : "Tus notificaciones y alertas"}</p>
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === tab.id
+                  ? "bg-white text-gray-900 shadow-sm border border-gray-200"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              }`}
+            >
+              {tab.label} ({tab.count})
+            </button>
+          ))}
         </div>
 
         {/* Resumen */}

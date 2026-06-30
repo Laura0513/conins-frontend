@@ -28,13 +28,14 @@ type Ficha = {
   instructores_count: number
   estado: string
   activo: boolean
+  instructor_nombre?: string
 }
 
 const MOCK_FICHAS: Ficha[] = [
-  { id: 1, numero_ficha: "2995403", programa: "ADSO", jornada: "Manana", etapa: "lectiva", modalidad: "Presencial", instructores_count: 4, estado: "Activa", activo: true },
-  { id: 2, numero_ficha: "2887341", programa: "Calzado", jornada: "Mixta", etapa: "productiva", modalidad: "Presencial", instructores_count: 2, estado: "Activa", activo: true },
-  { id: 3, numero_ficha: "3012456", programa: "Diseno", jornada: "Noche", etapa: "lectiva", modalidad: "Presencial", instructores_count: 3, estado: "Activa", activo: true },
-  { id: 4, numero_ficha: "2760123", programa: "HUI FORMACION", jornada: "Virtual", etapa: "lectiva", modalidad: "Virtual", instructores_count: 0, estado: "Activa", activo: true },
+  { id: 1, numero_ficha: "2995403", programa: "ADSO", jornada: "Manana", etapa: "lectiva", modalidad: "Presencial", instructores_count: 4, estado: "Activa", activo: true, instructor_nombre: "Carlos Álvarez" },
+  { id: 2, numero_ficha: "2887341", programa: "Calzado", jornada: "Mixta", etapa: "productiva", modalidad: "Presencial", instructores_count: 2, estado: "Activa", activo: true, instructor_nombre: "Andrés Pareja" },
+  { id: 3, numero_ficha: "3012456", programa: "Diseno", jornada: "Noche", etapa: "lectiva", modalidad: "Presencial", instructores_count: 3, estado: "Activa", activo: true, instructor_nombre: "William Ramírez" },
+  { id: 4, numero_ficha: "2760123", programa: "HUI FORMACION", jornada: "Virtual", etapa: "lectiva", modalidad: "Virtual", instructores_count: 0, estado: "Activa", activo: true, instructor_nombre: "Instructor Prueba" },
 ]
 
 export default function FichasPage() {
@@ -61,6 +62,8 @@ export default function FichasPage() {
   const [filtroEtapa, setFiltroEtapa] = useState("todas")
   const [filtroModalidad, setFiltroModalidad] = useState("todas")
 
+  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+
   useEffect(() => {
     cargarFichas()
     cargarProgramas()
@@ -79,10 +82,13 @@ export default function FichasPage() {
     setLoading(true)
     try {
       const res = await api.fichas.getAll()
-      setFichas(res.data)
+      const data = res.data || []
+      const filtrado = esAdmin ? data : data.filter((f: Ficha) => f.instructor_nombre === user?.nombre)
+      setFichas(filtrado)
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
-      setFichas(MOCK_FICHAS)
+      const filtrado = esAdmin ? MOCK_FICHAS : MOCK_FICHAS.filter((f) => f.instructor_nombre === user?.nombre)
+      setFichas(filtrado)
     } finally {
       setLoading(false)
     }
@@ -158,15 +164,17 @@ export default function FichasPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Fichas</h1>
-            <p className="text-gray-500 text-sm">Gestion de fichas de formacion</p>
+            <p className="text-gray-500 text-sm">{esAdmin ? "Gestion de fichas de formacion" : "Mis fichas asignadas"}</p>
           </div>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Registrar ficha
-          </button>
+          {esAdmin && (
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Registrar ficha
+            </button>
+          )}
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -250,7 +258,7 @@ export default function FichasPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4">Modalidad</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Instructores</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
-                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
+                    {esAdmin && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -282,29 +290,33 @@ export default function FichasPage() {
                         </span>
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openDetailModal(ficha)}
-                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
-                            title="Ver detalle"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => openEditModal(ficha)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleFinalizarFicha(ficha)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title="Finalizar ficha"
-                          >
-                            <Power className="w-4 h-4" />
-                          </button>
-                        </div>
+                        {esAdmin ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => openDetailModal(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                              title="Ver detalle"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => openEditModal(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                              title="Editar"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleFinalizarFicha(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                              title="Finalizar ficha"
+                            >
+                              <Power className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
                       </td>
                     </tr>
                   ))}
