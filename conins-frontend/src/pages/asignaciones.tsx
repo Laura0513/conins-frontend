@@ -65,6 +65,8 @@ export default function AsignacionesPage() {
   const [filtroPrograma, setFiltroPrograma] = useState("todos")
   const [filtroCoordinacion, setFiltroCoordinacion] = useState("todos")
 
+  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+
   useEffect(() => {
     cargarAsignaciones()
   }, [])
@@ -77,10 +79,12 @@ export default function AsignacionesPage() {
         ...a,
         tipo: !a.activo ? "historica" : a.es_provisional ? "provisional" : "activa",
       }))
-      setAsignaciones(mapped)
+      const filtrado = esAdmin ? mapped : mapped.filter((a: Asignacion) => a.instructor_nombre === user?.nombre)
+      setAsignaciones(filtrado)
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
-      setAsignaciones(MOCK_ASIGNACIONES)
+      const filtrado = esAdmin ? MOCK_ASIGNACIONES : MOCK_ASIGNACIONES.filter((a) => a.instructor_nombre === user?.nombre)
+      setAsignaciones(filtrado)
     } finally {
       setLoading(false)
     }
@@ -244,20 +248,24 @@ export default function AsignacionesPage() {
           </div>
 
           <div className="flex justify-end gap-3">
-            <button
-              onClick={() => setIsProvisionalModalOpen(true)}
-              className="px-4 py-2.5 border border-sena text-sena rounded-lg text-sm font-medium hover:bg-sena/5 transition-colors flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Asignación provisional
-            </button>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Asignar competencia
-            </button>
+            {esAdmin && (
+              <>
+                <button
+                  onClick={() => setIsProvisionalModalOpen(true)}
+                  className="px-4 py-2.5 border border-sena text-sena rounded-lg text-sm font-medium hover:bg-sena/5 transition-colors flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Asignación provisional
+                </button>
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Asignar competencia
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -283,7 +291,7 @@ export default function AsignacionesPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Jornada</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Líder</th>
-                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
+                    {esAdmin && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -300,29 +308,33 @@ export default function AsignacionesPage() {
                         )}
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => openDetailModal(asig)}
-                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
-                            title="Ver detalle"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => openEditModal(asig)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDesactivar(asig)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title="Desactivar"
-                          >
-                            <Power className="w-4 h-4" />
-                          </button>
-                        </div>
+                        {esAdmin ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => openDetailModal(asig)}
+                              className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                              title="Ver detalle"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => openEditModal(asig)}
+                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                              title="Editar"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDesactivar(asig)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                              title="Desactivar"
+                            >
+                              <Power className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
                       </td>
                     </tr>
                   ))}
