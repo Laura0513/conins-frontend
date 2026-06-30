@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
-import { Loader2, Award } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
 type Competencia = {
   id: number
   nombre: string
   programa: string
+  ficha_numero: string
+  ambiente: string
   estado: "Activa" | "Inactiva"
 }
 
 const MOCK_COMPETENCIAS: Competencia[] = [
-  { id: 1, nombre: "Bases de datos relacionales", programa: "ADSO", estado: "Activa" },
-  { id: 2, nombre: "Análisis y diseño de software", programa: "ADSO", estado: "Activa" },
-  { id: 3, nombre: "Desarrollo de aplicaciones web", programa: "ADSO", estado: "Activa" },
-  { id: 4, nombre: "Gestión de proyectos de software", programa: "ADSO", estado: "Inactiva" },
+  { id: 1, nombre: "Bases de datos relacionales", programa: "ADSO", ficha_numero: "2995403", ambiente: "Aula 203", estado: "Activa" },
+  { id: 2, nombre: "Análisis y diseño de software", programa: "ADSO", ficha_numero: "2995403", ambiente: "Aula 204", estado: "Activa" },
+  { id: 3, nombre: "Desarrollo de aplicaciones web", programa: "ADSO", ficha_numero: "2887341", ambiente: "Lab 101", estado: "Activa" },
+  { id: 4, nombre: "Gestión de proyectos de software", programa: "ADSO", ficha_numero: "3012456", ambiente: "Taller T1", estado: "Inactiva" },
 ]
 
 export default function CompetenciasPage() {
@@ -60,25 +62,35 @@ export default function CompetenciasPage() {
               No tienes competencias registradas.
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
-              {competencias.map((comp) => (
-                <div key={comp.id} className="p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-sena/10 flex items-center justify-center">
-                      <Award className="w-5 h-5 text-sena" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{comp.nombre}</p>
-                      <p className="text-sm text-gray-500">{comp.programa}</p>
-                    </div>
-                  </div>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    comp.estado === "Activa" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                  }`}>
-                    {comp.estado}
-                  </span>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
+                  <tr>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Competencia</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {competencias.map((comp) => (
+                    <tr key={comp.id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{comp.nombre}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{comp.programa}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{comp.ficha_numero}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{comp.ambiente}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          comp.estado === "Activa" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                        }`}>
+                          {comp.estado}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
