@@ -60,8 +60,8 @@ export default function Home() {
         .then((res) => {
           setInstructorCount(res.data.length)
         })
-        .catch((err) => {
-          console.error("Error cargando instructores:", err)
+        .catch(() => {
+          setInstructorCount(0)
         })
         .finally(() => setDataLoading(false))
     }
