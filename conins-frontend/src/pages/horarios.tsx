@@ -70,6 +70,8 @@ export default function HorariosPage() {
   const [filtroEstado, setFiltroEstado] = useState("todos")
   const [vistaGrilla, setVistaGrilla] = useState(false)
 
+  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+
   useEffect(() => {
     cargarHorarios()
   }, [])
@@ -78,10 +80,13 @@ export default function HorariosPage() {
     setLoading(true)
     try {
       const res = await api.horarios.getAll()
-      setHorarios(res.data)
+      const data = res.data || []
+      const filtrado = esAdmin ? data : data.filter((h: Horario) => h.instructor_nombre === user?.nombre)
+      setHorarios(filtrado)
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
-      setHorarios(MOCK_HORARIOS)
+      const filtrado = esAdmin ? MOCK_HORARIOS : MOCK_HORARIOS.filter((h) => h.instructor_nombre === user?.nombre)
+      setHorarios(filtrado)
     } finally {
       setLoading(false)
     }
@@ -268,13 +273,15 @@ export default function HorariosPage() {
               <FileDown className="w-4 h-4" />
               Exportar PDF
             </button>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Registrar horario
-            </button>
+            {esAdmin && (
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Registrar horario
+              </button>
+            )}
           </div>
         </div>
 
@@ -364,7 +371,7 @@ export default function HorariosPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4">Días</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Horas</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
-                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
+                    {esAdmin && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -402,50 +409,54 @@ export default function HorariosPage() {
                         </span>
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          {h.estado === 'Pendiente' ? (
-                            <>
-                              <button
-                                onClick={() => handleAprobar(h)}
-                                className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
-                                title="Aprobar"
-                              >
-                                <CheckCircle className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleRechazar(h)}
-                                className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                                title="Rechazar"
-                              >
-                                <XCircle className="w-4 h-4" />
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => openEditModal(h)}
-                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                title="Editar"
-                              >
-                                <Pencil className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleSuspender(h)}
-                                className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
-                                title="Suspender"
-                              >
-                                <Ban className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDesactivar(h)}
-                                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                title={h.activo ? "Deshabilitar" : "Habilitar"}
-                              >
-                                <Power className="w-4 h-4" />
-                              </button>
-                            </>
-                          )}
-                        </div>
+                        {esAdmin ? (
+                          <div className="flex items-center justify-center gap-2">
+                            {h.estado === 'Pendiente' ? (
+                              <>
+                                <button
+                                  onClick={() => handleAprobar(h)}
+                                  className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
+                                  title="Aprobar"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleRechazar(h)}
+                                  className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  title="Rechazar"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => openEditModal(h)}
+                                  className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                  title="Editar"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleSuspender(h)}
+                                  className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                                  title="Suspender"
+                                >
+                                  <Ban className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDesactivar(h)}
+                                  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                  title={h.activo ? "Deshabilitar" : "Habilitar"}
+                                >
+                                  <Power className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
                       </td>
                     </tr>
                   ))}
