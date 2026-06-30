@@ -66,9 +66,7 @@ export default function AmbientesPage() {
     setLoading(true)
     try {
       const res = await api.ambientes.getAll()
-      const data = res.data || []
-      const filtrado = esAdmin ? data : data.filter((a: Ambiente) => a.ocupante_actual?.instructor === user?.nombre)
-      setAmbientes(filtrado)
+      setAmbientes(res.data || [])
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
       const filtrado = esAdmin ? MOCK_AMBIENTES : MOCK_AMBIENTES.filter((a) => a.ocupante_actual?.instructor === user?.nombre)

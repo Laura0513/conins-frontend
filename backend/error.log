@@ -1965,3 +1965,29 @@ Error: Acceso denegado — rol insuficiente
     at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
     at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
 ---
+[2026-06-30T15:15:57.821Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-06-30T15:15:57.828Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---

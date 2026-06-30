@@ -79,8 +79,7 @@ export default function AsignacionesPage() {
         ...a,
         tipo: !a.activo ? "historica" : a.es_provisional ? "provisional" : "activa",
       }))
-      const filtrado = esAdmin ? mapped : mapped.filter((a: Asignacion) => a.instructor_nombre === user?.nombre)
-      setAsignaciones(filtrado)
+      setAsignaciones(mapped)
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
       const filtrado = esAdmin ? MOCK_ASIGNACIONES : MOCK_ASIGNACIONES.filter((a) => a.instructor_nombre === user?.nombre)

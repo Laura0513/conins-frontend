@@ -111,9 +111,7 @@ export default function AlertasPage() {
     setLoading(true)
     try {
       const res = await api.alertas.getAll()
-      const data = res.data || []
-      const filtrado = esAdmin ? data : data.filter((a: Alerta) => a.instructor_nombre === user?.nombre)
-      setAlertas(filtrado)
+      setAlertas(res.data || [])
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
       const filtrado = esAdmin ? MOCK_ALERTAS : MOCK_ALERTAS.filter((a) => a.instructor_nombre === user?.nombre)

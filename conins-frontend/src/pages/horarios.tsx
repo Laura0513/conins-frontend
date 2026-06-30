@@ -80,9 +80,7 @@ export default function HorariosPage() {
     setLoading(true)
     try {
       const res = await api.horarios.getAll()
-      const data = res.data || []
-      const filtrado = esAdmin ? data : data.filter((h: Horario) => h.instructor_nombre === user?.nombre)
-      setHorarios(filtrado)
+      setHorarios(res.data || [])
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
       const filtrado = esAdmin ? MOCK_HORARIOS : MOCK_HORARIOS.filter((h) => h.instructor_nombre === user?.nombre)

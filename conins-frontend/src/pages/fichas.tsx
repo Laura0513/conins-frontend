@@ -82,9 +82,7 @@ export default function FichasPage() {
     setLoading(true)
     try {
       const res = await api.fichas.getAll()
-      const data = res.data || []
-      const filtrado = esAdmin ? data : data.filter((f: Ficha) => f.instructor_nombre === user?.nombre)
-      setFichas(filtrado)
+      setFichas(res.data || [])
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
       const filtrado = esAdmin ? MOCK_FICHAS : MOCK_FICHAS.filter((f) => f.instructor_nombre === user?.nombre)
