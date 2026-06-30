@@ -48,6 +48,9 @@ export default function Home() {
   const [instructorCount, setInstructorCount] = useState(0)
   const [dataLoading, setDataLoading] = useState(true)
 
+  const rol = user?.roles?.[0]?.trim().toLowerCase() || "admin"
+  const esAdmin = rol !== "instructor"
+
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/auth")
@@ -55,7 +58,7 @@ export default function Home() {
   }, [user, loading, router])
 
   useEffect(() => {
-    if (user) {
+    if (user && esAdmin) {
       api.instructors.getAll()
         .then((res) => {
           setInstructorCount(res.data.length)
@@ -64,8 +67,10 @@ export default function Home() {
           setInstructorCount(0)
         })
         .finally(() => setDataLoading(false))
+    } else {
+      setDataLoading(false)
     }
-  }, [user])
+  }, [user, esAdmin])
 
   if (loading || !user) {
     return (
@@ -75,6 +80,52 @@ export default function Home() {
           <p>Verificando sesión...</p>
         </div>
       </div>
+    )
+  }
+
+  if (!esAdmin) {
+    return (
+      <DashboardLayout>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Bienvenido, {user.nombre}</h1>
+          <p className="text-gray-500 mb-8">Resumen de tu actividad académica</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <p className="text-sm text-gray-500 mb-1">Mis horarios activos</p>
+              <p className="text-3xl font-bold text-sena">3</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <p className="text-sm text-gray-500 mb-1">Fichas asignadas</p>
+              <p className="text-3xl font-bold text-sena">2</p>
+            </div>
+            <div className="bg-white p-6 rounded-xl border-l-4 border-yellow-400">
+              <p className="text-sm text-gray-500 mb-1">Notificaciones sin leer</p>
+              <p className="text-3xl font-bold text-yellow-600">1</p>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-gray-200">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Mis horarios de esta semana</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div>
+                  <p className="font-medium text-gray-900">Ficha 2995403 - Bases de datos</p>
+                  <p className="text-sm text-gray-500">Aula 203 · Lunes, Miércoles, Viernes</p>
+                </div>
+                <span className="text-sm font-medium text-sena">06:00 - 12:00</span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div>
+                  <p className="font-medium text-gray-900">Ficha 2995403 - Análisis y diseño</p>
+                  <p className="text-sm text-gray-500">Aula 204 · Martes, Jueves</p>
+                </div>
+                <span className="text-sm font-medium text-sena">08:00 - 12:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
     )
   }
 
