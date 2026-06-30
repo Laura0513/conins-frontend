@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 import Sidebar from "@/components/layout/Sidebar"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
+import { useAuth } from "@/lib/AuthContext"
 
 export default function DashboardLayout({
   children,
@@ -10,6 +11,8 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const { user } = useAuth()
+  const rol = user?.roles?.[0] || "Admin"
   
   // State for mobile sidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -50,7 +53,8 @@ export default function DashboardLayout({
       <Sidebar 
         alertasViewed={alertasViewed} 
         isOpen={isSidebarOpen} 
-        onClose={closeSidebar} 
+        onClose={closeSidebar}
+        rol={rol}
       />
       
       <div className="flex flex-col flex-1 md:ml-64">

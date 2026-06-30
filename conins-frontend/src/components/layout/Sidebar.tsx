@@ -11,8 +11,9 @@ import {
   Search,
   UserCog,
 } from "lucide-react"
+import { useAuth } from "@/lib/AuthContext"
 
-const menuItems = [
+const MENU_ADMIN = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   { name: "Instructores", href: "/instructores", icon: Users },
   { name: "Ambientes", href: "/ambientes", icon: Building2 },
@@ -24,14 +25,44 @@ const menuItems = [
   { name: "Usuarios", href: "/usuarios", icon: UserCog },
 ]
 
+const MENU_INSTRUCTOR = [
+  { name: "Inicio", href: "/", icon: LayoutDashboard },
+  { name: "Mis Horarios", href: "/horarios", icon: Calendar },
+  { name: "Mis Asignaciones", href: "/asignaciones", icon: ClipboardList },
+  { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
+]
+
+const MENU_LIDER = [
+  { name: "Inicio", href: "/", icon: LayoutDashboard },
+  { name: "Instructores", href: "/instructores", icon: Users },
+  { name: "Fichas", href: "/fichas", icon: BookOpen },
+  { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
+  { name: "Horarios", href: "/horarios", icon: Calendar },
+  { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
+  { name: "Reportes", href: "/consultas", icon: Search },
+]
+
+function getMenuItems(rol: string) {
+  switch (rol) {
+    case "Instructor":
+      return MENU_INSTRUCTOR
+    case "Lider de Programa":
+      return MENU_LIDER
+    default:
+      return MENU_ADMIN
+  }
+}
+
 type SidebarProps = {
   alertasViewed: boolean
   isOpen: boolean
   onClose: () => void
+  rol: string
 }
 
-export default function Sidebar({ alertasViewed, isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ alertasViewed, isOpen, onClose, rol }: SidebarProps) {
   const router = useRouter()
+  const menuItems = getMenuItems(rol)
 
   return (
     <aside className={`
