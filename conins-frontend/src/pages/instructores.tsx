@@ -57,6 +57,10 @@ export default function InstructoresPage() {
   const [filtroArea, setFiltroArea] = useState("todas")
   const [filtroEstado, setFiltroEstado] = useState("todos")
 
+  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
+  const esSubdirector = rol === "subdirector"
+  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
+
   useEffect(() => {
     cargarInstructores()
   }, [])
@@ -172,13 +176,15 @@ export default function InstructoresPage() {
             <h1 className="text-2xl font-bold text-gray-900">Instructores</h1>
             <p className="text-gray-500 text-sm">Gestion de instructores del CDMC</p>
           </div>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Registrar instructor
-          </button>
+          {puedeEditar && (
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Registrar instructor
+            </button>
+          )}
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -309,20 +315,24 @@ export default function InstructoresPage() {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button
-                            onClick={() => openEditModal(inst)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => openNovedadModal(inst.id, inst.nombre)}
-                            className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
-                            title="Registrar novedad"
-                          >
-                            <CalendarX className="w-4 h-4" />
-                          </button>
+                          {puedeEditar && (
+                            <>
+                              <button
+                                onClick={() => openEditModal(inst)}
+                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                                title="Editar"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => openNovedadModal(inst.id, inst.nombre)}
+                                className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                                title="Registrar novedad"
+                              >
+                                <CalendarX className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>

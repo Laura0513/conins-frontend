@@ -62,7 +62,8 @@ export default function FichasPage() {
   const [filtroEtapa, setFiltroEtapa] = useState("todas")
   const [filtroModalidad, setFiltroModalidad] = useState("todas")
 
-  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
+  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
 
   useEffect(() => {
     cargarFichas()
@@ -85,7 +86,7 @@ export default function FichasPage() {
       setFichas(res.data || [])
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
-      const filtrado = esAdmin ? MOCK_FICHAS : MOCK_FICHAS.filter((f) => f.instructor_nombre === user?.nombre)
+      const filtrado = rol !== "instructor" ? MOCK_FICHAS : MOCK_FICHAS.filter((f) => f.instructor_nombre === user?.nombre)
       setFichas(filtrado)
     } finally {
       setLoading(false)
@@ -162,9 +163,9 @@ export default function FichasPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Fichas</h1>
-            <p className="text-gray-500 text-sm">{esAdmin ? "Gestion de fichas de formacion" : "Mis fichas asignadas"}</p>
+            <p className="text-gray-500 text-sm">{puedeEditar ? "Gestion de fichas de formacion" : "Mis fichas asignadas"}</p>
           </div>
-          {esAdmin && (
+          {puedeEditar && (
             <button
               onClick={() => setIsCreateModalOpen(true)}
               className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
@@ -256,7 +257,7 @@ export default function FichasPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4">Modalidad</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Instructores</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
-                    {esAdmin && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
+                    {puedeEditar && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -288,7 +289,7 @@ export default function FichasPage() {
                         </span>
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                        {esAdmin ? (
+                        {puedeEditar ? (
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => openDetailModal(ficha)}

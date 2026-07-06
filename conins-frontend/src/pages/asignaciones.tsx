@@ -65,7 +65,8 @@ export default function AsignacionesPage() {
   const [filtroPrograma, setFiltroPrograma] = useState("todos")
   const [filtroCoordinacion, setFiltroCoordinacion] = useState("todos")
 
-  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
+  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
 
   useEffect(() => {
     cargarAsignaciones()
@@ -82,7 +83,7 @@ export default function AsignacionesPage() {
       setAsignaciones(mapped)
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
-      const filtrado = esAdmin ? MOCK_ASIGNACIONES : MOCK_ASIGNACIONES.filter((a) => a.instructor_nombre === user?.nombre)
+      const filtrado = rol !== "instructor" ? MOCK_ASIGNACIONES : MOCK_ASIGNACIONES.filter((a) => a.instructor_nombre === user?.nombre)
       setAsignaciones(filtrado)
     } finally {
       setLoading(false)
@@ -247,7 +248,7 @@ export default function AsignacionesPage() {
           </div>
 
           <div className="flex justify-end gap-3">
-            {esAdmin && (
+            {puedeEditar && (
               <>
                 <button
                   onClick={() => setIsProvisionalModalOpen(true)}
@@ -290,7 +291,7 @@ export default function AsignacionesPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Jornada</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Líder</th>
-                    {esAdmin && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
+                    {puedeEditar && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -307,7 +308,7 @@ export default function AsignacionesPage() {
                         )}
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                        {esAdmin ? (
+                        {puedeEditar ? (
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => openDetailModal(asig)}
@@ -331,6 +332,14 @@ export default function AsignacionesPage() {
                               <Power className="w-4 h-4" />
                             </button>
                           </div>
+                        ) : rol === "subdirector" ? (
+                          <button
+                            onClick={() => openDetailModal(asig)}
+                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                            title="Ver detalle"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
                         ) : (
                           <span className="text-xs text-gray-400">-</span>
                         )}

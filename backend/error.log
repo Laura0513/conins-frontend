@@ -1991,3 +1991,1361 @@ Error: Acceso denegado — rol insuficiente
     at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
     at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
 ---
+[2026-07-01T19:09:04.873Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:93:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-01T19:25:23.832Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:25:23.862Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:25:47.866Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:25:47.877Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:25:50.951Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:25:50.966Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:25:51.698Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T19:25:51.701Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:25:51.716Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:25:51.719Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T19:25:52.246Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:25:52.260Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:25:52.718Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:25:52.728Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:25:53.150Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\alerta.controller.ts:26:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:25:53.161Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\alerta.controller.ts:26:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:25:54.800Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:25:54.808Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:26:14.425Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:26:14.432Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:26:16.508Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:26:16.516Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:26:18.599Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\alerta.controller.ts:26:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:26:18.618Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\alerta.controller.ts:26:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:26:21.335Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:68:31)
+    at Object.getAllUsers (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:224:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:42:35)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-01T19:26:21.345Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:68:31)
+    at Object.getAllUsers (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:224:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:42:35)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-01T19:26:21.905Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:26:21.912Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:26:22.346Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:26:22.354Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:26:23.013Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:26:23.021Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:26:26.981Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:26:26.988Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:26:27.520Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:26:27.528Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:26:28.273Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:26:28.282Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:26:29.043Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:26:29.052Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:28:39.426Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:28:39.434Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:28:40.133Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:28:40.140Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:28:41.960Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:28:41.979Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:31:21.705Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:31:21.726Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:31:22.664Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:31:22.671Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T19:32:24.595Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:32:24.603Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:32:35.556Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:32:35.564Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:54:50.772Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:54:50.780Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:55:55.999Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:55:56.009Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:56:03.321Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:56:03.331Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:56:09.954Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:56:09.965Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T19:57:49.444Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T19:57:49.459Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T20:02:17.883Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T20:02:17.892Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T20:07:37.344Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T20:07:37.353Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\instructor.model.ts:26:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:10:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:9:47)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-01T20:07:38.422Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T20:07:38.429Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T20:07:44.792Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:07:44.800Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T20:07:44.814Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:07:44.817Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T20:07:51.346Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:07:51.353Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:08:20.962Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:08:20.967Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T20:08:20.980Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:08:20.982Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T20:09:04.137Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:09:04.152Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:32:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:11:28)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:9:48)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:09:46.298Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:09:46.308Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:11:41.387Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:11:41.391Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T20:11:41.410Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:11:41.413Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T20:12:15.506Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:12:15.518Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:38:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:11:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:13:08.069Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T20:13:30.756Z] AggregateError: 
+AggregateError: 
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-01T20:13:34.837Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:13:34.839Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T20:13:34.874Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:33:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:6:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-01T20:13:34.878Z] AggregateError: 
+AggregateError: 
+    at Object.findAllSimple (C:\Users\laura\Desktop\Conins\backend\models\programa.model.ts:35:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\programa.controller.ts:7:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-01T20:13:36.947Z] AggregateError: 
+AggregateError: 
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:68:31)
+    at Object.getAllUsers (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:224:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:42:35)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:52:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:25:22.953Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-07-06T12:33:34.719Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:33:34.724Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:33:40.762Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:33:40.766Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:33:47.622Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:33:47.627Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---

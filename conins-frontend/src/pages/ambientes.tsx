@@ -56,7 +56,8 @@ export default function AmbientesPage() {
   const [filtroTipo, setFiltroTipo] = useState("todos")
   const [filtroEstado, setFiltroEstado] = useState("todos")
 
-  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
+  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
 
   useEffect(() => {
     cargarAmbientes()
@@ -69,7 +70,7 @@ export default function AmbientesPage() {
       setAmbientes(res.data || [])
     } catch (err) {
       console.warn("Backend no disponible, usando datos mock:", err)
-      const filtrado = esAdmin ? MOCK_AMBIENTES : MOCK_AMBIENTES.filter((a) => a.ocupante_actual?.instructor === user?.nombre)
+      const filtrado = rol !== "instructor" ? MOCK_AMBIENTES : MOCK_AMBIENTES.filter((a) => a.ocupante_actual?.instructor === user?.nombre)
       setAmbientes(filtrado)
     } finally {
       setLoading(false)
@@ -152,9 +153,9 @@ export default function AmbientesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Ambientes</h1>
-            <p className="text-gray-500 text-sm">{esAdmin ? "Aulas y talleres del CDMC" : "Mis ambientes asignados"}</p>
+            <p className="text-gray-500 text-sm">{puedeEditar ? "Aulas y talleres del CDMC" : "Mis ambientes asignados"}</p>
           </div>
-          {esAdmin && (
+          {puedeEditar && (
             <button
               onClick={() => setIsCreateModalOpen(true)}
               className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
@@ -222,7 +223,7 @@ export default function AmbientesPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Capacidad</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Estado</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Ocupante Actual</th>
-                    {esAdmin && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
+                    {puedeEditar && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -251,7 +252,7 @@ export default function AmbientesPage() {
                         )}
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                        {esAdmin ? (
+                        {puedeEditar ? (
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => openAgendaModal(amb)}
@@ -275,6 +276,14 @@ export default function AmbientesPage() {
                               <Pencil className="w-4 h-4" />
                             </button>
                           </div>
+                        ) : rol === "subdirector" ? (
+                          <button
+                            onClick={() => openAgendaModal(amb)}
+                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                            title="Ver agenda"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
                         ) : (
                           <span className="text-xs text-gray-400">-</span>
                         )}

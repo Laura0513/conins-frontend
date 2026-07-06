@@ -25,6 +25,17 @@ const MENU_ADMIN = [
   { name: "Usuarios", href: "/usuarios", icon: UserCog },
 ]
 
+const MENU_SUBDIRECTOR = [
+  { name: "Inicio", href: "/", icon: LayoutDashboard },
+  { name: "Instructores", href: "/instructores", icon: Users },
+  { name: "Ambientes", href: "/ambientes", icon: Building2 },
+  { name: "Fichas", href: "/fichas", icon: BookOpen },
+  { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
+  { name: "Horarios", href: "/horarios", icon: Calendar },
+  { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
+  { name: "Reportes", href: "/consultas", icon: Search },
+]
+
 const MENU_INSTRUCTOR = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   { name: "Mis Horarios", href: "/horarios", icon: Calendar },
@@ -51,6 +62,8 @@ function getMenuItems(rol: string) {
       return MENU_INSTRUCTOR
     case "lider de programa":
       return MENU_LIDER
+    case "subdirector":
+      return MENU_SUBDIRECTOR
     default:
       return MENU_ADMIN
   }
