@@ -4,10 +4,16 @@ import { InstructorModel } from '../models/instructor.model.js';
 import { FichaModel } from '../models/ficha.model.js';
 import { PermisoService } from '../services/permiso.service.js';
 import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from '../utils/errors.js';
+import { ROLES, RoleKey } from '../constants/roles.js';
 import pool from '../config/db.js';
 
 export const AsignacionService = {
-  async getAll() {
+  async getAll(userId?: number, roles?: RoleKey[]) {
+    if (userId && roles && roles.length === 1 && roles[0] === ROLES.INSTRUCTOR) {
+      const instructor = await InstructorModel.findByUsuarioId(userId);
+      if (!instructor) return [];
+      return AsignacionModel.findAllByInstructorId(instructor.id);
+    }
     return AsignacionModel.findAll();
   },
 

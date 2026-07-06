@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import {
@@ -10,59 +11,59 @@ import {
   Bell,
   Search,
   UserCog,
+  User,
 } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
+import { api } from "@/lib/api"
 
-const MENU_ADMIN = [
+type MenuItem = {
+  name: string
+  href: string
+  icon: any
+  showBadge?: boolean
+}
+
+const MENU_ADMIN: MenuItem[] = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   { name: "Instructores", href: "/instructores", icon: Users },
   { name: "Ambientes", href: "/ambientes", icon: Building2 },
   { name: "Fichas", href: "/fichas", icon: BookOpen },
   { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
   { name: "Horarios", href: "/horarios", icon: Calendar },
-  { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
+  { name: "Alertas", href: "/alertas", icon: Bell, showBadge: true },
   { name: "Reportes", href: "/consultas", icon: Search },
   { name: "Usuarios", href: "/usuarios", icon: UserCog },
+  { name: "Mi Perfil", href: "/perfil", icon: User },
 ]
 
-const MENU_SUBDIRECTOR = [
+const MENU_SUBDIRECTOR: MenuItem[] = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   { name: "Instructores", href: "/instructores", icon: Users },
   { name: "Ambientes", href: "/ambientes", icon: Building2 },
   { name: "Fichas", href: "/fichas", icon: BookOpen },
   { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
   { name: "Horarios", href: "/horarios", icon: Calendar },
-  { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
+  { name: "Alertas", href: "/alertas", icon: Bell, showBadge: true },
   { name: "Reportes", href: "/consultas", icon: Search },
+  { name: "Mi Perfil", href: "/perfil", icon: User },
 ]
 
-const MENU_INSTRUCTOR = [
+const MENU_INSTRUCTOR: MenuItem[] = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   { name: "Mis Horarios", href: "/horarios", icon: Calendar },
   { name: "Mis Asignaciones", href: "/asignaciones", icon: ClipboardList },
   { name: "Mis Fichas", href: "/fichas", icon: BookOpen },
   { name: "Mis Competencias", href: "/competencias", icon: Users },
-  { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
-]
-
-const MENU_LIDER = [
-  { name: "Inicio", href: "/", icon: LayoutDashboard },
-  { name: "Instructores", href: "/instructores", icon: Users },
-  { name: "Fichas", href: "/fichas", icon: BookOpen },
-  { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
-  { name: "Horarios", href: "/horarios", icon: Calendar },
-  { name: "Alertas", href: "/alertas", icon: Bell, badge: 2 },
-  { name: "Reportes", href: "/consultas", icon: Search },
+  { name: "Alertas", href: "/alertas", icon: Bell, showBadge: true },
+  { name: "Mi Perfil", href: "/perfil", icon: User },
 ]
 
 function getMenuItems(rol: string) {
-  const rolNormalized = rol?.trim().toLowerCase()
-  switch (rolNormalized) {
-    case "instructor":
+  const r = rol?.trim() || ""
+  switch (r) {
+    case "Instructor":
       return MENU_INSTRUCTOR
-    case "lider de programa":
-      return MENU_LIDER
-    case "subdirector":
+    case "Subdirector":
       return MENU_SUBDIRECTOR
     default:
       return MENU_ADMIN
@@ -78,7 +79,27 @@ type SidebarProps = {
 
 export default function Sidebar({ alertasViewed, isOpen, onClose, rol }: SidebarProps) {
   const router = useRouter()
+  const { user } = useAuth()
   const menuItems = getMenuItems(rol)
+  const [alertasPendientes, setAlertasPendientes] = useState(0)
+
+  const cargarAlertasPendientes = useCallback(async () => {
+    try {
+      const res = await api.alertas.getAll()
+      const pendientes = (res.data || []).filter((a: any) => !a.atendida).length
+      setAlertasPendientes(pendientes)
+    } catch {
+      setAlertasPendientes(0)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (user) {
+      cargarAlertasPendientes()
+      const interval = setInterval(cargarAlertasPendientes, 60000)
+      return () => clearInterval(interval)
+    }
+  }, [user, cargarAlertasPendientes])
 
   return (
     <aside className={`
@@ -108,23 +129,7 @@ export default function Sidebar({ alertasViewed, isOpen, onClose, rol }: Sidebar
             <Link
               key={item.name}
               href={item.href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-sena/10 text-sena shadow-sm"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{item.name}</span>
-              {item.badge && !alertasViewed && (
-                <span className="ml-auto bg-sena text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                  {item.badge}
-                </span>
-              )}
-            </Link>
-          )
-        })}
-      </nav>
-    </aside>
-  )
-}
+                  ? "bg-sena/10 text

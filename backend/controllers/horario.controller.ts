@@ -3,8 +3,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { HorarioService } from '../services/horario.service.js';
 
-export const getAll = asyncHandler(async (_req: Request, res: Response) => {
-  const horarios = await HorarioService.getAll();
+export const getAll = asyncHandler(async (req: Request, res: Response) => {
+  const horarios = await HorarioService.getAll(req.user.id, req.user.roles_globales);
   ApiResponse.success(res, horarios);
 });
 
@@ -44,6 +44,17 @@ export const toggleActivo = asyncHandler(async (req: Request, res: Response) => 
   ApiResponse.success(res, result, message);
 });
 
+export const aprobar = asyncHandler(async (req: Request, res: Response) => {
+  const result = await HorarioService.aprobar(Number(req.params.id));
+  ApiResponse.success(res, result, 'Horario aprobado exitosamente');
+});
+
+export const rechazar = asyncHandler(async (req: Request, res: Response) => {
+  const { motivo } = req.body;
+  const result = await HorarioService.rechazar(Number(req.params.id), motivo);
+  ApiResponse.success(res, result, 'Horario rechazado');
+});
+
 export const updateMultiDia = asyncHandler(async (req: Request, res: Response) => {
   const { dia_ids, hora_inicio, hora_fin, jornada_id, ambiente_id } = req.body;
   const result = await HorarioService.updateMultiDia(Number(req.params.id), {
@@ -54,4 +65,13 @@ export const updateMultiDia = asyncHandler(async (req: Request, res: Response) =
     ambiente_id,
   });
   ApiResponse.success(res, result, 'Horario actualizado exitosamente');
+});
+
+export const suspender = asyncHandler(async (req: Request, res: Response) => {
+  const { motivo } = req.body;
+  if (!motivo || motivo.trim().length === 0) {
+    return res.status(400).json({ success: false, message: 'El motivo de suspension es obligatorio' });
+  }
+  const result = await HorarioService.suspender(Number(req.params.id), motivo);
+  ApiResponse.success(res, result, 'Horario suspendido exitosamente');
 });

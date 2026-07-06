@@ -1,20 +1,26 @@
+// ⚠ CAMBIO DE CONVENCIÓN 01/07/2026: snake_case → Title Case con espacios.
+// Los valores de los roles cambiaron (ej. 'instructor' → 'Instructor').
+// IMPACTO: todos los JWT emitidos antes de este cambio quedan INVÁLIDOS
+// porque el campo `rol` en el payload ya no coincide con las constantes.
+// → Laura (y cualquier usuario con sesión activa) debe hacer login de nuevo.
 export const ROLES = {
-  SUBDIRECTOR: 'subdirector',
-  COORDINADOR_MEDULAR: 'coordinador_medular',
-  COORDINADOR_TRANSVERSAL: 'coordinador_transversal',
-  LIDER_PROGRAMA: 'lider_programa',
-  INSTRUCTOR: 'instructor',
+  SUBDIRECTOR:             'Subdirector',
+  COORDINADORA_ACADEMICA:  'Coordinadora Academica',
+  ASISTENTE_COORDINACION:  'Asistente Coordinacion',
+  INSTRUCTOR:              'Instructor',
 } as const;
 
 export type RoleKey = (typeof ROLES)[keyof typeof ROLES];
 
+// Todos los roles con acceso de escritura (CRUD completo)
 export const ROLES_ADMIN = [
   ROLES.SUBDIRECTOR,
-  ROLES.COORDINADOR_MEDULAR,
-  ROLES.COORDINADOR_TRANSVERSAL,
+  ROLES.COORDINADORA_ACADEMICA,
+  ROLES.ASISTENTE_COORDINACION,
 ] as const;
 
-export const ROLES_COORDINADOR = [
-  ROLES.COORDINADOR_MEDULAR,
-  ROLES.COORDINADOR_TRANSVERSAL,
+// Solo los roles de coordinacion (sin subdirector)
+export const ROLES_COORDINACION = [
+  ROLES.COORDINADORA_ACADEMICA,
+  ROLES.ASISTENTE_COORDINACION,
 ] as const;

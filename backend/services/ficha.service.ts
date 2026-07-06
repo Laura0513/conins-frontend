@@ -1,8 +1,15 @@
 import { FichaModel } from '../models/ficha.model.js';
+import { InstructorModel } from '../models/instructor.model.js';
 import { NotFoundError, ConflictError } from '../utils/errors.js';
+import { ROLES, RoleKey } from '../constants/roles.js';
 
 export const FichaService = {
-  async getAll() {
+  async getAll(userId?: number, roles?: RoleKey[]) {
+    if (userId && roles && roles.length === 1 && roles[0] === ROLES.INSTRUCTOR) {
+      const instructor = await InstructorModel.findByUsuarioId(userId);
+      if (!instructor) return [];
+      return FichaModel.findAllByInstructorId(instructor.id);
+    }
     return FichaModel.findAll();
   },
 
@@ -17,9 +24,12 @@ export const FichaService = {
     programa_id: number;
     jornada_id: number;
     ambiente_id?: number | null;
+    lider_id?: number | null;
     etapa?: string;
     fecha_inicio_lectiva?: string;
     fecha_fin_lectiva?: string;
+    fecha_inicio_productiva?: string;
+    fecha_fin_productiva?: string;
     fecha_fin_ficha?: string;
   }) {
     const existing = await FichaModel.findByNumero(data.numero_ficha);
@@ -34,9 +44,12 @@ export const FichaService = {
     programa_id?: number;
     jornada_id?: number;
     ambiente_id?: number | null;
+    lider_id?: number | null;
     etapa?: string;
     fecha_inicio_lectiva?: string;
     fecha_fin_lectiva?: string;
+    fecha_inicio_productiva?: string;
+    fecha_fin_productiva?: string;
     fecha_fin_ficha?: string;
   }) {
     const ficha = await FichaModel.findById(id);

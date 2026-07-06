@@ -45,7 +45,7 @@ export const getAllUsers = asyncHandler(async (_req: Request, res: Response) => 
 
 export const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { nombre, email, rol_ids, tipo_contrato, tipo_area } = req.body;
+  const { nombre, email, rol_ids, tipo_contrato, tipo_area, tipo_documento, documento } = req.body;
   await AuthService.updateUser(
     Number(id),
     req.user.id,
@@ -55,6 +55,8 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
     rol_ids,
     tipo_contrato,
     tipo_area,
+    tipo_documento,
+    documento,
   );
   ApiResponse.success(res, null, 'Usuario actualizado exitosamente');
 });
@@ -64,4 +66,11 @@ export const toggleUserEstado = asyncHandler(async (req: Request, res: Response)
   const result = await AuthService.toggleUserEstado(Number(id));
   const message = result.activo ? 'Usuario activado' : 'Usuario desactivado';
   ApiResponse.success(res, result, message);
+});
+
+export const assignProgramasToLider = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { programa_ids } = req.body;
+  await AuthService.assignProgramasToLider(Number(id), programa_ids);
+  ApiResponse.success(res, null, 'Programas asignados al lider exitosamente');
 });

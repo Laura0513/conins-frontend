@@ -130,7 +130,7 @@ export const InstructorService = {
 
   async registrarNovedad(
     instructorId: number,
-    tipoNovedad: string,
+    tipoNovedadId: number,
     fechaInicio: string,
     fechaRegreso: string,
     observacion?: string,
@@ -144,7 +144,7 @@ export const InstructorService = {
 
     const novedadId = await InstructorModel.crearNovedad(
       instructorId,
-      tipoNovedad,
+      tipoNovedadId,
       fechaInicio,
       fechaRegreso,
       observacion,

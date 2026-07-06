@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import pool from '../config/db.js';
 import { UsuarioModel } from '../models/usuario.model.js';
 import { RolModel } from '../models/rol.model.js';
 import { InstructorModel } from '../models/instructor.model.js';
@@ -63,7 +64,7 @@ export const AuthService = {
       const expiresIn = (process.env.JWT_EXPIRES_IN || '24h') as jwt.SignOptions['expiresIn'];
 
       const token = jwt.sign(
-        { id: 1, nombre: 'Administrador', roles_globales: ['subdirector'] },
+        { id: 1, nombre: 'Administrador', roles_globales: ['Subdirector'] },
         secret,
         { expiresIn },
       );
@@ -74,7 +75,7 @@ export const AuthService = {
           id: 1,
           nombre: 'Administrador',
           email: superUser,
-          roles: ['subdirector'],
+          roles: ['Subdirector'],
         },
       };
     }
@@ -100,6 +101,8 @@ export const AuthService = {
     }
 
     recordSuccessfulLogin(email);
+
+    await UsuarioModel.updateUltimoAcceso(user.id);
 
     const roles = await RolModel.findByUsuarioId(user.id);
 
@@ -163,7 +166,7 @@ export const AuthService = {
     await UsuarioModel.updatePassword(existingUser.id, hashed);
 
     const roles = await RolModel.findByUsuarioId(existingUser.id);
-    if (roles.includes('instructor')) {
+    if (roles.includes('Instructor')) {
       const instructorExists = await InstructorModel.findByUsuarioId(existingUser.id);
       if (!instructorExists) {
         await InstructorModel.create(
@@ -217,7 +220,7 @@ export const AuthService = {
       }
     }
 
-    await UsuarioModel.updateProfile(userId, nombre, email);
+    await UsuarioModel.updateProfile(userId, nombre, email, undefined, undefined);
   },
 
   async getAllUsers() {
@@ -237,6 +240,8 @@ export const AuthService = {
     rol_ids?: number[],
     tipo_contrato?: string,
     tipo_area?: string,
+    tipo_documento?: string,
+    documento?: string,
   ) {
     if (email) {
       const emailExists = await UsuarioModel.emailExists(email, targetUserId);
@@ -245,8 +250,8 @@ export const AuthService = {
       }
     }
 
-    if (nombre || email) {
-      await UsuarioModel.updateProfile(targetUserId, nombre, email);
+    if (nombre || email || tipo_documento || documento) {
+      await UsuarioModel.updateProfile(targetUserId, nombre, email, tipo_documento, documento);
     }
 
     if (rol_ids && rol_ids.length > 0) {
@@ -255,13 +260,13 @@ export const AuthService = {
         throw new ValidationError('Uno o mas rol_ids no existen en el sistema');
       }
 
-      if (!actingRoles.includes('subdirector') && rol_ids.includes(1)) {
+      if (!actingRoles.includes('Subdirector') && rol_ids.includes(1)) {
         throw new ForbiddenError('Solo un Subdirector puede asignar el rol de Subdirector');
       }
 
       await RolModel.assignRoles(targetUserId, rol_ids);
 
-      if (rol_ids.includes(5)) {
+      if (rol_ids.includes(4)) {  // ID 4 = Instructor (era 5 antes del 01/07/2026)
         const instructorExists = await InstructorModel.findByUsuarioId(targetUserId);
         if (!instructorExists) {
           await InstructorModel.create(
@@ -290,5 +295,25 @@ export const AuthService = {
     await UsuarioModel.toggleActivo(userId, nuevoEstado);
 
     return { activo: nuevoEstado };
+  },
+
+  async assignProgramasToLider(userId: number, programaIds: number[]) {
+    const user = await UsuarioModel.findById(userId);
+    if (!user) throw new NotFoundError('Usuario no encontrado');
+
+    // 01/07/2026: lider_programa ya no es un rol del sistema; la asignación
+    // de programas líderes se maneja solo via la tabla lider_programa.
+    // Se valida que el usuario sea instructor en lugar de verificar el rol.
+    const instructor = await InstructorModel.findByUsuarioId(userId);
+    if (!instructor) throw new NotFoundError('El usuario no tiene perfil de instructor');
+
+    await pool.query('DELETE FROM lider_programa WHERE instructor_id = ?', [instructor.id]);
+
+    for (const programaId of programaIds) {
+      await pool.query(
+        'INSERT INTO lider_programa (instructor_id, programa_id) VALUES (?, ?)',
+        [instructor.id, programaId],
+      );
+    }
   },
 };

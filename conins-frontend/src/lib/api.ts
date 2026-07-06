@@ -255,6 +255,9 @@ export const api = {
         getTiposNovedadAmbiente() {
             return apiFetch('/catalogo/tipos-novedad-ambiente')
         },
+        getTiposActividad() {
+            return apiFetch('/catalogo/tipos-actividad')
+        },
     },
 
     ambientes: {
@@ -292,6 +295,21 @@ export const api = {
         },
     },
 
+    notificaciones: {
+        getMis(soloNoLeidas = false) {
+            return apiFetch(`/notificaciones${soloNoLeidas ? '?solo_no_leidas=true' : ''}`)
+        },
+        getNoLeidasCount() {
+            return apiFetch('/notificaciones/no-leidas/count')
+        },
+        marcarLeida(id: number) {
+            return apiFetch(`/notificaciones/${id}/leida`, { method: 'PATCH' })
+        },
+        marcarTodasLeidas() {
+            return apiFetch('/notificaciones/marcar-todas', { method: 'PATCH' })
+        },
+    },
+
     consultas: {
         getCargaHoraria() {
             return apiFetch('/consultas/carga-horaria')
@@ -304,38 +322,15 @@ export const api = {
         },
     },
 
-    users: {
-        getAll() {
-            return apiFetch('/auth/usuarios')
+    rapSeguimiento: {
+        getByFicha(fichaId: number) {
+            return apiFetch(`/rap-seguimiento/ficha/${fichaId}`)
         },
-        create(data: any) {
-            return apiFetch('/auth/register', {
-                method: 'POST',
-                body: JSON.stringify(data),
-            })
+        getDisponibles(fichaId: number) {
+            return apiFetch(`/rap-seguimiento/ficha/${fichaId}/disponibles`)
         },
-        update(id: number, data: any) {
-            return apiFetch(`/auth/usuarios/${id}`, {
-                method: 'PUT',
-                body: JSON.stringify(data),
-            })
+        getByAsignacionCompetencia(acId: number) {
+            return apiFetch(`/rap-seguimiento/asignacion-competencia/${acId}`)
         },
-        toggleEstado(id: number) {
-            return apiFetch(`/auth/usuarios/${id}/estado`, {
-                method: 'PATCH',
-            })
-        },
-        asignarProgramas(liderId: number, programaIds: number[]) {
-            return apiFetch(`/auth/usuarios/${liderId}/programas`, {
-                method: 'PUT',
-                body: JSON.stringify({ programa_ids: programaIds }),
-            })
-        },
-    },
-}
-
-export type ApiResponse<T = unknown> = {
-    success: boolean
-    message: string
-    data: T
-}
+        getById(id: number) {
+            return apiFetc

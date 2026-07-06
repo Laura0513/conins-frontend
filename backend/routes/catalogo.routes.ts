@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { CatalogoService } from '../services/catalogo.service.js';
+import * as catalogoController from '../controllers/catalogo.controller.js';
 
 const router = Router();
 
@@ -34,5 +35,12 @@ router.get('/competencias/:id/raps', asyncHandler(async (req, res) => {
   const raps = await CatalogoService.getRapsByCompetencia(Number(req.params.id));
   ApiResponse.success(res, raps);
 }));
+
+router.get('/jornadas', catalogoController.getJornadas);
+router.get('/ambientes', catalogoController.getAmbientes);
+router.get('/tipos-novedad-instructor', catalogoController.getTiposNovedadInstructor);
+router.get('/tipos-novedad-ambiente', catalogoController.getTiposNovedadAmbiente);
+router.get('/tipos-novedad-ficha', catalogoController.getTiposNovedadFicha);
+router.get('/tipos-actividad', catalogoController.getTiposActividad);
 
 export default router;

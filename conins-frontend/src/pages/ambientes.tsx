@@ -33,13 +33,6 @@ type Ambiente = {
   }
 }
 
-const MOCK_AMBIENTES: Ambiente[] = [
-  { id: 1, nombre: "Aula 200", tipo: "aula", capacidad: 30, area_id: null, activo: true },
-  { id: 2, nombre: "Aula 201", tipo: "aula", capacidad: 30, area_id: null, activo: true },
-  { id: 3, nombre: "Aula 203", tipo: "aula", capacidad: 35, area_id: null, activo: true, ocupante_actual: { instructor: "Carlos Álvarez", ficha: "2995403", competencia: "Bases de datos" } },
-  { id: 4, nombre: "Taller T1", tipo: "taller", capacidad: 20, area_id: null, activo: true, ocupante_actual: { instructor: "Instructor Prueba", ficha: "2760123", competencia: "HUI FORMACION" } },
-  { id: 5, nombre: "Lab 101", tipo: "laboratorio", capacidad: 25, area_id: null, activo: false },
-]
 
 export default function AmbientesPage() {
   const { user, loading: authLoading } = useProtectedRoute()
@@ -56,8 +49,8 @@ export default function AmbientesPage() {
   const [filtroTipo, setFiltroTipo] = useState("todos")
   const [filtroEstado, setFiltroEstado] = useState("todos")
 
-  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
-  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
+  const rol = user?.roles?.[0]?.trim() || ""
+  const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
 
   useEffect(() => {
     cargarAmbientes()
@@ -69,9 +62,8 @@ export default function AmbientesPage() {
       const res = await api.ambientes.getAll()
       setAmbientes(res.data || [])
     } catch (err) {
-      console.warn("Backend no disponible, usando datos mock:", err)
-      const filtrado = rol !== "instructor" ? MOCK_AMBIENTES : MOCK_AMBIENTES.filter((a) => a.ocupante_actual?.instructor === user?.nombre)
-      setAmbientes(filtrado)
+      console.warn("Error cargando ambientes:", err)
+      setAmbientes([])
     } finally {
       setLoading(false)
     }
@@ -276,7 +268,7 @@ export default function AmbientesPage() {
                               <Pencil className="w-4 h-4" />
                             </button>
                           </div>
-                        ) : rol === "subdirector" ? (
+                        ) : rol === "Subdirector" ? (
                           <button
                             onClick={() => openAgendaModal(amb)}
                             className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
@@ -341,3 +333,4 @@ export default function AmbientesPage() {
     </DashboardLayout>
   )
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

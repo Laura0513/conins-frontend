@@ -9,11 +9,11 @@ const router = Router();
 
 router.use(verifyToken);
 
-router.get('/', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR, ROLES.COORDINADOR_TRANSVERSAL]), instructorController.getAll);
+router.get('/', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.getAll);
 
 router.post(
   '/',
-  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR]),
+  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
   validate(crearInstructorCompletoSchema),
   instructorController.create,
 );
@@ -23,19 +23,19 @@ router.get('/perfil', instructorController.getOwnProfile);
 router.get('/:id', instructorController.getById);
 router.get('/:id/detalle', instructorController.getDetalle);
 
-router.patch('/:id', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR]), instructorController.update);
+router.patch('/:id', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.update);
 
 router.get('/:id/competencias', instructorController.getCompetenciasHabilitadas);
 
-router.post('/:id/competencias', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR]), instructorController.addCompetencia);
+router.post('/:id/competencias', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.addCompetencia);
 
-router.delete('/:id/competencias/:competenciaId', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR]), instructorController.removeCompetencia);
+router.delete('/:id/competencias/:competenciaId', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.removeCompetencia);
 
-router.patch('/:id/estado', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR]), instructorController.toggleEstado);
+router.patch('/:id/estado', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.toggleEstado);
 
 router.post(
   '/:id/novedades',
-  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR]),
+  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
   validate(registrarNovedadSchema),
   instructorController.registrarNovedad,
 );

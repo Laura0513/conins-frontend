@@ -23,18 +23,18 @@ type CargaHoraria = {
   total_horas: number
   fichas_count: number
   competencias_count: number
-  estado: "Normal" | "Sobrecarga"
+  estado: "Normal" | "Sobrecarga" | "Bajo carga"
 }
 
 type HorarioFicha = {
   ficha_numero: string
   programa: string
-  lunes: string
-  martes: string
-  miercoles: string
-  jueves: string
-  viernes: string
-  sabado: string
+  lunes: string | null
+  martes: string | null
+  miercoles: string | null
+  jueves: string | null
+  viernes: string | null
+  sabado: string | null
 }
 
 type OcupacionAmbiente = {
@@ -46,40 +46,20 @@ type OcupacionAmbiente = {
   porcentaje: number
 }
 
-// --- Mock Data ---
-const MOCK_CARGA: CargaHoraria[] = [
-  { instructor_id: 1, instructor_nombre: "Carlos Álvarez", total_horas: 45, fichas_count: 3, competencias_count: 5, estado: "Sobrecarga" },
-  { instructor_id: 2, instructor_nombre: "Andrés Pareja", total_horas: 38, fichas_count: 2, competencias_count: 4, estado: "Normal" },
-  { instructor_id: 3, instructor_nombre: "William Ramírez", total_horas: 40, fichas_count: 4, competencias_count: 6, estado: "Normal" },
-  { instructor_id: 4, instructor_nombre: "María López", total_horas: 20, fichas_count: 1, competencias_count: 2, estado: "Normal" },
-]
-
-const MOCK_HORARIOS_FICHA: HorarioFicha[] = [
-  { ficha_numero: "2995403", programa: "ADSO", lunes: "06:00 - 12:00", martes: "14:00 - 18:00", miercoles: "06:00 - 12:00", jueves: "14:00 - 18:00", viernes: "06:00 - 12:00", sabado: "-" },
-  { ficha_numero: "2887341", programa: "Contabilidad", lunes: "10:00 - 14:00", martes: "-", miercoles: "10:00 - 14:00", jueves: "-", viernes: "10:00 - 14:00", sabado: "-" },
-]
-
-const MOCK_OCUPACION: OcupacionAmbiente[] = [
-  { ambiente_nombre: "Aula 203", tipo: "Aula", capacidad: 30, horas_ocupadas: 35, horas_totales: 40, porcentaje: 87 },
-  { ambiente_nombre: "Aula 204", tipo: "Aula", capacidad: 30, horas_ocupadas: 20, horas_totales: 40, porcentaje: 50 },
-  { ambiente_nombre: "Taller T1", tipo: "Taller", capacidad: 25, horas_ocupadas: 38, horas_totales: 40, porcentaje: 95 },
-  { ambiente_nombre: "Lab. Redes", tipo: "Laboratorio", capacidad: 20, horas_ocupadas: 10, horas_totales: 40, porcentaje: 25 },
-]
-
 // --- Component ---
 export default function ConsultasPage() {
   const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [activeTab, setActiveTab] = useState<"carga" | "ficha" | "ocupacion">("carga")
-  
-  // Data states
+
   const [carga, setCarga] = useState<CargaHoraria[]>([])
   const [horariosFicha, setHorariosFicha] = useState<HorarioFicha[]>([])
   const [ocupacion, setOcupacion] = useState<OcupacionAmbiente[]>([])
-  
+
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [filtroFicha, setFiltroFicha] = useState("")
+  const [filtroEstado, setFiltroEstado] = useState("todos")
 
   useEffect(() => {
     loadData()
@@ -88,38 +68,55 @@ export default function ConsultasPage() {
   const loadData = async () => {
     setLoading(true)
     try {
-      // Simular carga de datos
-      setTimeout(() => {
-        setCarga(MOCK_CARGA)
-        setHorariosFicha(MOCK_HORARIOS_FICHA)
-        setOcupacion(MOCK_OCUPACION)
-        setLoading(false)
-      }, 500)
-      
-      // En producción:
-      // const [resCarga, resHorarios, resOcupacion] = await Promise.all([
-      //   api.consultas.getCargaHoraria(),
-      //   api.consultas.getHorariosPorFicha(),
-      //   api.consultas.getOcupacionAmbientes()
-      // ])
+      const [resCarga, resHorarios, resOcupacion] = await Promise.all([
+        api.consultas.getCargaHoraria(),
+        api.consultas.getHorariosPorFicha(),
+        api.consultas.getOcupacionAmbientes(),
+      ])
+      setCarga(resCarga.data || [])
+      setHorariosFicha(resHorarios.data || [])
+      setOcupacion(resOcupacion.data || [])
     } catch (err) {
-      console.warn("Backend no disponible, usando datos mock:", err)
-      setCarga(MOCK_CARGA)
-      setHorariosFicha(MOCK_HORARIOS_FICHA)
-      setOcupacion(MOCK_OCUPACION)
+      console.warn("Error cargando reportes:", err)
+      showToast("Error al cargar reportes del backend", "error")
+    } finally {
       setLoading(false)
     }
   }
 
   const handleExport = () => {
-    if (activeTab === "carga") {
-      exportarCargaHorariaPDF(carga)
-    } else if (activeTab === "ficha") {
-      exportarHorarioFichaPDF(horariosFicha)
-    } else if (activeTab === "ocupacion") {
-      exportarOcupacionPDF(ocupacion)
+    try {
+      if (activeTab === "carga") {
+        exportarCargaHorariaPDF(carga)
+      } else if (activeTab === "ficha") {
+        exportarHorarioFichaPDF(horariosFicha)
+      } else if (activeTab === "ocupacion") {
+        exportarOcupacionPDF(ocupacion)
+      }
+      showToast("PDF generado exitosamente", "success")
+    } catch {
+      showToast("Error al generar PDF", "error")
     }
   }
+
+  // Filtros
+  const cargaFiltrada = carga.filter((c) => {
+    const coincideBusqueda = c.instructor_nombre.toLowerCase().includes(search.toLowerCase())
+    const coincideEstado = filtroEstado === "todos" || c.estado === filtroEstado
+    return coincideBusqueda && coincideEstado
+  })
+
+  const fichasFiltradas = horariosFicha.filter((h) =>
+    h.ficha_numero.includes(filtroFicha) || h.programa.toLowerCase().includes(filtroFicha.toLowerCase())
+  )
+
+  // Stats
+  const totalHoras = carga.reduce((sum, c) => sum + Number(c.total_horas), 0)
+  const enSobrecarga = carga.filter((c) => c.estado === "Sobrecarga").length
+  const promedioOcupacion =
+    ocupacion.length > 0
+      ? Math.round(ocupacion.reduce((sum, o) => sum + Number(o.porcentaje), 0) / ocupacion.length)
+      : 0
 
   if (authLoading || !user) {
     return (
@@ -135,28 +132,70 @@ export default function ConsultasPage() {
   return (
     <DashboardLayout>
       <div className="p-6 space-y-6 print:p-0">
-        
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Reportes y Estadísticas</h1>
-            <p className="text-gray-500 text-sm">Vistas consolidadas para gestión académica</p>
+            <h1 className="text-2xl font-bold text-gray-900">Reportes y Estadisticas</h1>
+            <p className="text-gray-500 text-sm">Vistas consolidadas para gestion academica</p>
           </div>
           <button
             onClick={handleExport}
-            className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+            disabled={loading}
+            className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
           >
             <FileDown className="w-4 h-4" />
             Descargar PDF
           </button>
         </div>
 
+        {/* Tarjetas resumen */}
+        {!loading && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:hidden">
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-sena" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Instructores</p>
+                <p className="text-lg font-bold text-gray-900">{carga.length}</p>
+                <p className="text-xs text-gray-400">{totalHoras.toFixed(0)}h totales</p>
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${enSobrecarga > 0 ? "bg-red-50" : "bg-green-50"}`}>
+                {enSobrecarga > 0 ? (
+                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                ) : (
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                )}
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">En sobrecarga</p>
+                <p className={`text-lg font-bold ${enSobrecarga > 0 ? "text-red-600" : "text-green-600"}`}>
+                  {enSobrecarga}
+                </p>
+                <p className="text-xs text-gray-400">de {carga.length} instructores</p>
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-sena" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Ocupacion promedio</p>
+                <p className="text-lg font-bold text-gray-900">{promedioOcupacion}%</p>
+                <p className="text-xs text-gray-400">{ocupacion.length} ambientes</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="flex gap-2 border-b border-gray-200 print:hidden">
           {[
             { id: "carga", label: "Carga Horaria", icon: Users },
             { id: "ficha", label: "Horario por Ficha", icon: Calendar },
-            { id: "ocupacion", label: "Ocupación Ambientes", icon: Building2 },
+            { id: "ocupacion", label: "Ocupacion Ambientes", icon: Building2 },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -195,48 +234,105 @@ export default function ConsultasPage() {
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
                     />
                   </div>
-                  <div className="flex gap-2">
-                    <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white">
-                      <option>Todos los estados</option>
-                      <option>Normal</option>
-                      <option>Sobrecarga</option>
-                    </select>
-                  </div>
+                  <select
+                    value={filtroEstado}
+                    onChange={(e) => setFiltroEstado(e.target.value)}
+                    className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  >
+                    <option value="todos">Todos los estados</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Sobrecarga">Sobrecarga</option>
+                    <option value="Bajo carga">Bajo carga</option>
+                  </select>
                 </div>
 
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
-                      <tr>
-                        <th className="px-3 py-3 md:px-6 md:py-4">Instructor</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Total Horas</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Fichas</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Competencias</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {carga.filter(c => c.instructor_nombre.toLowerCase().includes(search.toLowerCase())).map((c) => (
-                        <tr key={c.instructor_id} className="hover:bg-gray-50/50">
-                          <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{c.instructor_nombre}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center font-semibold text-gray-700">{c.total_horas}h</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{c.fichas_count}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{c.competencias_count}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                              c.estado === "Sobrecarga" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
-                            }`}>
-                              {c.estado === "Sobrecarga" ? <AlertTriangle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
-                              {c.estado}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  {cargaFiltrada.length === 0 ? (
+                    <div className="p-12 text-center text-gray-500">
+                      No se encontraron resultados.
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left">
+                        <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
+                          <tr>
+                            <th className="px-3 py-3 md:px-6 md:py-4">Instructor</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Horas</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Progreso</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Fichas</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Competencias</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {cargaFiltrada.map((c) => (
+                            <tr key={c.instructor_id} className="hover:bg-gray-50/50">
+                              <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">
+                                {c.instructor_nombre}
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4 text-center font-semibold text-gray-700">
+                                {Number(c.total_horas).toFixed(0)}h
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div
+                                      className={`h-2 rounded-full transition-all ${
+                                        Number(c.total_horas) > 40
+                                          ? "bg-red-500"
+                                          : Number(c.total_horas) >= 34
+                                            ? "bg-yellow-500"
+                                            : "bg-sena"
+                                      }`}
+                                      style={{
+                                        width: `${Math.min((Number(c.total_horas) / 40) * 100, 100)}%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="text-xs text-gray-400 w-8 text-right">
+                                    {Math.round((Number(c.total_horas) / 40) * 100)}%
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">
+                                {c.fichas_count}
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">
+                                {c.competencias_count}
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4 text-center">
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                                    c.estado === "Sobrecarga"
+                                      ? "bg-red-100 text-red-700"
+                                      : c.estado === "Bajo carga"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : "bg-green-100 text-green-700"
+                                  }`}
+                                >
+                                  {c.estado === "Sobrecarga" ? (
+                                    <AlertTriangle className="w-3.5 h-3.5" />
+                                  ) : c.estado === "Bajo carga" ? (
+                                    <Clock className="w-3.5 h-3.5" />
+                                  ) : (
+                                    <CheckCircle className="w-3.5 h-3.5" />
+                                  )}
+                                  {c.estado}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                   <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 bg-gray-50 flex justify-between text-sm text-gray-500">
-                    <span>Total instructores: {carga.length}</span>
-                    <span>Horas totales: {carga.reduce((sum, c) => sum + c.total_horas, 0)}h</span>
+                    <span>
+                      Mostrando {cargaFiltrada.length} de {carga.length} instructores
+                    </span>
+                    <span>
+                      Horas totales: {cargaFiltrada.reduce((sum, c) => sum + Number(c.total_horas), 0).toFixed(0)}h
+                    </span>
                   </div>
                 </div>
               </div>
@@ -250,7 +346,7 @@ export default function ConsultasPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Buscar por número de ficha..."
+                      placeholder="Buscar por ficha o programa..."
                       value={filtroFicha}
                       onChange={(e) => setFiltroFicha(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
@@ -259,82 +355,15 @@ export default function ConsultasPage() {
                 </div>
 
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
-                      <tr>
-                        <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Lun</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Mar</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Mié</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Jue</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Vie</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Sáb</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {horariosFicha.filter(h => h.ficha_numero.includes(filtroFicha)).map((h) => (
-                        <tr key={h.ficha_numero} className="hover:bg-gray-50/50">
-                          <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-sena">{h.ficha_numero}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-gray-600">{h.programa}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.lunes}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.martes}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.miercoles}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.jueves}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.viernes}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-xs">{h.sabado}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: Ocupación Ambientes */}
-            {activeTab === "ocupacion" && (
-              <div className="space-y-4">
-                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
-                      <tr>
-                        <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Tipo</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Capacidad</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Horas Ocupadas</th>
-                        <th className="px-3 py-3 md:px-6 md:py-4 text-center">Ocupación</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {ocupacion.map((o) => (
-                        <tr key={o.ambiente_nombre} className="hover:bg-gray-50/50">
-                          <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{o.ambiente_nombre}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{o.tipo}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{o.capacidad}</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">{o.horas_ocupadas}h / {o.horas_totales}h</td>
-                          <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <div className="w-24 bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                                <div
-                                  className={`h-2.5 rounded-full ${
-                                    o.porcentaje > 80 ? "bg-red-500" : o.porcentaje > 50 ? "bg-yellow-500" : "bg-green-500"
-                                  }`}
-                                  style={{ width: `${o.porcentaje}%` }}
-                                />
-                              </div>
-                              <span className="text-xs font-medium text-gray-600 w-10">{o.porcentaje}%</span>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </DashboardLayout>
-  )
-}
+                  {fichasFiltradas.length === 0 ? (
+                    <div className="p-12 text-center text-gray-500">
+                      No se encontraron fichas con horarios activos.
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left">
+                        <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
+                          <tr>
+                            <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
+                            <th className="px-3 py

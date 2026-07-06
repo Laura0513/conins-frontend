@@ -3,53 +3,111 @@ import { useRouter } from "next/router"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useAuth } from "@/lib/AuthContext"
-import { Loader2 } from "lucide-react"
+import {
+  Loader2,
+  Users,
+  BookOpen,
+  ClipboardList,
+  AlertTriangle,
+  Calendar,
+  Bell,
+} from "lucide-react"
 
-// Datos de prueba (mock data) - TEMPORAL hasta que el backend tenga los endpoints
-const cargaHorariaMock = [
-  { instructor: "Carlos Álvarez", horas: 45, limite: 40, estado: "Excede límite", tipo: "danger" },
-  { instructor: "Andrés Pareja", horas: 22, limite: 32, estado: "En rango", tipo: "success" },
-  { instructor: "William Ramírez", horas: 40, limite: 40, estado: "En rango", tipo: "success" },
-  { instructor: "Paula Isaza", horas: 30, limite: 40, estado: "En rango", tipo: "success" },
-]
+// --- Types ---
+type CargaHoraria = {
+  instructor_id: number
+  instructor_nombre: string
+  total_horas: number
+  fichas_count: number
+  competencias_count: number
+  estado: "Normal" | "Sobrecarga" | "Bajo carga"
+}
 
-const alertasMock = [
-  { mensaje: "Carlos Álvarez tiene 45h — supera el límite de 40h semanales", tipo: "CARGA_HORARIA", tiempo: "Hace 2 h" },
-  { mensaje: "Aula 203 ocupada en jornada mañana por ficha 2995403", tipo: "AMBIENTE_OCUPADO", tiempo: "Hace 4 h" },
-  { mensaje: "Conflicto de horario detectado para William Ramírez el martes 10:00", tipo: "CONFLICTO", tiempo: "Ayer" },
-]
+type Alerta = {
+  id: number
+  instructor_nombre: string
+  tipo: string
+  mensaje: string
+  atendida: boolean
+  created_at: string
+}
 
+type HorarioInstructor = {
+  id: number
+  ficha_numero: string
+  competencia: string
+  ambiente: string
+  dias: string[] | string
+  horas: string
+  estado: string
+  activo: boolean
+}
+
+// --- Helpers ---
 function getProgressColor(horas: number, limite: number) {
   if (horas > limite) return "bg-red-500"
   if (horas >= limite * 0.85) return "bg-yellow-500"
   return "bg-sena"
 }
 
-function getStatusBadgeColor(tipo: string) {
-  switch (tipo) {
-    case "danger": return "bg-red-100 text-red-700"
-    case "warning": return "bg-yellow-100 text-yellow-700"
-    default: return "bg-green-100 text-green-700"
+function getStatusBadge(estado: string) {
+  switch (estado) {
+    case "Sobrecarga":
+      return "bg-red-100 text-red-700"
+    case "Bajo carga":
+      return "bg-yellow-100 text-yellow-700"
+    default:
+      return "bg-green-100 text-green-700"
   }
 }
 
 function getAlertBadgeColor(tipo: string) {
   switch (tipo) {
-    case "CARGA_HORARIA": return "bg-yellow-100 text-yellow-800"
-    case "AMBIENTE_OCUPADO": return "bg-orange-100 text-orange-800"
-    case "CONFLICTO": return "bg-red-100 text-red-800"
-    default: return "bg-gray-100 text-gray-800"
+    case "CARGA_HORARIA":
+      return "bg-yellow-100 text-yellow-800"
+    case "AMBIENTE_OCUPADO":
+      return "bg-orange-100 text-orange-800"
+    case "CONFLICTO":
+      return "bg-red-100 text-red-800"
+    default:
+      return "bg-gray-100 text-gray-800"
   }
+}
+
+function tiempoRelativo(fecha: string) {
+  const ahora = Date.now()
+  const creado = new Date(fecha).getTime()
+  const diff = ahora - creado
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `Hace ${mins} min`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `Hace ${hrs} h`
+  const dias = Math.floor(hrs / 24)
+  if (dias === 1) return "Ayer"
+  return `Hace ${dias} dias`
 }
 
 export default function Home() {
   const router = useRouter()
   const { user, loading } = useAuth()
+
+  // Admin stats
   const [instructorCount, setInstructorCount] = useState(0)
+  const [fichasCount, setFichasCount] = useState(0)
+  const [asignacionesCount, setAsignacionesCount] = useState(0)
+  const [alertasPendientes, setAlertasPendientes] = useState(0)
+  const [alertas, setAlertas] = useState<Alerta[]>([])
+  const [cargaHoraria, setCargaHoraria] = useState<CargaHoraria[]>([])
+
+  // Instructor stats
+  const [misHorarios, setMisHorarios] = useState<HorarioInstructor[]>([])
+  const [misFichasCount, setMisFichasCount] = useState(0)
+  const [notifCount, setNotifCount] = useState(0)
+
   const [dataLoading, setDataLoading] = useState(true)
 
-  const rol = user?.roles?.[0]?.trim().toLowerCase() || "admin"
-  const esAdmin = rol !== "instructor"
+  const rol = user?.roles?.[0]?.trim() || "admin"
+  const esAdmin = rol !== "Instructor"
 
   useEffect(() => {
     if (!loading && !user) {
@@ -57,19 +115,70 @@ export default function Home() {
     }
   }, [user, loading, router])
 
+  // Cargar datos admin
   useEffect(() => {
-    if (user && esAdmin) {
-      api.instructors.getAll()
-        .then((res) => {
-          setInstructorCount(res.data.length)
-        })
-        .catch(() => {
-          setInstructorCount(0)
-        })
-        .finally(() => setDataLoading(false))
-    } else {
+    if (!user || !esAdmin) return
+
+    setDataLoading(true)
+
+    Promise.allSettled([
+      api.instructors.getAll(),
+      api.fichas.getAll(),
+      api.assignments.getAll(),
+      api.alertas.getAll(),
+      api.consultas.getCargaHoraria(),
+    ]).then(([instRes, fichasRes, asigRes, alertasRes, cargaRes]) => {
+      if (instRes.status === "fulfilled") {
+        const activos = (instRes.value.data || []).filter((i: any) => i.activo !== false)
+        setInstructorCount(activos.length)
+      }
+      if (fichasRes.status === "fulfilled") {
+        const activas = (fichasRes.value.data || []).filter((f: any) => f.activo !== false)
+        setFichasCount(activas.length)
+      }
+      if (asigRes.status === "fulfilled") {
+        const activas = (asigRes.value.data || []).filter((a: any) => a.activo !== false)
+        setAsignacionesCount(activas.length)
+      }
+      if (alertasRes.status === "fulfilled") {
+        const todas = alertasRes.value.data || []
+        const noAtendidas = todas.filter((a: Alerta) => !a.atendida)
+        setAlertasPendientes(noAtendidas.length)
+        // Mostrar las 5 más recientes
+        setAlertas(todas.slice(0, 5))
+      }
+      if (cargaRes.status === "fulfilled") {
+        setCargaHoraria(cargaRes.value.data || [])
+      }
+
       setDataLoading(false)
-    }
+    })
+  }, [user, esAdmin])
+
+  // Cargar datos instructor
+  useEffect(() => {
+    if (!user || esAdmin) return
+
+    setDataLoading(true)
+
+    Promise.allSettled([
+      api.horarios.getAll(),
+      api.fichas.getAll(),
+      api.notificaciones.getNoLeidasCount(),
+    ]).then(([horariosRes, fichasRes, notifRes]) => {
+      if (horariosRes.status === "fulfilled") {
+        const activos = (horariosRes.value.data || []).filter((h: any) => h.activo)
+        setMisHorarios(activos)
+      }
+      if (fichasRes.status === "fulfilled") {
+        setMisFichasCount((fichasRes.value.data || []).length)
+      }
+      if (notifRes.status === "fulfilled") {
+        setNotifCount(notifRes.value.data?.count ?? 0)
+      }
+
+      setDataLoading(false)
+    })
   }, [user, esAdmin])
 
   if (loading || !user) {
@@ -77,156 +186,120 @@ export default function Home() {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-gray-500">
           <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Verificando sesión...</p>
+          <p>Verificando sesion...</p>
         </div>
       </div>
     )
   }
 
+  // ========================
+  // VISTA INSTRUCTOR
+  // ========================
   if (!esAdmin) {
     return (
       <DashboardLayout>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Bienvenido, {user.nombre}</h1>
-          <p className="text-gray-500 mb-8">Resumen de tu actividad académica</p>
+        <div className="p-6 space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Bienvenido, {user.nombre}</h1>
+            <p className="text-gray-500 text-sm">Resumen de tu actividad academica</p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <p className="text-sm text-gray-500 mb-1">Mis horarios activos</p>
-              <p className="text-3xl font-bold text-sena">3</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-sena" />
+                </div>
+                <p className="text-sm text-gray-500">Mis horarios activos</p>
+              </div>
+              <p className="text-3xl font-bold text-sena">
+                {dataLoading ? "..." : misHorarios.length}
+              </p>
             </div>
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <p className="text-sm text-gray-500 mb-1">Fichas asignadas</p>
-              <p className="text-3xl font-bold text-sena">2</p>
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-sena" />
+                </div>
+                <p className="text-sm text-gray-500">Fichas asignadas</p>
+              </div>
+              <p className="text-3xl font-bold text-sena">
+                {dataLoading ? "..." : misFichasCount}
+              </p>
             </div>
-            <div className="bg-white p-6 rounded-xl border-l-4 border-yellow-400">
-              <p className="text-sm text-gray-500 mb-1">Notificaciones sin leer</p>
-              <p className="text-3xl font-bold text-yellow-600">1</p>
+            <div className="bg-white p-6 rounded-xl border-l-4 border-yellow-400 shadow-sm">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+                  <Bell className="w-5 h-5 text-yellow-600" />
+                </div>
+                <p className="text-sm text-gray-500">Notificaciones sin leer</p>
+              </div>
+              <p className="text-3xl font-bold text-yellow-600">
+                {dataLoading ? "..." : notifCount}
+              </p>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Mis horarios de esta semana</h2>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div>
-                  <p className="font-medium text-gray-900">Ficha 2995403 - Bases de datos</p>
-                  <p className="text-sm text-gray-500">Aula 203 · Lunes, Miércoles, Viernes</p>
-                </div>
-                <span className="text-sm font-medium text-sena">06:00 - 12:00</span>
+
+            {dataLoading ? (
+              <div className="py-8 flex items-center justify-center text-gray-400">
+                <Loader2 className="w-6 h-6 animate-spin" />
               </div>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div>
-                  <p className="font-medium text-gray-900">Ficha 2995403 - Análisis y diseño</p>
-                  <p className="text-sm text-gray-500">Aula 204 · Martes, Jueves</p>
-                </div>
-                <span className="text-sm font-medium text-sena">08:00 - 12:00</span>
+            ) : misHorarios.length === 0 ? (
+              <p className="text-sm text-gray-500 py-4 text-center">
+                No tienes horarios activos esta semana.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {misHorarios.map((h) => (
+                  <div
+                    key={h.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        Ficha {h.ficha_numero} — {h.competencia}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {h.ambiente} · {Array.isArray(h.dias) ? h.dias.join(", ") : h.dias}
+                      </p>
+                    </div>
+                    <span className="text-sm font-medium text-sena whitespace-nowrap">
+                      {h.horas}
+                    </span>
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </DashboardLayout>
     )
   }
 
+  // ========================
+  // VISTA ADMIN
+  // ========================
   return (
     <DashboardLayout>
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Inicio</h1>
-        <p className="text-gray-500 mb-8">Resumen general del CDMC</p>
+      <div className="p-6 space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Inicio</h1>
+          <p className="text-gray-500 text-sm">Resumen general del CDMC</p>
+        </div>
 
         {/* Tarjetas de resumen */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-
-          {/* Tarjeta REAL de Instructores */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-500 mb-1">Instructores activos</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-sena" />
+              </div>
+              <p className="text-sm text-gray-500">Instructores activos</p>
+            </div>
             <p className="text-3xl font-bold text-gray-900">
               {dataLoading ? "..." : instructorCount}
             </p>
-          </div>
-
-          {/* Tarjetas con datos de prueba (Backend pendiente) */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-500 mb-1">Fichas activas</p>
-            <p className="text-3xl font-bold text-gray-900">4</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-500 mb-1">Asignaciones vigentes</p>
-            <p className="text-3xl font-bold text-gray-900">3</p>
-          </div>
-          <div className="bg-white p-6 rounded-xl border-l-4 border-yellow-400">
-            <p className="text-sm text-gray-500 mb-1">Alertas pendientes</p>
-            <p className="text-3xl font-bold text-gray-900">2</p>
-          </div>
-        </div>
-
-        {/* Contenido inferior: Tabla + Alertas */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {/* Tabla de carga horaria (Datos de prueba) */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Carga horaria semanal</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-gray-200 text-gray-500">
-                    <th className="text-left py-3 font-medium">Instructor</th>
-                    <th className="text-center py-3 font-medium">Horas</th>
-                    <th className="text-center py-3 font-medium">Límite</th>
-                    <th className="text-center py-3 font-medium">Progreso</th>
-                    <th className="text-center py-3 font-medium">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cargaHorariaMock.map((row, i) => (
-                    <tr key={i} className="border-b border-gray-100 last:border-0">
-                      <td className="py-3 font-medium text-gray-900">{row.instructor}</td>
-                      <td className="py-3 text-center text-gray-700">{row.horas}</td>
-                      <td className="py-3 text-center text-gray-500">{row.limite}</td>
-                      <td className="py-3">
-                        <div className="w-full bg-gray-200 rounded-full h-2.5">
-                          <div
-                            className={`h-2.5 rounded-full ${getProgressColor(row.horas, row.limite)}`}
-                            style={{ width: `${Math.min((row.horas / row.limite) * 100, 100)}%` }}
-                          />
-                        </div>
-                      </td>
-                      <td className="py-3 text-center">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(row.tipo)}`}>
-                          {row.estado}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Alertas recientes (Datos de prueba) */}
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Alertas recientes</h2>
-              <button onClick={() => router.push("/alertas")} className="text-sena text-sm font-medium hover:underline">Ver todas</button>
-            </div>
-            <div className="space-y-4">
-              {alertasMock.map((alerta, i) => (
-                <div key={i} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm text-gray-700 flex-1">{alerta.mensaje}</p>
-                    <span className={`shrink-0 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide ${getAlertBadgeColor(alerta.tipo)}`}>
-                      {alerta.tipo}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-2">{alerta.tiempo}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </DashboardLayout>
-  )
-}
+ 

@@ -63,10 +63,10 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const registrarNovedad = asyncHandler(async (req: Request, res: Response) => {
-  const { tipo_novedad, fecha_inicio, fecha_regreso, observacion } = req.body;
+  const { tipo_novedad_id, fecha_inicio, fecha_regreso, observacion } = req.body;
   const result = await InstructorService.registrarNovedad(
     Number(req.params.id),
-    tipo_novedad,
+    Number(tipo_novedad_id),
     fecha_inicio,
     fecha_regreso,
     observacion,
@@ -76,7 +76,7 @@ export const registrarNovedad = asyncHandler(async (req: Request, res: Response)
   if (instructor) {
     await NotificacionService.onNovedadRegistrada(
       instructor,
-      tipo_novedad,
+      tipo_novedad_id,
       fecha_inicio,
       fecha_regreso,
     );

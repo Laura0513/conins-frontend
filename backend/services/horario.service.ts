@@ -4,10 +4,17 @@ import { FichaModel } from '../models/ficha.model.js';
 import { AmbienteModel } from '../models/ambiente.model.js';
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors.js';
 import { getLunesSemanaActual } from '../utils/date.js';
+import { ROLES, RoleKey } from '../constants/roles.js';
 import pool from '../config/db.js';
 
 export const HorarioService = {
-  async getAll() {
+  async getAll(userId?: number, roles?: RoleKey[]) {
+    // Si es instructor, solo ver sus propios horarios
+    if (userId && roles && roles.length === 1 && roles[0] === ROLES.INSTRUCTOR) {
+      const instructor = await InstructorModel.findByUsuarioId(userId);
+      if (!instructor) return [];
+      return HorarioModel.findAllByInstructorId(instructor.id);
+    }
     return HorarioModel.findAll();
   },
 
@@ -25,6 +32,7 @@ export const HorarioService = {
     dia_semana: number;
     hora_inicio: string;
     hora_fin: string;
+    tipo_actividad_id?: number | null;
     jornada_id: number;
     semana?: string;
   }) {
@@ -101,33 +109,37 @@ export const HorarioService = {
     hora_fin?: string;
     competencia_id?: number;
     ambiente_id?: number | null;
+    tipo_actividad_id?: number | null;
   }) {
-    const horario = await HorarioModel.findById(id);
-    if (!horario) throw new NotFoundError('Horario no encontrado');
+    // Query raw record — findById retorna HorarioDetail sin IDs numéricos
+    const [rawRows] = await pool.query(
+      'SELECT * FROM horarios WHERE id = ? AND activo = TRUE',
+      [id],
+    );
+    const existing = (rawRows as any[])[0];
+    if (!existing) throw new NotFoundError('Horario no encontrado');
 
-    if (data.hora_inicio && data.hora_fin) {
-      if (new Date(`2000-01-01T${data.hora_fin}`).getTime() <= new Date(`2000-01-01T${data.hora_inicio}`).getTime()) {
-        throw new ValidationError('La hora de fin debe ser posterior a la hora de inicio');
-      }
+    // Valores finales (merge de nuevos con existentes)
+    const finalDia = data.dia_semana ?? existing.dia_semana;
+    const finalHoraInicio = data.hora_inicio ?? existing.hora_inicio;
+    const finalHoraFin = data.hora_fin ?? existing.hora_fin;
+    const finalAmbienteId = data.ambiente_id !== undefined ? data.ambiente_id : existing.ambiente_id;
+    const semana = existing.semana;
+
+    // Validar hora_fin > hora_inicio
+    const tInicio = new Date(`2000-01-01T${finalHoraInicio}`).getTime();
+    const tFin = new Date(`2000-01-01T${finalHoraFin}`).getTime();
+    if (tFin <= tInicio) {
+      throw new ValidationError('La hora de fin debe ser posterior a la hora de inicio');
     }
 
-    const existing = await HorarioModel.findById(id);
-    if (data.dia_semana || data.hora_inicio || data.hora_fin) {
-      const semana = getLunesSemanaActual();
-
-      const ambienteId = data.ambiente_id ?? (existing as any).ambiente_id;
-      if (ambienteId) {
-        const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(ambienteId, semana);
-        if (tieneBloqueo) {
-          throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
-        }
-      }
-
+    // RN-04: Solapamiento de horario del instructor
+    if (data.dia_semana !== undefined || data.hora_inicio !== undefined || data.hora_fin !== undefined) {
       const hasOverlap = await HorarioModel.hasOverlap(
-        (existing as any).instructor_id,
-        data.dia_semana ?? (existing as any).dia_semana,
-        data.hora_inicio ?? (existing as any).hora_inicio,
-        data.hora_fin ?? (existing as any).hora_fin,
+        existing.instructor_id,
+        finalDia,
+        finalHoraInicio,
+        finalHoraFin,
         semana,
         id,
       );
@@ -136,8 +148,79 @@ export const HorarioService = {
       }
     }
 
+    // RN-09: Bloqueo de ambiente
+    if (finalAmbienteId) {
+      const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(finalAmbienteId, semana);
+      if (tieneBloqueo) {
+        throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+      }
+    }
+
+    // RN-05: Ambiente ocupado (alerta, no bloqueo)
+    let alertaAmbienteOcupado = false;
+    if (finalAmbienteId && (data.ambiente_id !== undefined || data.dia_semana !== undefined)) {
+      alertaAmbienteOcupado = await HorarioModel.hasAmbienteOcupado(
+        finalAmbienteId,
+        finalDia,
+        existing.jornada_id,
+        semana,
+        id,
+      );
+    }
+
+    // RN-03: Carga horaria máxima 40h semanales
+    if (data.hora_inicio !== undefined || data.hora_fin !== undefined) {
+      // Horas totales excluyendo este horario
+      const [horasRows] = await pool.query(
+        `SELECT COALESCE(SUM(TIMESTAMPDIFF(MINUTE, h.hora_inicio, h.hora_fin)), 0) / 60 AS total_horas
+         FROM horarios h
+         LEFT JOIN tipos_actividad ta ON h.tipo_actividad_id = ta.id
+         WHERE h.instructor_id = ? AND h.semana = ? AND h.activo = TRUE AND h.id != ?
+           AND (ta.suma_carga_horaria = TRUE OR h.tipo_actividad_id IS NULL)`,
+        [existing.instructor_id, semana, id],
+      );
+      const horasSinEste = Number((horasRows as any[])[0]?.total_horas ?? 0);
+
+      // Verificar si el nuevo tipo suma carga horaria
+      const finalTipoId = data.tipo_actividad_id !== undefined ? data.tipo_actividad_id : existing.tipo_actividad_id;
+      let sumaCarga = true;
+      if (finalTipoId) {
+        const [tipoRows] = await pool.query(
+          'SELECT suma_carga_horaria FROM tipos_actividad WHERE id = ?',
+          [finalTipoId],
+        );
+        sumaCarga = (tipoRows as any[])[0]?.suma_carga_horaria !== 0;
+      }
+
+      if (sumaCarga) {
+        const nuevasHoras = (tFin - tInicio) / (1000 * 60 * 60);
+        const totalHoras = horasSinEste + nuevasHoras;
+        if (totalHoras > 40) {
+          throw new ValidationError(
+            `El instructor excede el limite de 40 horas semanales (actual: ${horasSinEste.toFixed(1)}h + nuevas: ${nuevasHoras.toFixed(1)}h = ${totalHoras.toFixed(1)}h)`,
+          );
+        }
+      }
+    }
+
+    // Alerta jornada restringida (instructor de planta en noche/fin de semana)
+    let alertaJornadaRestringida = false;
+    if (data.dia_semana !== undefined) {
+      const esDePlanta = await HorarioModel.isInstructorDePlanta(existing.instructor_id);
+      const esNocheOFinde = await HorarioModel.isJornadaNocturnaOFinDeSemana(existing.jornada_id, finalDia);
+      if (esDePlanta && esNocheOFinde) {
+        alertaJornadaRestringida = true;
+      }
+    }
+
     await HorarioModel.update(id, data);
-    return HorarioModel.findById(id);
+    const updated = await HorarioModel.findById(id);
+
+    return {
+      ...updated,
+      alerta_ambiente_ocupado: alertaAmbienteOcupado,
+      alerta_jornada_restringida: alertaJornadaRestringida,
+    };
   },
 
   async toggleActivo(id: number, motivo?: string) {
@@ -146,6 +229,26 @@ export const HorarioService = {
 
     const nuevoEstado = await HorarioModel.toggleActivo(id, motivo);
     return { activo: nuevoEstado };
+  },
+
+  async aprobar(id: number) {
+    const horario = await HorarioModel.findById(id);
+    if (!horario) throw new NotFoundError('Horario no encontrado');
+
+    await HorarioModel.aprobar(id);
+    return HorarioModel.findById(id);
+  },
+
+  async rechazar(id: number, motivo: string) {
+    const horario = await HorarioModel.findById(id);
+    if (!horario) throw new NotFoundError('Horario no encontrado');
+
+    if (!motivo || motivo.trim().length === 0) {
+      throw new ValidationError('El motivo de rechazo es obligatorio');
+    }
+
+    await HorarioModel.rechazar(id, motivo);
+    return HorarioModel.findById(id);
   },
 
   async updateMultiDia(id: number, data: {
@@ -219,5 +322,13 @@ export const HorarioService = {
     }
 
     return HorarioModel.findAll();
+  },
+
+  async suspender(id: number, motivo: string) {
+    const horario = await HorarioModel.findById(id);
+    if (!horario) throw new NotFoundError('Horario no encontrado');
+
+    await HorarioModel.suspender(id, motivo);
+    return HorarioModel.findById(id);
   },
 };

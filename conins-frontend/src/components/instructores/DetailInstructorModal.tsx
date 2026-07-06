@@ -1,4 +1,6 @@
-import { X, User, Mail, FileText, Clock, AlertCircle, BookOpen, Calendar } from "lucide-react"
+import { useState, useEffect } from "react"
+import { X, User, Mail, FileText, Clock, AlertCircle, BookOpen, Calendar, Loader2 } from "lucide-react"
+import { api } from "@/lib/api"
 
 type Instructor = {
   id: number
@@ -33,17 +35,32 @@ type DetailInstructorModalProps = {
   instructor: Instructor | null
 }
 
-// Mock data until backend endpoints are ready
-const MOCK_ASIGNACIONES: Asignacion[] = [
-  { ficha_numero: "2995403", programa: "ADSO", jornada: "Manana", horas_asignadas: 20, es_lider: true },
-  { ficha_numero: "2887341", programa: "Calzado", jornada: "Tarde", horas_asignadas: 15, es_lider: false },
-]
-
-const MOCK_NOVEDADES: Novedad[] = [
-  { tipo: "Licencia", fecha_inicio: "2026-03-01", fecha_regreso: "2026-03-15", observacion: "Licencia medica" },
-]
-
 export default function DetailInstructorModal({ isOpen, onClose, instructor }: DetailInstructorModalProps) {
+  const [asignaciones, setAsignaciones] = useState<Asignacion[]>([])
+  const [novedades, setNovedades] = useState<Novedad[]>([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (isOpen && instructor) {
+      cargarDetalle()
+    }
+  }, [isOpen, instructor])
+
+  const cargarDetalle = async () => {
+    if (!instructor) return
+    setLoading(true)
+    try {
+      const res = await api.instructors.getDetalle(instructor.id)
+      setAsignaciones(res.data?.asignaciones || [])
+      setNovedades(res.data?.novedades || [])
+    } catch {
+      setAsignaciones([])
+      setNovedades([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (!isOpen || !instructor) return null
 
   const horas = instructor.horas_semana ?? 0
@@ -121,68 +138,56 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor }: D
             </div>
           </div>
 
-          {/* Asignaciones */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-sena" />
-              Asignaciones ({MOCK_ASIGNACIONES.length})
-            </h4>
-            <div className="space-y-2">
-              {MOCK_ASIGNACIONES.map((asig, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      Ficha {asig.ficha_numero}
-                      {asig.es_lider && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sena/10 text-sena">
-                          Lider
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-xs text-gray-500">{asig.programa} - {asig.jornada}</p>
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">{asig.horas_asignadas}h</span>
-                </div>
-              ))}
+          {loading ? (
+            <div className="py-6 flex items-center justify-center text-gray-400">
+              <Loader2 className="w-5 h-5 animate-spin" />
             </div>
-          </div>
-
-          {/* Novedades */}
-          <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-orange-500" />
-              Novedades ({MOCK_NOVEDADES.length})
-            </h4>
-            {MOCK_NOVEDADES.length > 0 ? (
-              <div className="space-y-2">
-                {MOCK_NOVEDADES.map((nov, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
-                    <AlertCircle className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
-                    <div>
-                      <p className="text-sm font-medium text-orange-900">{nov.tipo}</p>
-                      <p className="text-xs text-orange-700">
-                        {nov.fecha_inicio} a {nov.fecha_regreso}
-                      </p>
-                      <p className="text-xs text-orange-600 mt-1">{nov.observacion}</p>
-                    </div>
+          ) : (
+            <>
+              {/* Asignaciones */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-sena" />
+                  Asignaciones ({asignaciones.length})
+                </h4>
+                {asignaciones.length > 0 ? (
+                  <div className="space-y-2">
+                    {asignaciones.map((asig, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Ficha {asig.ficha_numero}
+                            {asig.es_lider && (
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sena/10 text-sena">
+                                Lider
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-xs text-gray-500">{asig.programa} - {asig.jornada}</p>
+                        </div>
+                        <span className="text-sm font-medium text-gray-700">{asig.horas_asignadas}h</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <p className="text-sm text-gray-500">Sin asignaciones activas</p>
+                )}
               </div>
-            ) : (
-              <p className="text-sm text-gray-500">Sin novedades registradas</p>
-            )}
-          </div>
-        </div>
 
-        <div className="p-4 border-t border-gray-100 flex justify-end shrink-0">
-          <button
-            onClick={onClose}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Cerrar
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+              {/* Novedades */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-orange-500" />
+                  Novedades ({novedades.length})
+                </h4>
+                {novedades.length > 0 ? (
+                  <div className="space-y-2">
+                    {novedades.map((nov, i) => (
+                      <div key={i} className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
+                        <AlertCircle className="w-4 h-4 text-orange-500 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-orange-900">{nov.tipo}</p>
+                          <p className="text-xs text-orange-700">
+                            {nov.fecha_inicio} a {nov.fecha_regreso}
+                          </p>
+                          <p cla

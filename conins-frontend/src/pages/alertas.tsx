@@ -25,11 +25,6 @@ type Alerta = {
   created_at: string
 }
 
-const MOCK_ALERTAS: Alerta[] = [
-  { id: 1, instructor_id: 1, instructor_nombre: "Carlos Álvarez", tipo: "HORAS_EXCEDIDAS", mensaje: "Carlos Álvarez tiene 45h — supera el límite de 40h semanales", semana: "2026-06-01", total_horas: 45, atendida: false, created_at: "2026-06-01T10:00:00Z" },
-  { id: 2, instructor_id: 2, instructor_nombre: "Andrés Pareja", tipo: "AMBIENTE_OCUPADO", mensaje: "Aula 203 ocupada en jornada mañana por ficha 2995403", semana: "2026-06-01", total_horas: 32, atendida: false, created_at: "2026-05-31T14:00:00Z" },
-  { id: 3, instructor_id: 3, instructor_nombre: "William Ramírez", tipo: "ASIGNACION_PROVISIONAL", mensaje: "Conflicto de horario detectado para William Ramírez el martes 10:00", semana: "2026-06-01", total_horas: 40, atendida: true, created_at: "2026-05-30T08:00:00Z" },
-]
 
 function getAlertIcon(tipo: string) {
   switch (tipo) {
@@ -101,7 +96,8 @@ export default function AlertasPage() {
   const [filtroEstado, setFiltroEstado] = useState("todas")
   const [activeTab, setActiveTab] = useState<"pendientes" | "historial">("pendientes")
 
-  const esAdmin = user?.roles?.[0]?.trim().toLowerCase() !== "instructor"
+  const rol = user?.roles?.[0]?.trim() || ""
+  const esAdmin = rol !== "Instructor"
 
   useEffect(() => {
     cargarAlertas()
@@ -113,9 +109,8 @@ export default function AlertasPage() {
       const res = await api.alertas.getAll()
       setAlertas(res.data || [])
     } catch (err) {
-      console.warn("Backend no disponible, usando datos mock:", err)
-      const filtrado = esAdmin ? MOCK_ALERTAS : MOCK_ALERTAS.filter((a) => a.instructor_nombre === user?.nombre)
-      setAlertas(filtrado)
+      console.warn("Error cargando alertas:", err)
+      setAlertas([])
     } finally {
       setLoading(false)
     }
@@ -323,3 +318,4 @@ export default function AlertasPage() {
     </DashboardLayout>
   )
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       

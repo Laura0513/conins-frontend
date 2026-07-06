@@ -54,6 +54,33 @@ export const AsignacionModel = {
     return rows;
   },
 
+  async findAllByInstructorId(instructorId: number): Promise<AsignacionDetail[]> {
+    const [rows] = await pool.query<AsignacionDetail[]>(`
+      SELECT a.id, a.instructor_id, a.ficha_id, ac.competencia_id,
+             u.nombre AS instructor_nombre, f.numero_ficha AS ficha_numero,
+             c.nombre AS competencia,
+             COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
+             ab.id AS ambiente_id,
+             j.nombre AS jornada,
+             a.es_lider_ficha AS es_lider,
+             a.es_provisional,
+             a.activo
+      FROM asignacion a
+      JOIN instructores i ON a.instructor_id = i.id
+      JOIN usuarios u ON i.usuario_id = u.id
+      JOIN fichas f ON a.ficha_id = f.id
+      JOIN asignacion_competencia ac ON ac.asignacion_id = a.id
+      JOIN competencias c ON ac.competencia_id = c.id
+      JOIN jornadas j ON f.jornada_id = j.id
+      LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
+      WHERE a.instructor_id = ?
+      GROUP BY a.id, u.nombre, f.numero_ficha, c.nombre, ab.nombre, j.nombre,
+               a.es_lider_ficha, a.es_provisional, a.activo
+      ORDER BY a.id
+    `, [instructorId]);
+    return rows;
+  },
+
   async findById(id: number): Promise<AsignacionDetail | null> {
     const [rows] = await pool.query<AsignacionDetail[]>(`
       SELECT a.id, u.nombre AS instructor_nombre, f.numero_ficha AS ficha_numero,

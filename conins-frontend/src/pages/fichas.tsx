@@ -6,6 +6,7 @@ import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import CrearFichaModal from "@/components/fichas/CrearFichaModal"
 import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import EditFichaModal from "@/components/fichas/EditFichaModal"
+import RapSeguimientoModal from "@/components/fichas/RapSeguimientoModal"
 import {
   Search,
   Plus,
@@ -16,6 +17,7 @@ import {
   ChevronRight,
   Loader2,
   AlertTriangle,
+  ClipboardList,
 } from "lucide-react"
 
 type Ficha = {
@@ -31,12 +33,6 @@ type Ficha = {
   instructor_nombre?: string
 }
 
-const MOCK_FICHAS: Ficha[] = [
-  { id: 1, numero_ficha: "2995403", programa: "ADSO", jornada: "Manana", etapa: "lectiva", modalidad: "Presencial", instructores_count: 4, estado: "Activa", activo: true, instructor_nombre: "Carlos Álvarez" },
-  { id: 2, numero_ficha: "2887341", programa: "Calzado", jornada: "Mixta", etapa: "productiva", modalidad: "Presencial", instructores_count: 2, estado: "Activa", activo: true, instructor_nombre: "Andrés Pareja" },
-  { id: 3, numero_ficha: "3012456", programa: "Diseno", jornada: "Noche", etapa: "lectiva", modalidad: "Presencial", instructores_count: 3, estado: "Activa", activo: true, instructor_nombre: "William Ramírez" },
-  { id: 4, numero_ficha: "2760123", programa: "HUI FORMACION", jornada: "Virtual", etapa: "lectiva", modalidad: "Virtual", instructores_count: 0, estado: "Activa", activo: true, instructor_nombre: "Instructor Prueba" },
-]
 
 export default function FichasPage() {
   const { user, loading: authLoading } = useProtectedRoute()
@@ -46,6 +42,7 @@ export default function FichasPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isRapModalOpen, setIsRapModalOpen] = useState(false)
   const [selectedFicha, setSelectedFicha] = useState<Ficha | null>(null)
 
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -62,8 +59,8 @@ export default function FichasPage() {
   const [filtroEtapa, setFiltroEtapa] = useState("todas")
   const [filtroModalidad, setFiltroModalidad] = useState("todas")
 
-  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
-  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
+  const rol = user?.roles?.[0]?.trim() || ""
+  const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
 
   useEffect(() => {
     cargarFichas()
@@ -85,9 +82,8 @@ export default function FichasPage() {
       const res = await api.fichas.getAll()
       setFichas(res.data || [])
     } catch (err) {
-      console.warn("Backend no disponible, usando datos mock:", err)
-      const filtrado = rol !== "instructor" ? MOCK_FICHAS : MOCK_FICHAS.filter((f) => f.instructor_nombre === user?.nombre)
-      setFichas(filtrado)
+      console.warn("Error cargando fichas:", err)
+      setFichas([])
     } finally {
       setLoading(false)
     }
@@ -113,6 +109,11 @@ export default function FichasPage() {
   const openEditModal = (ficha: Ficha) => {
     setSelectedFicha(ficha)
     setIsEditModalOpen(true)
+  }
+
+  const openRapModal = (ficha: Ficha) => {
+    setSelectedFicha(ficha)
+    setIsRapModalOpen(true)
   }
 
   const handleFinalizarFicha = (ficha: Ficha) => {
@@ -299,6 +300,13 @@ export default function FichasPage() {
                               <Eye className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() => openRapModal(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                              title="Seguimiento RAPs"
+                            >
+                              <ClipboardList className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => openEditModal(ficha)}
                               className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                               title="Editar"
@@ -314,13 +322,22 @@ export default function FichasPage() {
                             </button>
                           </div>
                         ) : (
-                          <button
-                            onClick={() => openDetailModal(ficha)}
-                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
-                            title="Ver detalle"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => openDetailModal(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                              title="Ver detalle"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => openRapModal(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
+                              title="Seguimiento RAPs"
+                            >
+                              <ClipboardList className="w-4 h-4" />
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -375,6 +392,15 @@ export default function FichasPage() {
         onSubmit={handleEditFicha}
       />
 
+      <RapSeguimientoModal
+        isOpen={isRapModalOpen}
+        onClose={() => setIsRapModalOpen(false)}
+        fichaId={selectedFicha?.id ?? null}
+        fichaNumero={selectedFicha?.numero_ficha ?? ""}
+        puedeEditar={puedeEditar}
+        onToast={showToast}
+      />
+
       {confirmDialog.isOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
@@ -390,21 +416,4 @@ export default function FichasPage() {
                 <button
                   onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
                   className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={confirmDialog.onConfirm}
-                  className="px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors"
-                >
-                  Confirmar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </DashboardLayout>
-  )
-}
+  

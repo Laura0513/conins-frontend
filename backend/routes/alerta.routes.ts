@@ -11,7 +11,7 @@ router.get('/', alertaController.listar);
 
 router.patch(
   '/:id/atendida',
-  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR, ROLES.COORDINADOR_TRANSVERSAL]),
+  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
   alertaController.marcarAtendida,
 );
 

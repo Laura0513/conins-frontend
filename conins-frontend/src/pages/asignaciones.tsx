@@ -36,11 +36,6 @@ type Asignacion = {
   tipo: "activa" | "provisional" | "historica"
 }
 
-const MOCK_ASIGNACIONES: Asignacion[] = [
-  { id: 1, instructor_id: 1, ficha_id: 1, competencia_id: 1, instructor_nombre: "Carlos Álvarez", ficha_numero: "2995403", competencia: "ADSO", ambiente: "Aula 203", jornada: "Mañana", es_lider: true, es_provisional: false, activo: true, tipo: "activa" },
-  { id: 2, instructor_id: 2, ficha_id: 2, competencia_id: 2, instructor_nombre: "Andrés Pareja", ficha_numero: "2887341", competencia: "Contabilidad", ambiente: "Aula 207", jornada: "Mixta", es_lider: false, es_provisional: false, activo: true, tipo: "activa" },
-  { id: 3, instructor_id: 3, ficha_id: 3, competencia_id: 3, instructor_nombre: "William Ramírez", ficha_numero: "3012456", competencia: "Logística", ambiente: "Taller T2", jornada: "Noche", es_lider: true, es_provisional: false, activo: true, tipo: "activa" },
-]
 
 export default function AsignacionesPage() {
   const { user, loading: authLoading } = useProtectedRoute()
@@ -65,8 +60,8 @@ export default function AsignacionesPage() {
   const [filtroPrograma, setFiltroPrograma] = useState("todos")
   const [filtroCoordinacion, setFiltroCoordinacion] = useState("todos")
 
-  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
-  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
+  const rol = user?.roles?.[0]?.trim() || ""
+  const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
 
   useEffect(() => {
     cargarAsignaciones()
@@ -82,9 +77,8 @@ export default function AsignacionesPage() {
       }))
       setAsignaciones(mapped)
     } catch (err) {
-      console.warn("Backend no disponible, usando datos mock:", err)
-      const filtrado = rol !== "instructor" ? MOCK_ASIGNACIONES : MOCK_ASIGNACIONES.filter((a) => a.instructor_nombre === user?.nombre)
-      setAsignaciones(filtrado)
+      console.warn("Error cargando asignaciones:", err)
+      setAsignaciones([])
     } finally {
       setLoading(false)
     }
@@ -99,7 +93,7 @@ export default function AsignacionesPage() {
       asig.competencia.toLowerCase().includes(texto)
     
     const coincidePrograma = filtroPrograma === "todos" || asig.competencia === filtroPrograma
-    const coincideCoordinacion = filtroCoordinacion === "todos" || true // Mock logic
+    const coincideCoordinacion = filtroCoordinacion === "todos" || true
     
     return coincideTab && coincideBusqueda && coincidePrograma && coincideCoordinacion
   })
@@ -332,7 +326,7 @@ export default function AsignacionesPage() {
                               <Power className="w-4 h-4" />
                             </button>
                           </div>
-                        ) : rol === "subdirector" ? (
+                        ) : rol === "Subdirector" ? (
                           <button
                             onClick={() => openDetailModal(asig)}
                             className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
@@ -426,3 +420,4 @@ export default function AsignacionesPage() {
     </DashboardLayout>
   )
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

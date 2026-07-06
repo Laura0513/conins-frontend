@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
+import { ROLES } from '../constants/roles.js';
 import pool from '../config/db.js';
 
 export const listar = asyncHandler(async (req: Request, res: Response) => {
   const { solo_no_atendidas } = req.query;
+  const userRoles = req.user?.roles_globales ?? [];
+  const esInstructor = userRoles.length === 1 && userRoles[0] === ROLES.INSTRUCTOR;
 
   let query = `
     SELECT a.id, a.instructor_id, u.nombre AS instructor_nombre,
@@ -16,6 +19,12 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
     WHERE 1=1
   `;
   const params: any[] = [];
+
+  // P22: Instructor solo ve sus propias alertas
+  if (esInstructor) {
+    query += ' AND i.usuario_id = ?';
+    params.push(req.user.id);
+  }
 
   if (solo_no_atendidas === 'true') {
     query += ' AND a.atendida = FALSE';

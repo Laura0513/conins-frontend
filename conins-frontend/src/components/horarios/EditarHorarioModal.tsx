@@ -10,6 +10,7 @@ type Horario = {
   competencia: string
   ambiente: string
   jornada: string
+  tipo_actividad?: string | null
   dias: string[]
   horas: string
   estado: string
@@ -19,11 +20,21 @@ type Horario = {
   hora_fin?: string
   jornada_id?: number
   ambiente_id?: number | null
+  tipo_actividad_id?: number | null
 }
 
 type Ambiente = {
   id: number
   nombre: string
+}
+
+type TipoActividad = {
+  id: number
+  nombre: string
+  suma_carga_horaria: boolean
+  requiere_ficha: boolean
+  requiere_ambiente: boolean
+  requiere_competencia: boolean
 }
 
 type EditarHorarioModalProps = {
@@ -53,6 +64,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
   const { showToast } = useToast()
   const [submitting, setSubmitting] = useState(false)
   const [ambientes, setAmbientes] = useState<Ambiente[]>([])
+  const [tiposActividad, setTiposActividad] = useState<TipoActividad[]>([])
   const [loading, setLoading] = useState(false)
   
   // El backend devuelve días como ["Lun", "Mar"], necesitamos mapear a IDs para el formulario
@@ -65,14 +77,16 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
     hora_fin: "",
     jornada_id: "",
     ambiente_id: "",
+    tipo_actividad_id: "",
   })
 
   useEffect(() => {
     if (isOpen && horario) {
       setLoading(true)
-      api.ambientes.getAll()
-        .then((res) => setAmbientes(res.data || []))
-        .finally(() => setLoading(false))
+      Promise.all([
+        api.ambientes.getAll().then((res) => setAmbientes(res.data || [])),
+        api.catalogo.getTiposActividad().then((res) => setTiposActividad(res.data || [])),
+      ]).finally(() => setLoading(false))
 
       // Mapear días del string a IDs
       const selectedDayIds: number[] = []
@@ -103,6 +117,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
         hora_fin: horaFin,
         jornada_id: jornadaId,
         ambiente_id: horario.ambiente_id ? String(horario.ambiente_id) : "",
+        tipo_actividad_id: horario.tipo_actividad_id ? String(horario.tipo_actividad_id) : "",
       })
     }
   }, [isOpen, horario])
@@ -123,6 +138,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
         hora_fin: formData.hora_fin,
         jornada_id: Number(formData.jornada_id),
         ambiente_id: formData.ambiente_id ? Number(formData.ambiente_id) : null,
+        tipo_actividad_id: formData.tipo_actividad_id ? Number(formData.tipo_actividad_id) : null,
       }
       await onSubmit(payload)
     } finally {
@@ -256,28 +272,9 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
                   ))}
                 </select>
               </div>
-            </>
-          )}
 
-          <div className="pt-2 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={submitting || loading}
-              className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
-            >
-              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Guardar cambios
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  )
-}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de actividad</label>
+                <select
+                  value={formData.tipo_actividad_id}
+       

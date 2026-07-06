@@ -32,6 +32,8 @@ export const updateUserSchema = z.object({
   rol_ids: z.array(z.number().int().positive()).optional(),
   tipo_contrato: z.enum(['contratista', 'de_planta']).optional(),
   tipo_area: z.enum(['tecnica', 'transversal']).optional(),
+  tipo_documento: z.enum(['cc', 'ce', 'ti', 'pasaporte']).optional(),
+  documento: z.string().max(20).optional(),
 });
 
 export const toggleEstadoSchema = z.object({

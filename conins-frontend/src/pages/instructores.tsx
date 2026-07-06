@@ -57,9 +57,9 @@ export default function InstructoresPage() {
   const [filtroArea, setFiltroArea] = useState("todas")
   const [filtroEstado, setFiltroEstado] = useState("todos")
 
-  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
-  const esSubdirector = rol === "subdirector"
-  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
+  const rol = user?.roles?.[0]?.trim() || ""
+  const esSubdirector = rol === "Subdirector"
+  const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
 
   useEffect(() => {
     cargarInstructores()
@@ -151,10 +151,6 @@ export default function InstructoresPage() {
     return coincideBusqueda && coincideContrato && coincideArea && coincideEstado
   })
 
-  const getMockHoras = (id: number): number => {
-    const horas = [22, 30, 40, 45, 18, 35, 28]
-    return horas[id % horas.length]
-  }
 
   if (authLoading || !user) {
     return (
@@ -272,7 +268,7 @@ export default function InstructoresPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700 capitalize">{inst.tipo_area}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         {(() => {
-                          const horas = inst.horas_semana ?? getMockHoras(inst.id)
+                          const horas = inst.horas_semana ?? 0
                           const limite = 40
                           const porcentaje = Math.min((horas / limite) * 100, 100)
                           let colorBarra = "bg-sena"
@@ -418,3 +414,4 @@ export default function InstructoresPage() {
     </DashboardLayout>
   )
 }
+                                                                                                                                                                              

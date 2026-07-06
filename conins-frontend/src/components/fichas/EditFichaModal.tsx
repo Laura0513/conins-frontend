@@ -65,7 +65,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
       api.users.getAll()
         .then((res) => {
           const lideresList = (res.data || []).filter(
-            (u: any) => u.rol === "Lider de Programa"
+            (u: any) => u.rol === "Instructor"
           )
           setLideres(lideresList)
         })
@@ -240,3 +240,4 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
     </div>
   )
 }
+       

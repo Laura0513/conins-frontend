@@ -24,8 +24,9 @@ router.put('/perfil', verifyToken, validate(updateUserSchema), authController.up
 router.patch('/cambiar-contrasena', verifyToken, validate(changePasswordSchema), authController.changePassword);
 
 // Admin endpoints
-router.get('/usuarios', verifyToken, requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR, ROLES.COORDINADOR_TRANSVERSAL]), authController.getAllUsers);
-router.put('/usuarios/:id', verifyToken, requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR, ROLES.COORDINADOR_TRANSVERSAL]), validate(updateUserSchema), authController.updateUser);
-router.patch('/usuarios/:id/estado', verifyToken, requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADOR_MEDULAR, ROLES.COORDINADOR_TRANSVERSAL]), authController.toggleUserEstado);
+router.get('/usuarios', verifyToken, requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), authController.getAllUsers);
+router.put('/usuarios/:id', verifyToken, requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), validate(updateUserSchema), authController.updateUser);
+router.patch('/usuarios/:id/estado', verifyToken, requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), authController.toggleUserEstado);
+router.put('/usuarios/:id/programas', verifyToken, requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), authController.assignProgramasToLider);
 
 export default router;

@@ -5,8 +5,8 @@ import { AsignacionService } from '../services/asignacion.service.js';
 import { NotificacionService } from '../services/notificacion.service.js';
 import { InstructorModel } from '../models/instructor.model.js';
 
-export const getAll = asyncHandler(async (_req: Request, res: Response) => {
-  const asignaciones = await AsignacionService.getAll();
+export const getAll = asyncHandler(async (req: Request, res: Response) => {
+  const asignaciones = await AsignacionService.getAll(req.user.id, req.user.roles_globales);
   ApiResponse.success(res, asignaciones);
 });
 

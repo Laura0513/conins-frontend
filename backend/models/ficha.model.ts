@@ -10,6 +10,8 @@ export interface FichaRecord extends RowDataPacket {
   etapa: string;
   fecha_inicio_lectiva: Date | null;
   fecha_fin_lectiva: Date | null;
+  fecha_inicio_productiva: Date | null;
+  fecha_fin_productiva: Date | null;
   fecha_fin_ficha: Date | null;
   estado: string;
   activo: boolean;
@@ -45,6 +47,26 @@ export const FichaModel = {
     return rows;
   },
 
+  async findAllByInstructorId(instructorId: number): Promise<FichaDetail[]> {
+    const [rows] = await pool.query<FichaDetail[]>(`
+      SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
+             f.etapa, p.modalidad,
+             COUNT(DISTINCT a2.id) AS instructores_count,
+             f.estado, f.activo
+      FROM fichas f
+      JOIN programas p ON f.programa_id = p.id
+      JOIN jornadas j ON f.jornada_id = j.id
+      LEFT JOIN asignacion a2 ON a2.ficha_id = f.id AND a2.activo = TRUE
+      WHERE f.id IN (
+        SELECT DISTINCT a.ficha_id FROM asignacion a
+        WHERE a.instructor_id = ? AND a.activo = TRUE
+      )
+      GROUP BY f.id
+      ORDER BY f.numero_ficha
+    `, [instructorId]);
+    return rows;
+  },
+
   async findById(id: number): Promise<FichaDetail | null> {
     const [rows] = await pool.query<FichaDetail[]>(`
       SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
@@ -74,23 +96,29 @@ export const FichaModel = {
     programa_id: number;
     jornada_id: number;
     ambiente_id?: number | null;
+    lider_id?: number | null;
     etapa?: string;
     fecha_inicio_lectiva?: string;
     fecha_fin_lectiva?: string;
+    fecha_inicio_productiva?: string;
+    fecha_fin_productiva?: string;
     fecha_fin_ficha?: string;
   }): Promise<number> {
     const [result] = await pool.query(
-      `INSERT INTO fichas (numero_ficha, programa_id, jornada_id, ambiente_id, etapa,
-        fecha_inicio_lectiva, fecha_fin_lectiva, fecha_fin_ficha)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO fichas (numero_ficha, programa_id, jornada_id, ambiente_id, lider_id, etapa,
+        fecha_inicio_lectiva, fecha_fin_lectiva, fecha_inicio_productiva, fecha_fin_productiva, fecha_fin_ficha)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         data.numero_ficha,
         data.programa_id,
         data.jornada_id,
         data.ambiente_id ?? null,
+        data.lider_id ?? null,
         data.etapa ?? 'lectiva',
         data.fecha_inicio_lectiva ?? null,
         data.fecha_fin_lectiva ?? null,
+        data.fecha_inicio_productiva ?? null,
+        data.fecha_fin_productiva ?? null,
         data.fecha_fin_ficha ?? null,
       ],
     );
@@ -102,9 +130,12 @@ export const FichaModel = {
     programa_id?: number;
     jornada_id?: number;
     ambiente_id?: number | null;
+    lider_id?: number | null;
     etapa?: string;
     fecha_inicio_lectiva?: string;
     fecha_fin_lectiva?: string;
+    fecha_inicio_productiva?: string;
+    fecha_fin_productiva?: string;
     fecha_fin_ficha?: string;
   }): Promise<void> {
     const updates: string[] = [];
@@ -114,9 +145,12 @@ export const FichaModel = {
     if (data.programa_id !== undefined) { updates.push('programa_id = ?'); values.push(data.programa_id); }
     if (data.jornada_id !== undefined) { updates.push('jornada_id = ?'); values.push(data.jornada_id); }
     if (data.ambiente_id !== undefined) { updates.push('ambiente_id = ?'); values.push(data.ambiente_id); }
+    if (data.lider_id !== undefined) { updates.push('lider_id = ?'); values.push(data.lider_id); }
     if (data.etapa !== undefined) { updates.push('etapa = ?'); values.push(data.etapa); }
     if (data.fecha_inicio_lectiva !== undefined) { updates.push('fecha_inicio_lectiva = ?'); values.push(data.fecha_inicio_lectiva); }
     if (data.fecha_fin_lectiva !== undefined) { updates.push('fecha_fin_lectiva = ?'); values.push(data.fecha_fin_lectiva); }
+    if (data.fecha_inicio_productiva !== undefined) { updates.push('fecha_inicio_productiva = ?'); values.push(data.fecha_inicio_productiva); }
+    if (data.fecha_fin_productiva !== undefined) { updates.push('fecha_fin_productiva = ?'); values.push(data.fecha_fin_productiva); }
     if (data.fecha_fin_ficha !== undefined) { updates.push('fecha_fin_ficha = ?'); values.push(data.fecha_fin_ficha); }
 
     if (updates.length === 0) return;

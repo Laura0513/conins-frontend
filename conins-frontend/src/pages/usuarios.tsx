@@ -26,12 +26,6 @@ type Usuario = {
   ultimo_acceso?: string
 }
 
-const MOCK_USUARIOS: Usuario[] = [
-  { id: 1, nombre: "Dyron Javier Ramirez Osorio", email: "djramirez@sena.edu.co", rol: "Subdirector", activo: true, ultimo_acceso: "2026-06-09" },
-  { id: 2, nombre: "Rocio del Pilar Medina Rojas", email: "rpmedina@sena.edu.co", rol: "Coordinador", activo: true, ultimo_acceso: "2026-06-08" },
-  { id: 3, nombre: "Leidy Johana Ruiz Cortes", email: "ljruizc@sena.edu.co", rol: "Coordinador", activo: true, ultimo_acceso: "2026-06-09" },
-  { id: 4, nombre: "Paul Ernesto Tamayo Caviedes", email: "ptamayo@sena.edu.co", rol: "Coordinador", activo: false, ultimo_acceso: "2026-05-20" },
-]
 
 export default function UsuariosPage() {
   const { user, loading: authLoading } = useProtectedRoute()
@@ -57,8 +51,8 @@ export default function UsuariosPage() {
       const res = await api.users.getAll()
       setUsuarios(res.data)
     } catch (err) {
-      console.warn("Backend no disponible, usando datos mock:", err)
-      setUsuarios(MOCK_USUARIOS)
+      console.warn("Error cargando usuarios:", err)
+      setUsuarios([])
     } finally {
       setLoading(false)
     }
@@ -174,8 +168,9 @@ export default function UsuariosPage() {
             >
               <option value="todos">Rol: Todos</option>
               <option value="Subdirector">Subdirector</option>
-              <option value="Coordinador">Coordinador</option>
-              <option value="Lider de Programa">Lider de Programa</option>
+              <option value="Coordinadora Academica">Coordinadora Academica</option>
+              <option value="Asistente Coordinacion">Asistente Coordinacion</option>
+              
               <option value="Instructor">Instructor</option>
             </select>
 
@@ -222,8 +217,8 @@ export default function UsuariosPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           u.rol === 'Subdirector' ? 'bg-purple-100 text-purple-800' : 
-                          u.rol === 'Coordinador' ? 'bg-blue-100 text-blue-800' :
-                          u.rol === 'Lider de Programa' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'
+                          u.rol === 'Coordinadora Academica' || u.rol === 'Asistente Coordinacion' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
                         }`}>
                           {u.rol}
                         </span>
@@ -247,7 +242,7 @@ export default function UsuariosPage() {
                           >
                             <Pencil className="w-4 h-4" />
                           </button>
-                          {u.rol === "Lider de Programa" && (
+                          {false && (
                             <button
                               onClick={() => openAsignarProgramasModal(u)}
                               className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
@@ -311,3 +306,4 @@ export default function UsuariosPage() {
     </DashboardLayout>
   )
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

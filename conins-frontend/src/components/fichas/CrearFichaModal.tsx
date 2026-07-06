@@ -42,7 +42,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
         .then(([programsRes, usersRes]) => {
           setProgramas(programsRes.data || [])
           const lideresList = (usersRes.data || []).filter(
-            (u: any) => u.rol === "Lider de Programa"
+            (u: any) => u.rol === "Instructor"
           )
           setLideres(lideresList)
         })
@@ -241,3 +241,4 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
     </div>
   )
 }
+       

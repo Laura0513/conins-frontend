@@ -14,6 +14,7 @@ type AuthContextType = {
   loading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => void
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -53,17 +54,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('auth_token')
   }
 
-  return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth debe usarse dentro de un AuthProvider')
+  const refreshUser = async () => {
+    try {
+      const res = await api.auth.getPerfil()
+      setUser(res.data)
+    } catch {
+      // Silencioso
+    }
   }
-  return context
-}
+
+  return (
+    <AuthContext.Provider value={{ user, token, loading, login, logout, refreshUser }}>
+      {children}
+    </AuthContext.Pr

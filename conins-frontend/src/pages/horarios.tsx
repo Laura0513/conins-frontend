@@ -5,6 +5,7 @@ import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import { exportarHorariosPDF } from "@/lib/exportPDF"
 import CrearHorarioModal from "@/components/horarios/CrearHorarioModal"
+import CrearBloqueHorarioModal from "@/components/horarios/CrearBloqueHorarioModal"
 import EditarHorarioModal from "@/components/horarios/EditarHorarioModal"
 import GrillaHorarios from "@/components/horarios/GrillaHorarios"
 import ConfirmDialog from "@/components/ui/ConfirmDialog"
@@ -33,18 +34,13 @@ type Horario = {
   competencia: string
   ambiente: string
   jornada: string
+  tipo_actividad: string | null
   dias: string[]
   horas: string
   estado: string
   activo: boolean
 }
 
-const MOCK_HORARIOS: Horario[] = [
-  { id: 1, ficha_numero: "2995403", instructor_nombre: "Carlos Álvarez", competencia: "Bases de datos", ambiente: "Aula 203", jornada: "Mañana", dias: ["Lun", "Mié", "Vie"], horas: "06:00 - 12:00", estado: "Aprobado", activo: true },
-  { id: 2, ficha_numero: "2887341", instructor_nombre: "Andrés Pareja", competencia: "Contabilidad básica", ambiente: "Aula 207", jornada: "Mixta", dias: ["Mar", "Jue"], horas: "10:00 - 16:00", estado: "Pendiente", activo: true },
-  { id: 3, ficha_numero: "3012456", instructor_nombre: "William Ramírez", competencia: "Logística empresarial", ambiente: "Taller T2", jornada: "Noche", dias: ["Lun", "Mar", "Mié", "Jue"], horas: "18:00 - 22:00", estado: "Aprobado", activo: true },
-  { id: 4, ficha_numero: "2995403", instructor_nombre: "Carlos Álvarez", competencia: "Análisis y diseño de software", ambiente: "Aula 204", jornada: "Mañana", dias: ["Mar", "Jue"], horas: "08:00 - 12:00", estado: "Rechazado", activo: false },
-]
 
 export default function HorariosPage() {
   const { user, loading: authLoading } = useProtectedRoute()
@@ -70,8 +66,8 @@ export default function HorariosPage() {
   const [filtroEstado, setFiltroEstado] = useState("todos")
   const [vistaGrilla, setVistaGrilla] = useState(false)
 
-  const rol = user?.roles?.[0]?.trim().toLowerCase() || ""
-  const puedeEditar = !["instructor", "lider de programa", "subdirector"].includes(rol)
+  const rol = user?.roles?.[0]?.trim() || ""
+  const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
 
   useEffect(() => {
     cargarHorarios()
@@ -83,9 +79,8 @@ export default function HorariosPage() {
       const res = await api.horarios.getAll()
       setHorarios(res.data || [])
     } catch (err) {
-      console.warn("Backend no disponible, usando datos mock:", err)
-      const filtrado = rol !== "instructor" ? MOCK_HORARIOS : MOCK_HORARIOS.filter((h) => h.instructor_nombre === user?.nombre)
-      setHorarios(filtrado)
+      console.warn("Error cargando horarios:", err)
+      setHorarios([])
     } finally {
       setLoading(false)
     }
@@ -126,6 +121,7 @@ export default function HorariosPage() {
           hora_fin: data.hora_fin,
           jornada_id: data.jornada_id,
           ambiente_id: data.ambiente_id,
+          tipo_actividad_id: data.tipo_actividad_id ?? null,
           semana,
         }
         await api.horarios.create(payload)
@@ -367,6 +363,7 @@ export default function HorariosPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4">Competencia</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Jornada</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Tipo actividad</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Días</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Horas</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
@@ -386,6 +383,9 @@ export default function HorariosPage() {
                         }`}>
                           {h.jornada}
                         </span>
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
+                        {h.tipo_actividad || <span className="text-gray-300">—</span>}
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <div className="flex flex-wrap gap-1">
@@ -508,3 +508,4 @@ export default function HorariosPage() {
     </DashboardLayout>
   )
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

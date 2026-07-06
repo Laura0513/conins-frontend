@@ -142,15 +142,15 @@ export const InstructorModel = {
 
   async crearNovedad(
     instructorId: number,
-    tipoNovedad: string,
+    tipoNovedadId: number,
     fechaInicio: string,
     fechaRegreso: string,
     observacion?: string,
   ): Promise<number> {
     const [result] = await pool.query(
-      `INSERT INTO instructor_novedades (instructor_id, tipo_novedad, fecha_inicio, fecha_regreso, observacion)
+      `INSERT INTO instructor_novedades (instructor_id, tipo_novedad_id, fecha_inicio, fecha_regreso, observacion)
        VALUES (?, ?, ?, ?, ?)`,
-      [instructorId, tipoNovedad, fechaInicio, fechaRegreso, observacion ?? null],
+      [instructorId, tipoNovedadId, fechaInicio, fechaRegreso, observacion ?? null],
     );
     return (result as any).insertId;
   },
@@ -244,9 +244,10 @@ export const InstructorModel = {
     `, [instructorId]);
 
     const [novedadesRows] = await pool.query(`
-      SELECT id, tipo_novedad, fecha_inicio, fecha_regreso, observacion, activo
-      FROM instructor_novedades
-      WHERE instructor_id = ?
+      SELECT n.id, t.nombre AS tipo_novedad, n.fecha_inicio, n.fecha_regreso, n.observacion, n.activo
+      FROM instructor_novedades n
+      JOIN tipos_novedad_instructor t ON n.tipo_novedad_id = t.id
+      WHERE n.instructor_id = ?
       ORDER BY fecha_inicio DESC
     `, [instructorId]);
 

@@ -18,6 +18,7 @@ import catalogoRoutes from './routes/catalogo.routes.js';
 import programaRoutes from './routes/programa.routes.js';
 import auditoriaRoutes from './routes/auditoria.routes.js';
 import consultaRoutes from './routes/consulta.routes.js';
+import rapSeguimientoRoutes from './routes/rap-seguimiento.routes.js';
 
 dotenv.config();
 
@@ -63,6 +64,7 @@ app.use('/api/catalogo', catalogoRoutes);
 app.use('/api/programas', programaRoutes);
 app.use('/api/auditoria', auditoriaRoutes);
 app.use('/api/consultas', consultaRoutes);
+app.use('/api/rap-seguimiento', rapSeguimientoRoutes);
 
 // Error handler — must be last
 app.use(errorHandler);

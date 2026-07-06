@@ -3349,3 +3349,330 @@ Error: Acceso denegado — rol insuficiente
     at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
     at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
 ---
+[2026-07-06T12:51:14.791Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:51:22.529Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:51:22.533Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:51:25.724Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:51:25.729Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:51:37.001Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-06T12:51:37.006Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-06T12:51:59.024Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:51:59.028Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:54:35.415Z] Error: Token no proporcionado
+Error: Token no proporcionado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:29:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-07-06T12:54:35.419Z] Error: Token no proporcionado
+Error: Token no proporcionado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:29:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-07-06T12:55:05.688Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T12:55:05.692Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T13:00:37.337Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T13:00:37.342Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-06T17:35:46.622Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:28:58.621Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:28:58.633Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:29:18.786Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:29:18.793Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:34:55.879Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:34:55.884Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:36:08.911Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:36:08.921Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:37:24.437Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:37:48.087Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:37:48.093Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:40:02.790Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:40:02.798Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:58:38.736Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:58:38.744Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:59:29.143Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:59:29.150Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:59:45.850Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:59:45.856Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:59:54.043Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-06T19:59:54.047Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:202:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
