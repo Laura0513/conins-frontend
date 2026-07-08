@@ -299,9 +299,9 @@ export default function HorariosPage() {
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="todas">Ficha: Todas</option>
-              <option value="2995403">2995403</option>
-              <option value="2887341">2887341</option>
-              <option value="3012456">3012456</option>
+              {[...new Set(horarios.map((h) => h.ficha_numero))].sort().map((f) => (
+                <option key={f} value={f}>{f}</option>
+              ))}
             </select>
 
             <select
@@ -310,9 +310,9 @@ export default function HorariosPage() {
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="todos">Instructor: Todos</option>
-              <option value="Carlos Álvarez">Carlos Álvarez</option>
-              <option value="Andrés Pareja">Andrés Pareja</option>
-              <option value="William Ramírez">William Ramírez</option>
+              {[...new Set(horarios.map((h) => h.instructor_nombre))].sort().map((i) => (
+                <option key={i} value={i}>{i}</option>
+              ))}
             </select>
 
             <select
@@ -508,4 +508,3 @@ export default function HorariosPage() {
     </DashboardLayout>
   )
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

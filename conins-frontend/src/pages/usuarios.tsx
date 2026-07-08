@@ -24,6 +24,8 @@ type Usuario = {
   rol: string
   activo: boolean
   ultimo_acceso?: string
+  tipo_documento?: string
+  documento?: string
 }
 
 
@@ -60,7 +62,7 @@ export default function UsuariosPage() {
 
   const listaFiltrada = usuarios.filter((u) => {
     const texto = search.toLowerCase()
-    const coincideBusqueda = u.nombre.toLowerCase().includes(texto) || u.email.toLowerCase().includes(texto)
+    const coincideBusqueda = u.nombre.toLowerCase().includes(texto) || u.email.toLowerCase().includes(texto) || (u.documento || "").toLowerCase().includes(texto)
     const coincideRol = filtroRol === "todos" || u.rol === filtroRol
     const coincideEstado = filtroEstado === "todos" || (filtroEstado === "activo" ? u.activo : !u.activo)
     return coincideBusqueda && coincideRol && coincideEstado
@@ -203,6 +205,7 @@ export default function UsuariosPage() {
                   <tr>
                     <th className="px-3 py-3 md:px-6 md:py-4">Nombre</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Correo</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Documento</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Rol</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Último Acceso</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
@@ -214,6 +217,14 @@ export default function UsuariosPage() {
                     <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{u.nombre}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{u.email}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
+                        {u.documento ? (
+                          <span>
+                            <span className="text-xs text-gray-400 uppercase">{u.tipo_documento || "CC"}</span>{" "}
+                            {u.documento}
+                          </span>
+                        ) : "—"}
+                      </td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           u.rol === 'Subdirector' ? 'bg-purple-100 text-purple-800' : 
@@ -306,4 +317,3 @@ export default function UsuariosPage() {
     </DashboardLayout>
   )
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

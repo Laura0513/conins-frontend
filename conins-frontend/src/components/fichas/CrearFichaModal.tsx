@@ -30,6 +30,8 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
     lider_id: "",
     fecha_inicio_lectiva: "",
     fecha_fin_lectiva: "",
+    fecha_inicio_productiva: "",
+    fecha_fin_productiva: "",
     fecha_fin_ficha: "",
   })
 
@@ -67,6 +69,8 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
         lider_id: Number(formData.lider_id) || null,
         fecha_inicio_lectiva: formData.fecha_inicio_lectiva || undefined,
         fecha_fin_lectiva: formData.fecha_fin_lectiva || undefined,
+        fecha_inicio_productiva: formData.fecha_inicio_productiva || undefined,
+        fecha_fin_productiva: formData.fecha_fin_productiva || undefined,
         fecha_fin_ficha: formData.fecha_fin_ficha || undefined,
       }
       await onSubmit(payload)
@@ -78,6 +82,8 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
         lider_id: "",
         fecha_inicio_lectiva: "",
         fecha_fin_lectiva: "",
+        fecha_inicio_productiva: "",
+        fecha_fin_productiva: "",
         fecha_fin_ficha: "",
       })
     } finally {
@@ -188,24 +194,53 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha inicio lectiva</label>
-              <input
-                type="date"
-                value={formData.fecha_inicio_lectiva}
-                onChange={(e) => handleChange("fecha_inicio_lectiva", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-              />
+          {/* Fechas lectiva */}
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Etapa lectiva</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Fecha inicio</label>
+                <input
+                  type="date"
+                  value={formData.fecha_inicio_lectiva}
+                  onChange={(e) => handleChange("fecha_inicio_lectiva", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Fecha fin</label>
+                <input
+                  type="date"
+                  value={formData.fecha_fin_lectiva}
+                  onChange={(e) => handleChange("fecha_fin_lectiva", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin lectiva</label>
-              <input
-                type="date"
-                value={formData.fecha_fin_lectiva}
-                onChange={(e) => handleChange("fecha_fin_lectiva", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-              />
+          </div>
+
+          {/* Fechas productiva */}
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Etapa productiva</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Fecha inicio</label>
+                <input
+                  type="date"
+                  value={formData.fecha_inicio_productiva}
+                  onChange={(e) => handleChange("fecha_inicio_productiva", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Fecha fin</label>
+                <input
+                  type="date"
+                  value={formData.fecha_fin_productiva}
+                  onChange={(e) => handleChange("fecha_fin_productiva", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                />
+              </div>
             </div>
           </div>
 
@@ -241,4 +276,3 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
     </div>
   )
 }
-       

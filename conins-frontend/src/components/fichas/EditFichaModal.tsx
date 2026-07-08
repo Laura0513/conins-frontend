@@ -6,70 +6,93 @@ type Ficha = {
   id: number
   numero_ficha: string
   programa: string
+  programa_id?: number
   jornada: string
+  jornada_id?: number
   etapa: string
   modalidad: string
   instructores_count: number
   estado: string
   activo: boolean
+  lider_id?: number | null
+  ambiente_id?: number | null
+  fecha_inicio_lectiva?: string | null
+  fecha_fin_lectiva?: string | null
+  fecha_inicio_productiva?: string | null
+  fecha_fin_productiva?: string | null
+  fecha_fin_ficha?: string | null
 }
 
 type EditFichaModalProps = {
   isOpen: boolean
   onClose: () => void
   ficha: Ficha | null
-  onSubmit: (data: Partial<Ficha>) => Promise<void>
+  onSubmit: (data: any) => Promise<void>
 }
 
-const PROGRAMAS_MOCK = [
-  { id: 1, nombre: "ADSO" },
-  { id: 2, nombre: "Calzado" },
-  { id: 3, nombre: "Diseño" },
-  { id: 4, nombre: "HUI FORMACION" },
+const JORNADAS = [
+  { id: 1, nombre: "Mañana" },
+  { id: 2, nombre: "Mixta" },
+  { id: 3, nombre: "Noche" },
+  { id: 4, nombre: "Virtual" },
 ]
-
-const JORNADAS = ["Mañana", "Mixta", "Noche", "Virtual"]
-const MODALIDADES = ["Presencial", "Virtual"]
-const ETAPAS = ["Lectiva", "Productiva"]
 
 export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: EditFichaModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [programas, setProgramas] = useState<{ id: number; nombre: string }[]>([])
   const [lideres, setLideres] = useState<{ id: number; nombre: string }[]>([])
+  const [ambientes, setAmbientes] = useState<{ id: number; nombre: string }[]>([])
   const [formData, setFormData] = useState({
     numero_ficha: "",
     programa_id: "",
-    jornada: "Mañana",
-    modalidad: "Presencial",
-    etapa: "Lectiva",
-    fecha_inicio: "",
-    fecha_fin: "",
-    lider_ficha_id: "",
-    es_lider: false,
+    jornada_id: "",
+    etapa: "lectiva",
+    lider_id: "",
+    ambiente_id: "",
+    fecha_inicio_lectiva: "",
+    fecha_fin_lectiva: "",
+    fecha_inicio_productiva: "",
+    fecha_fin_productiva: "",
+    fecha_fin_ficha: "",
   })
 
+  const formatDateForInput = (d: string | null | undefined) => {
+    if (!d) return ""
+    return d.substring(0, 10)
+  }
+
   useEffect(() => {
-    if (ficha) {
-      setFormData({
-        numero_ficha: ficha.numero_ficha,
-        programa_id: "1",
-        jornada: ficha.jornada,
-        modalidad: ficha.modalidad,
-        etapa: ficha.etapa === "lectiva" ? "Lectiva" : "Productiva",
-        fecha_inicio: "",
-        fecha_fin: "",
-        lider_ficha_id: "",
-        es_lider: false,
-      })
-    }
-    if (isOpen) {
-      api.users.getAll()
-        .then((res) => {
-          const lideresList = (res.data || []).filter(
+    if (isOpen && ficha) {
+      // Cargar catálogos
+      Promise.allSettled([
+        api.programs.getAll(),
+        api.users.getAll(),
+        api.ambientes.getAll(),
+      ]).then(([programsRes, usersRes, ambientesRes]) => {
+        if (programsRes.status === "fulfilled") setProgramas(programsRes.value.data || [])
+        if (usersRes.status === "fulfilled") {
+          const lideresList = (usersRes.value.data || []).filter(
             (u: any) => u.rol === "Instructor"
           )
           setLideres(lideresList)
-        })
-        .catch(() => setLideres([]))
+        }
+        if (ambientesRes.status === "fulfilled") setAmbientes(ambientesRes.value.data || [])
+      })
+
+      // Poblar form con datos de la ficha
+      setFormData({
+        numero_ficha: ficha.numero_ficha || "",
+        programa_id: String(ficha.programa_id || ""),
+        jornada_id: String(ficha.jornada_id || ""),
+        etapa: ficha.etapa || "lectiva",
+        lider_id: String(ficha.lider_id || ""),
+        ambiente_id: String(ficha.ambiente_id || ""),
+        fecha_inicio_lectiva: formatDateForInput(ficha.fecha_inicio_lectiva),
+        fecha_fin_lectiva: formatDateForInput(ficha.fecha_fin_lectiva),
+        fecha_inicio_productiva: formatDateForInput(ficha.fecha_inicio_productiva),
+        fecha_fin_productiva: formatDateForInput(ficha.fecha_fin_productiva),
+        fecha_fin_ficha: formatDateForInput(ficha.fecha_fin_ficha),
+      })
     }
   }, [isOpen, ficha])
 
@@ -79,7 +102,20 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
     e.preventDefault()
     setSubmitting(true)
     try {
-      await onSubmit(formData)
+      const payload = {
+        numero_ficha: formData.numero_ficha,
+        programa_id: Number(formData.programa_id) || undefined,
+        jornada_id: Number(formData.jornada_id) || undefined,
+        etapa: formData.etapa,
+        lider_id: Number(formData.lider_id) || null,
+        ambiente_id: Number(formData.ambiente_id) || null,
+        fecha_inicio_lectiva: formData.fecha_inicio_lectiva || undefined,
+        fecha_fin_lectiva: formData.fecha_fin_lectiva || undefined,
+        fecha_inicio_productiva: formData.fecha_inicio_productiva || undefined,
+        fecha_fin_productiva: formData.fecha_fin_productiva || undefined,
+        fecha_fin_ficha: formData.fecha_fin_ficha || undefined,
+      }
+      await onSubmit(payload)
     } finally {
       setSubmitting(false)
     }
@@ -91,17 +127,17 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
           <h2 className="text-lg font-bold text-gray-900">Editar ficha {ficha.numero_ficha}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5 overflow-y-auto flex-1">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Número de ficha</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Numero de ficha</label>
             <input
               type="text"
               required
@@ -120,59 +156,55 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="">Seleccionar programa</option>
-              {PROGRAMAS_MOCK.map((p) => (
+              {programas.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre}</option>
               ))}
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Lider de programa</label>
-            <select
-              value={formData.lider_ficha_id}
-              onChange={(e) => handleChange("lider_ficha_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="">Sin asignar</option>
-              {lideres.map((l) => (
-                <option key={l.id} value={l.id}>{l.nombre}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Lider de programa</label>
+              <select
+                value={formData.lider_id}
+                onChange={(e) => handleChange("lider_id", e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              >
+                <option value="">Sin asignar</option>
+                {lideres.map((l) => (
+                  <option key={l.id} value={l.id}>{l.nombre}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente</label>
+              <select
+                value={formData.ambiente_id}
+                onChange={(e) => handleChange("ambiente_id", e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              >
+                <option value="">Sin asignar</option>
+                {ambientes.map((a) => (
+                  <option key={a.id} value={a.id}>{a.nombre}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Jornada</label>
             <div className="flex flex-wrap gap-4">
               {JORNADAS.map((j) => (
-                <label key={j} className="flex items-center gap-2 cursor-pointer">
+                <label key={j.id} className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
                     name="jornada_edit"
-                    value={j}
-                    checked={formData.jornada === j}
-                    onChange={(e) => handleChange("jornada", e.target.value)}
+                    value={j.id}
+                    checked={Number(formData.jornada_id) === j.id}
+                    onChange={(e) => handleChange("jornada_id", e.target.value)}
                     className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
                   />
-                  <span className="text-sm text-gray-700">{j}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Modalidad</label>
-            <div className="flex gap-4">
-              {MODALIDADES.map((m) => (
-                <label key={m} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="modalidad_edit"
-                    value={m}
-                    checked={formData.modalidad === m}
-                    onChange={(e) => handleChange("modalidad", e.target.value)}
-                    className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
-                  />
-                  <span className="text-sm text-gray-700">{m}</span>
+                  <span className="text-sm text-gray-700">{j.nombre}</span>
                 </label>
               ))}
             </div>
@@ -181,41 +213,89 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Etapa</label>
             <div className="flex gap-4">
-              {ETAPAS.map((e) => (
-                <label key={e} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="etapa_edit"
-                    value={e}
-                    checked={formData.etapa === e}
-                    onChange={(ev) => handleChange("etapa", ev.target.value)}
-                    className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
-                  />
-                  <span className="text-sm text-gray-700">{e}</span>
-                </label>
-              ))}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="etapa_edit"
+                  value="lectiva"
+                  checked={formData.etapa === "lectiva"}
+                  onChange={(e) => handleChange("etapa", e.target.value)}
+                  className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
+                />
+                <span className="text-sm text-gray-700">Lectiva</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="etapa_edit"
+                  value="productiva"
+                  checked={formData.etapa === "productiva"}
+                  onChange={(e) => handleChange("etapa", e.target.value)}
+                  className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
+                />
+                <span className="text-sm text-gray-700">Productiva</span>
+              </label>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha inicio</label>
-              <input
-                type="date"
-                value={formData.fecha_inicio}
-                onChange={(e) => handleChange("fecha_inicio", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-              />
+          {/* Fechas lectiva */}
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Etapa lectiva</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Fecha inicio</label>
+                <input
+                  type="date"
+                  value={formData.fecha_inicio_lectiva}
+                  onChange={(e) => handleChange("fecha_inicio_lectiva", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Fecha fin</label>
+                <input
+                  type="date"
+                  value={formData.fecha_fin_lectiva}
+                  onChange={(e) => handleChange("fecha_fin_lectiva", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin</label>
-              <input
-                type="date"
-                value={formData.fecha_fin}
-                onChange={(e) => handleChange("fecha_fin", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-              />
+          </div>
+
+          {/* Fechas productiva */}
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-2">Etapa productiva</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Fecha inicio</label>
+                <input
+                  type="date"
+                  value={formData.fecha_inicio_productiva}
+                  onChange={(e) => handleChange("fecha_inicio_productiva", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Fecha fin</label>
+                <input
+                  type="date"
+                  value={formData.fecha_fin_productiva}
+                  onChange={(e) => handleChange("fecha_fin_productiva", e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                />
+              </div>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin ficha</label>
+            <input
+              type="date"
+              value={formData.fecha_fin_ficha}
+              onChange={(e) => handleChange("fecha_fin_ficha", e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+            />
           </div>
 
           <div className="pt-2 flex items-center justify-end gap-3">
@@ -240,4 +320,3 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
     </div>
   )
 }
-       
