@@ -27,6 +27,25 @@ export interface RapFichaSeguimientoDetail extends RowDataPacket {
 }
 
 export const RapFichaSeguimientoModel = {
+  async findByFicha(fichaId: number): Promise<RapFichaSeguimientoDetail[]> {
+    const [rows] = await pool.query<RapFichaSeguimientoDetail[]>(
+      `SELECT rfs.id, rfs.asignacion_competencia_id, rfs.rap_id,
+              r.nombre AS rap_nombre, r.codigo AS rap_codigo,
+              c.nombre AS competencia,
+              rfs.fecha_inicio, rfs.fecha_fin_programada,
+              rfs.estado_evaluacion, rfs.estado_aprobacion, rfs.activo
+       FROM rap_ficha_seguimiento rfs
+       JOIN asignacion_competencia ac ON rfs.asignacion_competencia_id = ac.id
+       JOIN asignacion a ON ac.asignacion_id = a.id
+       JOIN raps r ON rfs.rap_id = r.id
+       JOIN competencias c ON r.competencia_id = c.id
+       WHERE a.ficha_id = ?
+       ORDER BY c.nombre, r.codigo`,
+      [fichaId],
+    );
+    return rows;
+  },
+
   async findByAsignacionCompetencia(
     asignacionCompetenciaId: number,
   ): Promise<RapFichaSeguimientoDetail[]> {
@@ -42,30 +61,6 @@ export const RapFichaSeguimientoModel = {
        WHERE rfs.asignacion_competencia_id = ?
        ORDER BY r.codigo`,
       [asignacionCompetenciaId],
-    );
-    return rows;
-  },
-
-  async findByFicha(fichaId: number): Promise<RapFichaSeguimientoDetail[]> {
-    const [rows] = await pool.query<RapFichaSeguimientoDetail[]>(
-      `SELECT rfs.id, rfs.asignacion_competencia_id, rfs.rap_id,
-              r.nombre AS rap_nombre, r.codigo AS rap_codigo,
-              c.nombre AS competencia,
-              u.nombre AS instructor_nombre,
-              f.numero_ficha,
-              rfs.fecha_inicio, rfs.fecha_fin_programada,
-              rfs.estado_evaluacion, rfs.estado_aprobacion, rfs.activo
-       FROM rap_ficha_seguimiento rfs
-       JOIN raps r ON rfs.rap_id = r.id
-       JOIN competencias c ON r.competencia_id = c.id
-       JOIN asignacion_competencia ac ON rfs.asignacion_competencia_id = ac.id
-       JOIN asignacion a ON ac.asignacion_id = a.id
-       JOIN instructores i ON a.instructor_id = i.id
-       JOIN usuarios u ON i.usuario_id = u.id
-       JOIN fichas f ON a.ficha_id = f.id
-       WHERE a.ficha_id = ?
-       ORDER BY c.nombre, r.codigo`,
-      [fichaId],
     );
     return rows;
   },

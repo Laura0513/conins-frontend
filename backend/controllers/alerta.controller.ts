@@ -20,8 +20,8 @@ export const listar = asyncHandler(async (req: Request, res: Response) => {
   `;
   const params: any[] = [];
 
-  // P22: Instructor solo ve sus propias alertas
-  if (esInstructor) {
+  // P22: instructor solo ve sus propias alertas
+  if (esInstructor && req.user?.id) {
     query += ' AND i.usuario_id = ?';
     params.push(req.user.id);
   }

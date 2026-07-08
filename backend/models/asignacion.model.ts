@@ -47,8 +47,6 @@ export const AsignacionModel = {
       JOIN competencias c ON ac.competencia_id = c.id
       JOIN jornadas j ON f.jornada_id = j.id
       LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
-      GROUP BY a.id, u.nombre, f.numero_ficha, c.nombre, ab.nombre, j.nombre,
-               a.es_lider_ficha, a.es_provisional, a.activo
       ORDER BY a.id
     `);
     return rows;
@@ -74,8 +72,6 @@ export const AsignacionModel = {
       JOIN jornadas j ON f.jornada_id = j.id
       LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
       WHERE a.instructor_id = ?
-      GROUP BY a.id, u.nombre, f.numero_ficha, c.nombre, ab.nombre, j.nombre,
-               a.es_lider_ficha, a.es_provisional, a.activo
       ORDER BY a.id
     `, [instructorId]);
     return rows;
@@ -99,8 +95,7 @@ export const AsignacionModel = {
       JOIN jornadas j ON f.jornada_id = j.id
       LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
       WHERE a.id = ?
-      GROUP BY a.id, u.nombre, f.numero_ficha, c.nombre, ab.nombre, j.nombre,
-               a.es_lider_ficha, a.es_provisional, a.activo
+      ORDER BY ac.competencia_id
     `, [id]);
     return rows[0] ?? null;
   },
@@ -231,8 +226,6 @@ export const AsignacionModel = {
       JOIN jornadas j ON f.jornada_id = j.id
       LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
       WHERE a.activo = FALSE
-      GROUP BY a.id, u.nombre, f.numero_ficha, c.nombre, ab.nombre, j.nombre,
-               a.es_lider_ficha, a.es_provisional, a.activo
       ORDER BY a.fecha_asignacion DESC
     `);
     return rows;

@@ -26,21 +26,21 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
+// CORS va primero — antes del rate limiter para que los 429 lleven el header correcto
+app.use(
+  cors({
+    origin: FRONTEND_URL,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  }),
+);
+
 // Security headers (Helmet)
 app.use(securityHeaders);
 
 // Global rate limiter
 app.use(rateLimiterGlobal);
-
-// CORS
-app.use(
-  cors({
-    origin: FRONTEND_URL,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  }),
-);
 
 app.use(express.json({ limit: '10kb' }));
 
@@ -71,6 +71,14 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`CONINS backend v4 corriendo en puerto ${PORT}`);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[CRASH] unhandledRejection:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[CRASH] uncaughtException:', err);
 });
 
 export default app;

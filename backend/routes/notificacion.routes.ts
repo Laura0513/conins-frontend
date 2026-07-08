@@ -7,6 +7,7 @@ const router = Router();
 router.use(verifyToken);
 
 router.get('/', notificacionController.getMisNotificaciones);
+router.get('/mis', notificacionController.getMisNotificaciones); // alias para frontend (P24)
 router.get('/no-leidas/count', notificacionController.getNoLeidasCount);
 router.patch('/:id/leida', notificacionController.marcarLeida);
 router.patch('/marcar-todas', notificacionController.marcarTodasLeidas);

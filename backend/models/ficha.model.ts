@@ -51,16 +51,13 @@ export const FichaModel = {
     const [rows] = await pool.query<FichaDetail[]>(`
       SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
              f.etapa, p.modalidad,
-             COUNT(DISTINCT a2.id) AS instructores_count,
+             COUNT(DISTINCT a_all.id) AS instructores_count,
              f.estado, f.activo
       FROM fichas f
       JOIN programas p ON f.programa_id = p.id
       JOIN jornadas j ON f.jornada_id = j.id
-      LEFT JOIN asignacion a2 ON a2.ficha_id = f.id AND a2.activo = TRUE
-      WHERE f.id IN (
-        SELECT DISTINCT a.ficha_id FROM asignacion a
-        WHERE a.instructor_id = ? AND a.activo = TRUE
-      )
+      JOIN asignacion a ON a.ficha_id = f.id AND a.activo = TRUE AND a.instructor_id = ?
+      LEFT JOIN asignacion a_all ON a_all.ficha_id = f.id AND a_all.activo = TRUE
       GROUP BY f.id
       ORDER BY f.numero_ficha
     `, [instructorId]);

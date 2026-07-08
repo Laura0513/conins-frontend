@@ -4,7 +4,6 @@ import pool from '../config/db.js';
 
 export const RapSeguimientoService = {
   async getByFicha(fichaId: number) {
-    // Verificar que la ficha existe
     const [fichaRows] = await pool.query('SELECT id FROM fichas WHERE id = ?', [fichaId]);
     if ((fichaRows as any[]).length === 0) throw new NotFoundError('Ficha no encontrada');
     return RapFichaSeguimientoModel.findByFicha(fichaId);
@@ -16,7 +15,7 @@ export const RapSeguimientoService = {
       [asignacionCompetenciaId],
     );
     if ((acRows as any[]).length === 0) {
-      throw new NotFoundError('Asignación-competencia no encontrada');
+      throw new NotFoundError('Asignacion-competencia no encontrada');
     }
     return RapFichaSeguimientoModel.findByAsignacionCompetencia(asignacionCompetenciaId);
   },
@@ -33,16 +32,16 @@ export const RapSeguimientoService = {
     fecha_inicio?: string | null;
     fecha_fin_programada?: string | null;
   }) {
-    // Verificar que la asignacion_competencia existe
+    // Verificar que la asignacion_competencia existe y esta activa
     const [acRows] = await pool.query(
       'SELECT id FROM asignacion_competencia WHERE id = ? AND activo = TRUE',
       [data.asignacion_competencia_id],
     );
     if ((acRows as any[]).length === 0) {
-      throw new NotFoundError('Asignación-competencia no encontrada o inactiva');
+      throw new NotFoundError('Asignacion-competencia no encontrada o inactiva');
     }
 
-    // Verificar que el RAP existe y pertenece a la competencia de la asignación
+    // Verificar que el RAP existe y pertenece a la competencia de la asignacion
     const [rapRows] = await pool.query(
       `SELECT r.id FROM raps r
        JOIN asignacion_competencia ac ON r.competencia_id = ac.competencia_id
@@ -50,16 +49,16 @@ export const RapSeguimientoService = {
       [data.rap_id, data.asignacion_competencia_id],
     );
     if ((rapRows as any[]).length === 0) {
-      throw new ValidationError('El RAP no pertenece a la competencia de esta asignación');
+      throw new ValidationError('El RAP no pertenece a la competencia de esta asignacion');
     }
 
-    // Verificar duplicado (UNIQUE constraint)
+    // Verificar duplicado
     const [existingRows] = await pool.query(
       'SELECT id FROM rap_ficha_seguimiento WHERE asignacion_competencia_id = ? AND rap_id = ?',
       [data.asignacion_competencia_id, data.rap_id],
     );
     if ((existingRows as any[]).length > 0) {
-      throw new ConflictError('Ya existe un seguimiento para este RAP en esta asignación');
+      throw new ConflictError('Ya existe un seguimiento para este RAP en esta asignacion');
     }
 
     const id = await RapFichaSeguimientoModel.create(data);
@@ -77,9 +76,8 @@ export const RapSeguimientoService = {
 
     // Si se marca como evaluado, estado_aprobacion es obligatorio
     if (data.estado_evaluacion === 'evaluado' && !data.estado_aprobacion) {
-      const current = seguimiento.estado_aprobacion;
-      if (!current) {
-        throw new ValidationError('Al marcar como evaluado, debe indicar si fue aprobado o no_aprobado');
+      if (!seguimiento.estado_aprobacion) {
+        throw new ValidationError('Al marcar como evaluado se debe indicar si fue aprobado o no_aprobado');
       }
     }
 
@@ -107,11 +105,10 @@ export const RapSeguimientoService = {
   },
 
   async getDisponibles(fichaId: number) {
-    // Verificar que la ficha existe
     const [fichaRows] = await pool.query('SELECT id FROM fichas WHERE id = ?', [fichaId]);
     if ((fichaRows as any[]).length === 0) throw new NotFoundError('Ficha no encontrada');
 
-    // Retornar asignacion_competencias con sus RAPs que NO tienen seguimiento aún
+    // RAPs que NO tienen seguimiento aun en esta ficha
     const [rows] = await pool.query(
       `SELECT ac.id AS asignacion_competencia_id,
               c.nombre AS competencia,

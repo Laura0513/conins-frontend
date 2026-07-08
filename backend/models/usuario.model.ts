@@ -21,6 +21,7 @@ export interface UsuarioWithRoles {
   documento: string | null;
   activo: boolean;
   created_at: Date;
+  ultimo_acceso: Date | null;
   rol: string;
   roles: string[];
   rol_ids: number[];
@@ -45,9 +46,10 @@ export const UsuarioModel = {
 
   async findAllActive(): Promise<UsuarioWithRoles[]> {
     const [rows] = await pool.query<
-      (RowDataPacket & { id: number; nombre: string; email: string; activo: boolean; created_at: Date; rol_ids: string; rol_nombre: string; tipo_documento: string | null; documento: string | null })[]
+      (RowDataPacket & { id: number; nombre: string; email: string; activo: boolean; created_at: Date; ultimo_acceso: Date | null; rol_ids: string; rol_nombre: string; tipo_documento: string | null; documento: string | null })[]
     >(`
-      SELECT u.id, u.nombre, u.email, u.activo, u.created_at, u.tipo_documento, u.documento,
+      SELECT u.id, u.nombre, u.email, u.activo, u.created_at, u.ultimo_acceso,
+             u.tipo_documento, u.documento,
              GROUP_CONCAT(r.id ORDER BY r.nivel ASC SEPARATOR ',') AS rol_ids,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS rol_nombre
       FROM usuarios u
@@ -68,6 +70,7 @@ export const UsuarioModel = {
         documento: r.documento,
         activo: r.activo,
         created_at: r.created_at,
+        ultimo_acceso: r.ultimo_acceso,
         rol: roles[0] || 'Sin rol',
         rol_ids: r.rol_ids ? r.rol_ids.split(',').map(Number) : [],
         roles,
@@ -77,9 +80,10 @@ export const UsuarioModel = {
 
   async findAll(): Promise<UsuarioWithRoles[]> {
     const [rows] = await pool.query<
-      (RowDataPacket & { id: number; nombre: string; email: string; activo: boolean; created_at: Date; rol_ids: string; rol_nombre: string; tipo_documento: string | null; documento: string | null })[]
+      (RowDataPacket & { id: number; nombre: string; email: string; activo: boolean; created_at: Date; ultimo_acceso: Date | null; rol_ids: string; rol_nombre: string; tipo_documento: string | null; documento: string | null })[]
     >(`
-      SELECT u.id, u.nombre, u.email, u.activo, u.created_at, u.tipo_documento, u.documento,
+      SELECT u.id, u.nombre, u.email, u.activo, u.created_at, u.ultimo_acceso,
+             u.tipo_documento, u.documento,
              GROUP_CONCAT(r.id ORDER BY r.nivel ASC SEPARATOR ',') AS rol_ids,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS rol_nombre
       FROM usuarios u
@@ -99,6 +103,7 @@ export const UsuarioModel = {
         documento: r.documento,
         activo: r.activo,
         created_at: r.created_at,
+        ultimo_acceso: r.ultimo_acceso,
         rol: roles[0] || 'Sin rol',
         rol_ids: r.rol_ids ? r.rol_ids.split(',').map(Number) : [],
         roles,

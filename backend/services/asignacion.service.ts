@@ -9,6 +9,7 @@ import pool from '../config/db.js';
 
 export const AsignacionService = {
   async getAll(userId?: number, roles?: RoleKey[]) {
+    // P22: instructor solo ve sus propias asignaciones
     if (userId && roles && roles.length === 1 && roles[0] === ROLES.INSTRUCTOR) {
       const instructor = await InstructorModel.findByUsuarioId(userId);
       if (!instructor) return [];

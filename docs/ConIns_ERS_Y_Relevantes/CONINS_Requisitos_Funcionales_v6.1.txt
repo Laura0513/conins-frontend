@@ -1,0 +1,189 @@
+REQUISITOS FUNCIONALES — CONINS v6.1
+Centro del Diseño y Manufactura del Cuero — CDMC SENA
+Actualizado: Junio 2026
+
+════════════════════════════════════════════════════════════════
+
+Modulo AUTH — Autenticación y gestión de cuentas
+
+RF-01  El sistema debe permitir el registro de administradores (Subdirector y Coordinadores) previa existencia del usuario en la base de datos.
+RF-02  El sistema debe permitir el inicio de sesión seguro de administradores.
+RF-03  El sistema debe permitir a los administradores editar su propia cuenta de usuario.
+RF-04  El sistema debe permitir a los administradores recuperar y cambiar su contraseña.
+RF-05  El sistema debe permitir a los administradores deshabilitar cuentas de usuarios con menor jerarquía.
+RF-06  El sistema debe permitir a los administradores reactivar cuentas previamente deshabilitadas.
+RF-07  El sistema debe permitir a los administradores cerrar sesión de forma segura.
+RF-08  El sistema debe permitir el registro de líderes e instructores, de acuerdo a su rol, previa existencia en la base de datos.
+RF-09  El sistema debe permitir el inicio de sesión seguro de líderes e instructores.
+RF-10  El sistema debe permitir a los líderes e instructores editar su propia cuenta de usuario.
+RF-11  El sistema debe permitir a los líderes e instructores recuperar y cambiar su contraseña.
+RF-12  El sistema debe permitir a los líderes e instructores cerrar sesión de forma segura.
+RF-13  El sistema debe permitir a los administradores crear y habilitar cuentas de nuevos usuarios (líderes e instructores), asignándoles correo, cargo y área antes de que puedan registrarse.
+RF-46  El sistema debe permitir a los administradores registrar y consultar el tipo y número de documento de identidad de cada usuario del sistema (CC, CE, TI o pasaporte), como campo adicional al registro de la cuenta de usuario.
+
+════════════════════════════════════════════════════════════════
+
+Modulo INSTRUCTORES
+
+RF-14  El sistema debe permitir a los administradores registrar y actualizar los datos específicos de los instructores: tipo de contrato (planta o contratista), tipo de área (técnica o transversal) y vigencia del contrato, como complemento al registro de su cuenta de usuario.
+RF-15  El sistema debe permitir a los administradores registrar y actualizar las competencias habilitadas para cada instructor según su contrato vigente, de manera que el sistema pueda filtrarlas correctamente al momento de realizar asignaciones.
+RF-16  El sistema debe permitir a los administradores registrar una novedad administrativa para un instructor activo (licencia, incapacidad, comisión u otra), indicando el tipo de novedad, fecha de inicio, fecha estimada de regreso y un campo de observación opcional, de manera que el sistema lo excluya de las opciones de asignación mientras la novedad esté vigente y lo reincorpore automáticamente al vencerse la fecha de regreso.
+
+════════════════════════════════════════════════════════════════
+
+Modulo FICHAS
+
+RF-17  El sistema debe permitir a los administradores registrar fichas de formación indicando el número de ficha, fechas de inicio y terminación, etapa (lectiva o productiva), y vinculándola a un programa, jornada, modalidad y líderes previamente registrados en el sistema.
+RF-18  El sistema debe permitir a los administradores editar la información de una ficha registrada, incluyendo la actualización de su etapa cuando el grupo avance de lectiva a productiva.
+RF-19  El sistema debe permitir a los administradores deshabilitar fichas de formación sin eliminarlas físicamente, conservando su historial de asignaciones y horarios.
+RF-20  El sistema debe permitir a los administradores y líderes consultar y filtrar el listado de fichas por programa, jornada, etapa y modalidad.
+RF-47  El sistema debe permitir a los administradores registrar una novedad administrativa de una ficha activa (comité de evaluación, paro, actividad académica fuera del CDMC u otra), indicando el tipo de novedad, fecha de inicio, fecha estimada de regreso y un campo de observación opcional, de manera que el sistema excluya la ficha de nuevas asignaciones de horarios mientras la novedad esté vigente y la reincorpore automáticamente al vencerse la fecha de regreso.
+
+════════════════════════════════════════════════════════════════
+
+Modulo HORARIOS
+
+RF-21  El sistema debe permitir a los administradores registrar horarios asignados a fichas, instructores y ambientes, asociados a una jornada.
+RF-22  El sistema debe permitir a los administradores editar los horarios registrados en el sistema.
+RF-23  El sistema debe permitir a los administradores deshabilitar horarios sin eliminarlos físicamente, dejando registro del cambio.
+RF-24  El sistema debe permitir visualizar la malla de horarios de una ficha o instructor en formato de grilla semanal, mostrando jornada, ambiente e instructor asignado por día.
+
+════════════════════════════════════════════════════════════════
+
+Modulo ASIGNACIONES
+
+RF-25  El sistema debe permitir a los administradores asignar el rol de líder de programa a un instructor, y designar al líder de una ficha activando el campo correspondiente en la asignación.
+RF-26  El sistema debe permitir a los administradores asignar programas de formación a líderes, respetando la línea del coordinador que los gestiona.
+RF-27  El sistema debe permitir a los administradores asignar competencias a instructores, validando que la competencia esté habilitada para ese instructor según su contrato.
+RF-28  El sistema debe permitir a los administradores asignar ambientes a fichas e instructores, validando disponibilidad por jornada, horario y ausencia de bloqueo temporal vigente en el ambiente.
+RF-29  El sistema debe permitir a los administradores registrar asignaciones provisionales de instructores a fichas o programas fuera de su área, con registro del autorizante, fecha y motivo.
+RF-30  El sistema debe permitir a los líderes de programa asignar instructores y ambientes dentro de los programas que tienen a su cargo, actuando por instrucción de un administrador.
+
+════════════════════════════════════════════════════════════════
+
+Modulo AMBIENTES
+
+RF-31  El sistema debe permitir a los administradores registrar un bloqueo temporal de un ambiente, indicando la fecha de inicio, fecha de fin y motivo, de manera que el sistema lo excluya de las opciones de asignación durante ese periodo y lo reincorpore automáticamente al vencerse la fecha de fin del bloqueo.
+
+════════════════════════════════════════════════════════════════
+
+Sistema / Administrador – MÓDULO ALERTAS, VALIDACIONES Y NOTIFICACIONES
+
+RF-32  El sistema debe emitir una alerta cuando un instructor supere el límite de horas semanales permitidas según su tipo de contrato, sin bloquear la asignación.
+RF-33  El sistema debe emitir una alerta cuando se intente registrar un horario en jornada nocturna o fin de semana para un instructor de planta, sin bloquear el registro.
+RF-34  El sistema debe emitir una alerta antes de confirmar la asignación cuando un ambiente ya esté ocupado en la misma jornada por otra ficha, sin bloquear el registro.
+RF-35  El sistema debe impedir que un mismo RAP quede asignado a dos instructores diferentes dentro de una misma ficha, validando esta restricción antes de registrar cualquier asignación.
+RF-36  El sistema debe permitir registrar la suspensión de un horario específico, con campo de motivo opcional, dejando trazabilidad del cambio.
+RF-37  El sistema debe verificar automáticamente que los cambios en horarios, jornadas, instructores o ambientes no generen conflictos con las asignaciones existentes, emitiendo una alerta si se detecta alguno.
+RF-38  El sistema debe notificar al instructor cuando se le asigne, modifique o elimine una competencia o ficha, o cuando se registre una novedad administrativa sobre su cuenta, mediante una notificación interna en el sistema y un correo electrónico al correo registrado.
+RF-39  El sistema debe notificar al líder de programa cuando ocurra un cambio de asignación o se registre una novedad administrativa en un instructor de su programa, o cuando se registre una asignación provisional en su línea, mediante notificación interna en el sistema.
+RF-40  El sistema debe notificar a los coordinadores y al subdirector cuando se genere una alerta de carga horaria fuera de rango, una asignación provisional, un bloqueo de ambiente, o una deshabilitación de cuenta en su línea o en el CDMC, mediante notificación interna en el sistema.
+
+════════════════════════════════════════════════════════════════
+
+Administrador / Líder / Instructor – MÓDULO CONSULTA Y VISUALIZACIÓN
+
+RF-41  El sistema debe permitir a los administradores consultar, visualizar, filtrar y buscar información de instructores, líderes, programas, competencias, ambientes, fichas, jornadas y horarios; incluyendo un panel de carga horaria semanal por instructor que muestre el total de horas asignadas comparado con el límite permitido según su tipo de contrato.
+RF-42  El sistema debe permitir a los administradores visualizar el estado de asignaciones activas, provisionales e históricas.
+RF-43  El sistema debe permitir a los líderes de programa consultar y visualizar la información de los instructores, competencias, ambientes y fichas correspondientes a los programas que tienen a su cargo.
+RF-44  El sistema debe permitir a los instructores consultar la información de las fichas, competencias, ambientes y horarios que tienen asignados, incluyendo el historial de notificaciones recibidas.
+RF-45  El sistema debe permitir a los administradores y líderes exportar la malla de horarios de una ficha o instructor en formato PDF, para su uso en reportes, reuniones o evidencias de gestión.
+
+════════════════════════════════════════════════════════════════
+
+RESUMEN
+Total de requisitos funcionales: 47
+Modulo AUTH:                               14  (RF-01 al RF-13, RF-46)
+Modulo Instructores:                        3  (RF-14 al RF-16)
+Modulo Fichas:                              5  (RF-17 al RF-20, RF-47)
+Modulo Horarios:                            4  (RF-21 al RF-24)
+Modulo Asignaciones:                        6  (RF-25 al RF-30)
+Modulo Ambientes:                           1  (RF-31)
+Modulo Alertas, Validaciones y Notif.:      9  (RF-32 al RF-40)
+Modulo Consulta y Visualizacion:            5  (RF-41 al RF-45)
+
+════════════════════════════════════════════════════════════════
+
+NOTAS DE CAMBIOS RESPECTO A LA VERSION 5.0
+
+NUEVO MODULO — Alertas, Validaciones y Notificaciones:
+El modulo de Alertas y Validaciones se amplió para incluir
+un sub-módulo de notificaciones. La razon es que las
+notificaciones son la consecuencia directa de las alertas
+y cambios que el sistema ya genera, por lo que no tiene
+sentido separar "el sistema detecta algo" de "el sistema
+avisa a alguien". Son dos partes del mismo flujo.
+
+El modelo de notificaciones opera en dos canales:
+- Notificacion interna: visible como campanita dentro del
+  sistema para todos los roles. Queda registrada en BD
+  para consulta historica.
+- Correo electronico: solo para el instructor (RF-38), por
+  ser el usuario con menor acceso al sistema y el que mas
+  necesita enterarse de cambios que le afectan directamente.
+  Se implementa con nodemailer, compatible con el stack
+  Node.js existente.
+
+Logica de notificaciones por rol:
+
+INSTRUCTOR (RF-38) — notificacion interna + correo:
+- Se le asigna, modifica o elimina una competencia o ficha.
+- Se registra una novedad administrativa sobre su cuenta.
+- Su cuenta es creada, deshabilitada o reactivada.
+
+LIDER DE PROGRAMA (RF-39) — solo notificacion interna:
+- Un instructor de su programa recibe un cambio de asignacion.
+- Un instructor de su programa tiene una novedad administrativa.
+- Se registra una asignacion provisional en su linea.
+
+COORDINADORES Y SUBDIRECTOR (RF-40) — solo notif. interna:
+- Un instructor supera o cae por debajo del rango de horas.
+- Se registra una asignacion provisional en su linea.
+- Un ambiente es bloqueado temporalmente.
+- Un instructor de planta tiene horario nocturno o fin de semana.
+- Una cuenta es deshabilitada en su linea o en el CDMC.
+
+Implicacion en BD: se requiere una tabla notificaciones
+con los campos: id, usuario_id, tipo, mensaje, leida
+BOOLEAN DEFAULT FALSE, generada_en TIMESTAMP. Las queries
+de listado filtran por usuario_id del usuario autenticado.
+
+AJUSTE EN RF-44:
+Se agrego a la vista del instructor la consulta del historial
+de notificaciones recibidas, para que el instructor pueda
+revisar cambios anteriores en cualquier momento.
+
+RENUMERACION PARCIAL:
+Los RF-38 al RF-42 del modulo Consulta y Visualizacion
+pasaron a ser RF-41 al RF-45 para dar lugar a los tres
+nuevos RF de notificaciones (RF-38, RF-39, RF-40).
+Total de RF en ese momento: de 42 a 45.
+
+════════════════════════════════════════════════════════════════
+
+NOTAS DE CAMBIOS RESPECTO A LA VERSION 6.0 (v6.1 — Junio 2026)
+
+RF-46 — Documento de identidad de usuario:
+Se integro al Modulo AUTH (antes listado como extension suelta).
+Registra tipo y numero de documento (CC, CE, TI, pasaporte) como
+campo adicional al usuario. Implica en BD las columnas
+tipo_documento ENUM('cc','ce','ti','pasaporte') y documento
+VARCHAR(20) UNIQUE en la tabla usuarios.
+
+RF-47 — Novedad administrativa de ficha:
+Se integro al Modulo FICHAS (antes listado como extension suelta).
+Es el equivalente de RF-16 (novedad de instructor) pero aplicado
+a una ficha activa: comite de evaluacion, paro, actividad fuera
+del CDMC u otra causa que suspenda temporalmente la ficha de
+nuevas asignaciones de horarios, con reincorporacion automatica
+al vencerse la fecha de regreso. Implica en BD la tabla
+ficha_novedades con estructura analoga a instructor_novedades,
+mas la tabla de catalogo tipos_novedad_ficha.
+
+Ambos RF se reubicaron dentro de sus modulos correspondientes
+para mantener consistencia estructural con el resto del documento.
+Se elimino el resumen intermedio de 45 RF (vigente solo entre la
+v6.0 y la v6.1) y se dejo un unico resumen con el total vigente
+de 47 RF.
+
+Total de requisitos funcionales: de 45 a 47.

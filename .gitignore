@@ -1,45 +1,26 @@
-# Dependencies
+# Dependencias
 node_modules/
-.pnp
-.pnp.js
 
-# Testing
-coverage/
+# Build
+dist/
+*.tsbuildinfo
 
-# Next.js
-.next/
-out/
-
-# Production
-build/
-
-# Misc
-.DS_Store
-*.pem
-
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Environment variables
+# Variables de entorno - NUNCA commitear
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*.local
 
-# Vercel
-.vercel
+# Datos reales - NUNCA commitear
+backend/seed_data.sql
 
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
+# Logs
+*.log
+npm-debug.log*
 
-# IDE
-.vscode/
-.idea/
-
-# OS
+# Sistema
+.DS_Store
+*.pem
 Thumbs.db
+
+# Claude Code
+.claude

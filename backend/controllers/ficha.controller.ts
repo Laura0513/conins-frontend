@@ -4,7 +4,7 @@ import { ApiResponse } from '../utils/response.js';
 import { FichaService } from '../services/ficha.service.js';
 
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
-  const fichas = await FichaService.getAll(req.user.id, req.user.roles_globales);
+  const fichas = await FichaService.getAll(req.user?.id, req.user?.roles_globales);
   ApiResponse.success(res, fichas);
 });
 

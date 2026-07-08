@@ -4,7 +4,7 @@ import { ApiResponse } from '../utils/response.js';
 import { HorarioService } from '../services/horario.service.js';
 
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
-  const horarios = await HorarioService.getAll(req.user.id, req.user.roles_globales);
+  const horarios = await HorarioService.getAll(req.user?.id, req.user?.roles_globales);
   ApiResponse.success(res, horarios);
 });
 
@@ -33,8 +33,22 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const update = asyncHandler(async (req: Request, res: Response) => {
-  const horario = await HorarioService.update(Number(req.params.id), req.body);
-  ApiResponse.success(res, horario, 'Horario actualizado exitosamente');
+  const result = await HorarioService.update(Number(req.params.id), req.body);
+
+  const alertas: string[] = [];
+  if (result.alerta_ambiente_ocupado) alertas.push('AMBIENTE_OCUPADO');
+  if (result.alerta_jornada_restringida) alertas.push('JORNADA_RESTRINGIDA');
+
+  if (alertas.length > 0) {
+    return res.status(200).json({
+      success: true,
+      message: `Horario actualizado con alertas: ${alertas.join(', ')}`,
+      data: result,
+      alertas,
+    });
+  }
+
+  ApiResponse.success(res, result, 'Horario actualizado exitosamente');
 });
 
 export const toggleActivo = asyncHandler(async (req: Request, res: Response) => {

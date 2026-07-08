@@ -13,17 +13,11 @@ const router = Router();
 
 router.use(verifyToken);
 
-// GET seguimientos por ficha (todos los roles pueden ver)
-router.get(
-  '/ficha/:fichaId',
-  rapSeguimientoController.getByFicha,
-);
+// GET seguimientos por ficha (todos los roles)
+router.get('/ficha/:fichaId', rapSeguimientoController.getByFicha);
 
 // GET RAPs disponibles (sin seguimiento) por ficha
-router.get(
-  '/ficha/:fichaId/disponibles',
-  rapSeguimientoController.getDisponibles,
-);
+router.get('/ficha/:fichaId/disponibles', rapSeguimientoController.getDisponibles);
 
 // GET seguimientos por asignacion_competencia
 router.get(
@@ -32,12 +26,9 @@ router.get(
 );
 
 // GET seguimiento por ID
-router.get(
-  '/:id',
-  rapSeguimientoController.getById,
-);
+router.get('/:id', rapSeguimientoController.getById);
 
-// POST crear seguimiento (solo admin/coordinación)
+// POST crear seguimiento (solo admin/coordinacion)
 router.post(
   '/',
   requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),

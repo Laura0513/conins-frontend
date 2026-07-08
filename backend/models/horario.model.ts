@@ -41,7 +41,7 @@ const DIAS_MAP: Record<number, string> = {
 export const HorarioModel = {
   async findAll(): Promise<HorarioDetail[]> {
     const [rows] = await pool.query<HorarioDetail[]>(`
-      SELECT h.id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
+      SELECT MIN(h.id) AS id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
              c.nombre AS competencia,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
              j.nombre AS jornada,
@@ -64,8 +64,9 @@ export const HorarioModel = {
       LEFT JOIN ambientes ab ON h.ambiente_id = ab.id
       JOIN jornadas j ON h.jornada_id = j.id
       LEFT JOIN tipos_actividad ta ON h.tipo_actividad_id = ta.id
-      GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.ambiente_id, h.jornada_id, h.hora_inicio, h.hora_fin, h.estado, h.motivo_rechazo, h.activo
-      ORDER BY h.id
+      GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.ambiente_id, h.jornada_id,
+               h.tipo_actividad_id, h.hora_inicio, h.hora_fin, h.estado, h.motivo_rechazo, h.activo
+      ORDER BY MIN(h.id)
     `);
 
     return rows.map((row) => ({
@@ -78,7 +79,7 @@ export const HorarioModel = {
 
   async findAllByInstructorId(instructorId: number): Promise<HorarioDetail[]> {
     const [rows] = await pool.query<HorarioDetail[]>(`
-      SELECT h.id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
+      SELECT MIN(h.id) AS id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
              c.nombre AS competencia,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
              j.nombre AS jornada,
@@ -102,8 +103,9 @@ export const HorarioModel = {
       JOIN jornadas j ON h.jornada_id = j.id
       LEFT JOIN tipos_actividad ta ON h.tipo_actividad_id = ta.id
       WHERE h.instructor_id = ?
-      GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.ambiente_id, h.jornada_id, h.hora_inicio, h.hora_fin, h.estado, h.motivo_rechazo, h.activo
-      ORDER BY h.id
+      GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.ambiente_id, h.jornada_id,
+               h.tipo_actividad_id, h.hora_inicio, h.hora_fin, h.estado, h.motivo_rechazo, h.activo
+      ORDER BY MIN(h.id)
     `, [instructorId]);
 
     return rows.map((row) => ({

@@ -64,7 +64,7 @@ export const AuthService = {
       const expiresIn = (process.env.JWT_EXPIRES_IN || '24h') as jwt.SignOptions['expiresIn'];
 
       const token = jwt.sign(
-        { id: 1, nombre: 'Administrador', roles_globales: ['Subdirector'] },
+        { id: 0, nombre: 'Administrador', roles_globales: ['Subdirector'] },
         secret,
         { expiresIn },
       );
@@ -72,7 +72,7 @@ export const AuthService = {
       return {
         token,
         user: {
-          id: 1,
+          id: 0,
           nombre: 'Administrador',
           email: superUser,
           roles: ['Subdirector'],
@@ -198,6 +198,17 @@ export const AuthService = {
   },
 
   async getOwnProfile(userId: number) {
+    // id: 0 = super admin virtual (no existe en tabla usuarios)
+    if (userId === 0) {
+      return {
+        id: 0,
+        nombre: 'Administrador',
+        email: process.env.SUPER_USER ?? 'admin@conins.sena',
+        activo: true,
+        roles: ['Subdirector'],
+      };
+    }
+
     const user = await UsuarioModel.findById(userId);
     if (!user) throw new NotFoundError('Usuario no encontrado');
 

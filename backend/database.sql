@@ -42,19 +42,8 @@ CREATE TABLE IF NOT EXISTS roles (
     activo BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
--- ⚠ CAMBIO 01/07/2026: 5 roles → 4 roles (Title Case con espacios).
--- TRUNCATE limpia datos de ejecuciones previas. FK_CHECKS deshabilita
--- temporalmente la restricción de usuario_roles → roles para permitir TRUNCATE.
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE usuario_roles;
-TRUNCATE TABLE roles;
-SET FOREIGN_KEY_CHECKS = 1;
-
-INSERT INTO roles (id, nombre, nivel) VALUES
-(1, 'Subdirector',             1),
-(2, 'Coordinadora Academica',  2),
-(3, 'Asistente Coordinacion',  3),
-(4, 'Instructor',              4);
+-- Datos de roles se insertan despues de CREATE TABLE usuario_roles
+-- para que TRUNCATE no falle en importacion sobre BD vacia (ver linea ~106).
 
 -- ============================================================
 -- 3. ÁREAS
@@ -104,6 +93,19 @@ CREATE TABLE IF NOT EXISTS usuario_roles (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (rol_id)     REFERENCES roles(id)    ON DELETE RESTRICT
 ) ENGINE=InnoDB;
+
+-- ⚠ CAMBIO 01/07/2026: 5 roles → 4 roles (Title Case con espacios).
+-- Movido aqui para que TRUNCATE no falle en BD vacia (usuario_roles existe desde la linea anterior).
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE usuario_roles;
+TRUNCATE TABLE roles;
+SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT INTO roles (id, nombre, nivel) VALUES
+(1, 'Subdirector',             1),
+(2, 'Coordinadora Academica',  2),
+(3, 'Asistente Coordinacion',  3),
+(4, 'Instructor',              4);
 
 -- ============================================================
 -- 5. INSTRUCTORES (perfil extendido de usuarios)
@@ -993,7 +995,7 @@ BEGIN
     SET p_instructor_id = LAST_INSERT_ID();
 
     INSERT INTO usuario_roles (usuario_id, rol_id)
-    VALUES (p_usuario_id, 4);
+    VALUES (p_usuario_id, 4); -- ID 4 = Instructor (corregido 06/07/2026)
 
     COMMIT;
 END$$
@@ -1224,4 +1226,83 @@ CREATE OR REPLACE VIEW vw_instructores_con_novedad AS
 SELECT
     i.id AS instructor_id,
     u.nombre AS instructor_nombre,
-    u.email AS 
+    u.email AS instructor_email,
+    tni.nombre AS tipo_novedad,
+    n.fecha_inicio,
+    n.fecha_regreso,
+    n.observacion,
+    DATEDIFF(n.fecha_regreso, n.fecha_inicio) + 1 AS dias_novedad,
+    n.activo AS novedad_activa
+FROM instructores i
+JOIN usuarios u ON i.usuario_id = u.id
+JOIN instructor_novedades n ON n.instructor_id = i.id
+JOIN tipos_novedad_instructor tni ON n.tipo_novedad_id = tni.id
+WHERE n.activo = TRUE
+  AND n.fecha_inicio <= CURDATE()
+  AND n.fecha_regreso >= CURDATE();
+
+-- --- vw_alertas_pendientes: Alertas no atendidas con prioridad ---
+CREATE OR REPLACE VIEW vw_alertas_pendientes AS
+SELECT
+    al.id AS alerta_id,
+    u.nombre AS instructor_nombre,
+    al.tipo AS alerta_tipo,
+    al.mensaje,
+    al.semana,
+    al.total_horas,
+    al.atendida,
+    al.leida,
+    al.created_at,
+    CASE
+        WHEN al.tipo = 'HORAS_EXCEDIDAS' THEN 'alta'
+        WHEN al.tipo = 'INSTRUCTOR_PLANTA_JORNADA_NOCTURNA' THEN 'alta'
+        WHEN al.tipo = 'AMBIENTE_OCUPADO' THEN 'media'
+        ELSE 'baja'
+    END AS prioridad
+FROM alertas al
+JOIN instructores i ON al.instructor_id = i.id
+JOIN usuarios u ON i.usuario_id = u.id
+WHERE al.atendida = FALSE
+ORDER BY
+    FIELD(CASE
+        WHEN al.tipo = 'HORAS_EXCEDIDAS' THEN 'alta'
+        WHEN al.tipo = 'INSTRUCTOR_PLANTA_JORNADA_NOCTURNA' THEN 'alta'
+        WHEN al.tipo = 'AMBIENTE_OCUPADO' THEN 'media'
+        ELSE 'baja'
+    END, 'alta', 'media', 'baja'),
+    al.created_at DESC;
+
+-- ============================================================
+-- FIN DEL SCHEMA (v5 → 27 tablas a partir de 01/07/2026)
+-- Tablas nuevas: tipos_actividad (26), rap_ficha_seguimiento (27)
+-- ============================================================
+-- ============================================================
+-- 25. UTF-8 COLLATION
+-- Todas las tablas en utf8mb4_general_ci para caracteres especiales
+-- ============================================================
+
+ALTER DATABASE conIns CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+ALTER TABLE jornadas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE roles CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE areas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE usuarios CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE usuario_roles CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE instructores CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE programas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE competencias CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE raps CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE ambientes CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE fichas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE asignacion CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE asignacion_competencia CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE lider_programa CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE instructor_competencias_habilitadas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE horarios CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE alertas CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE instructor_novedades CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE ambiente_bloqueos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE notificaciones CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE tipos_actividad CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE rap_ficha_seguimiento CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE auditoria CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

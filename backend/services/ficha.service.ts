@@ -5,6 +5,7 @@ import { ROLES, RoleKey } from '../constants/roles.js';
 
 export const FichaService = {
   async getAll(userId?: number, roles?: RoleKey[]) {
+    // P22: instructor solo ve fichas donde tiene asignacion activa
     if (userId && roles && roles.length === 1 && roles[0] === ROLES.INSTRUCTOR) {
       const instructor = await InstructorModel.findByUsuarioId(userId);
       if (!instructor) return [];
