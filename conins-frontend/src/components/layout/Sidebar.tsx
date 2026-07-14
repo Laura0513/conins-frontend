@@ -132,4 +132,21 @@ export default function Sidebar({ alertasViewed, isOpen, onClose, rol }: Sidebar
               onClick={onClose}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-sena/10 text
+                  ? "bg-sena/10 text-sena shadow-sm"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span>{item.name}</span>
+              {item.showBadge && alertasPendientes > 0 && !alertasViewed && (
+                <span className="ml-auto bg-sena text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  {alertasPendientes > 99 ? "99+" : alertasPendientes}
+                </span>
+              )}
+            </Link>
+          )
+        })}
+      </nav>
+    </aside>
+  )
+}

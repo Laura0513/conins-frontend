@@ -7,6 +7,7 @@ import CrearFichaModal from "@/components/fichas/CrearFichaModal"
 import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import EditFichaModal from "@/components/fichas/EditFichaModal"
 import RapSeguimientoModal from "@/components/fichas/RapSeguimientoModal"
+import NovedadFichaModal from "@/components/fichas/NovedadFichaModal"
 import {
   Search,
   Plus,
@@ -18,6 +19,7 @@ import {
   Loader2,
   AlertTriangle,
   ClipboardList,
+  FileWarning,
 } from "lucide-react"
 
 type Ficha = {
@@ -43,6 +45,7 @@ export default function FichasPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isRapModalOpen, setIsRapModalOpen] = useState(false)
+  const [isNovedadModalOpen, setIsNovedadModalOpen] = useState(false)
   const [selectedFicha, setSelectedFicha] = useState<Ficha | null>(null)
 
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -114,6 +117,11 @@ export default function FichasPage() {
   const openRapModal = (ficha: Ficha) => {
     setSelectedFicha(ficha)
     setIsRapModalOpen(true)
+  }
+
+  const openNovedadModal = (ficha: Ficha) => {
+    setSelectedFicha(ficha)
+    setIsNovedadModalOpen(true)
   }
 
   const handleFinalizarFicha = (ficha: Ficha) => {
@@ -307,6 +315,13 @@ export default function FichasPage() {
                               <ClipboardList className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() => openNovedadModal(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                              title="Novedades"
+                            >
+                              <FileWarning className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => openEditModal(ficha)}
                               className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                               title="Editar"
@@ -401,6 +416,13 @@ export default function FichasPage() {
         onToast={showToast}
       />
 
+      <NovedadFichaModal
+        isOpen={isNovedadModalOpen}
+        onClose={() => setIsNovedadModalOpen(false)}
+        ficha={selectedFicha}
+        puedeEditar={puedeEditar}
+      />
+
       {confirmDialog.isOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
@@ -416,4 +438,21 @@ export default function FichasPage() {
                 <button
                   onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
                   className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-  
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDialog.onConfirm}
+                  className="px-4 py-2.5 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  Confirmar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </DashboardLayout>
+  )
+}

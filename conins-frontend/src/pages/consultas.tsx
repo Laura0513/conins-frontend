@@ -366,4 +366,120 @@ export default function ConsultasPage() {
                           <tr>
                             <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
                             <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
-                            <th className="px-3 py
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Lun</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Mar</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Mie</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Jue</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Vie</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Sab</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {fichasFiltradas.map((h) => (
+                            <tr key={h.ficha_numero} className="hover:bg-gray-50/50">
+                              <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-sena">
+                                {h.ficha_numero}
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4 text-gray-600">
+                                {h.programa}
+                              </td>
+                              {[h.lunes, h.martes, h.miercoles, h.jueves, h.viernes, h.sabado].map(
+                                (dia, i) => (
+                                  <td
+                                    key={i}
+                                    className={`px-3 py-3 md:px-6 md:py-4 text-center text-xs ${
+                                      dia ? "text-gray-700" : "text-gray-300"
+                                    }`}
+                                  >
+                                    {dia || "—"}
+                                  </td>
+                                )
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 bg-gray-50 text-sm text-gray-500">
+                    Mostrando {fichasFiltradas.length} de {horariosFicha.length} fichas
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tab: Ocupación Ambientes */}
+            {activeTab === "ocupacion" && (
+              <div className="space-y-4">
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                  {ocupacion.length === 0 ? (
+                    <div className="p-12 text-center text-gray-500">
+                      No hay datos de ocupacion disponibles.
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm text-left">
+                        <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
+                          <tr>
+                            <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Tipo</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Capacidad</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Horas</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Ocupacion</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                          {ocupacion.map((o) => (
+                            <tr key={o.ambiente_nombre} className="hover:bg-gray-50/50">
+                              <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">
+                                {o.ambiente_nombre}
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4 text-center">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 capitalize">
+                                  {o.tipo}
+                                </span>
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">
+                                {o.capacidad ?? "—"}
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-600">
+                                {Number(o.horas_ocupadas).toFixed(0)}h / {o.horas_totales}h
+                              </td>
+                              <td className="px-3 py-3 md:px-6 md:py-4">
+                                <div className="flex items-center justify-center gap-2">
+                                  <div className="w-24 bg-gray-200 rounded-full h-2 overflow-hidden">
+                                    <div
+                                      className={`h-2 rounded-full transition-all ${
+                                        Number(o.porcentaje) > 80
+                                          ? "bg-red-500"
+                                          : Number(o.porcentaje) > 50
+                                            ? "bg-yellow-500"
+                                            : "bg-sena"
+                                      }`}
+                                      style={{ width: `${Math.min(Number(o.porcentaje), 100)}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-xs font-medium text-gray-600 w-10 text-right">
+                                    {Number(o.porcentaje).toFixed(0)}%
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 bg-gray-50 flex justify-between text-sm text-gray-500">
+                    <span>{ocupacion.length} ambientes</span>
+                    <span>Ocupacion promedio: {promedioOcupacion}%</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </DashboardLayout>
+  )
+}

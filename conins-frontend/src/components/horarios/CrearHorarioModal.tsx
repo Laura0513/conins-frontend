@@ -278,4 +278,37 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
                 <select
                   value={formData.tipo_actividad_id}
                   onChange={(e) => handleChange("tipo_actividad_id", e.target.value)}
-                  classNam
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                >
+                  <option value="">Sin clasificar</option>
+                  {tiposActividad.map((t) => (
+                    <option key={t.id} value={t.id}>{t.nombre}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Clasifica el tipo de actividad para el cálculo de carga horaria.</p>
+              </div>
+            </>
+          )}
+
+          <div className="pt-2 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={submitting || loading}
+              className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              Guardar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}

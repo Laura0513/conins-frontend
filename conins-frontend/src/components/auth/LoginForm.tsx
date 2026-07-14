@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useRouter } from "next/router"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
+import Link from "next/link"
 import { useAuth } from "@/lib/AuthContext"
 import { useToast } from "@/lib/ToastContext"
 
@@ -84,9 +85,9 @@ export default function LoginForm() {
       </button>
 
       {/* Link olvidaste contraseña */}
-      <a href="#" className="text-center text-green-500 text-sm font-semibold hover:underline">
+      <Link href="/recuperar-contrasena" className="text-center text-sena text-sm font-semibold hover:underline">
         ¿Olvidaste tu contraseña?
-      </a>
+      </Link>
 
     </form>
   )

@@ -115,4 +115,15 @@ export default function VerAgendaAmbienteModal({ isOpen, onClose, ambiente }: Ve
           )}
         </div>
 
-        <
+        <div className="p-4 border-t border-gray-100 flex justify-end shrink-0">
+          <button
+            onClick={onClose}
+            className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

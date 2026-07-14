@@ -75,6 +75,20 @@ export const api = {
                 body: JSON.stringify({ contrasena_actual, nueva_contrasena }),
             })
         },
+
+        solicitarRecuperacion(email: string) {
+            return apiFetch('/auth/recuperar-contrasena', {
+                method: 'POST',
+                body: JSON.stringify({ email }),
+            })
+        },
+
+        resetearContrasena(token: string, nueva_contrasena: string) {
+            return apiFetch('/auth/resetear-contrasena', {
+                method: 'POST',
+                body: JSON.stringify({ token, nueva_contrasena }),
+            })
+        },
     },
 
     instructors: {
@@ -155,6 +169,20 @@ export const api = {
         },
         toggleEstado(id: number) {
             return apiFetch(`/fichas/${id}/estado`, {
+                method: 'PATCH',
+            })
+        },
+        getNovedades(fichaId: number) {
+            return apiFetch(`/fichas/${fichaId}/novedades`)
+        },
+        crearNovedad(fichaId: number, data: any) {
+            return apiFetch(`/fichas/${fichaId}/novedades`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        toggleNovedad(fichaId: number, novedadId: number) {
+            return apiFetch(`/fichas/${fichaId}/novedades/${novedadId}/toggle`, {
                 method: 'PATCH',
             })
         },
@@ -252,6 +280,9 @@ export const api = {
         getTiposNovedadInstructor() {
             return apiFetch('/catalogo/tipos-novedad-instructor')
         },
+        getTiposNovedadFicha() {
+            return apiFetch('/catalogo/tipos-novedad-ficha')
+        },
         getTiposNovedadAmbiente() {
             return apiFetch('/catalogo/tipos-novedad-ambiente')
         },
@@ -333,4 +364,65 @@ export const api = {
             return apiFetch(`/rap-seguimiento/asignacion-competencia/${acId}`)
         },
         getById(id: number) {
-            return apiFetc
+            return apiFetch(`/rap-seguimiento/${id}`)
+        },
+        create(data: any) {
+            return apiFetch('/rap-seguimiento', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        update(id: number, data: any) {
+            return apiFetch(`/rap-seguimiento/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            })
+        },
+        evaluar(id: number, estado_aprobacion: string) {
+            return apiFetch(`/rap-seguimiento/${id}/evaluar`, {
+                method: 'PATCH',
+                body: JSON.stringify({ estado_aprobacion }),
+            })
+        },
+        toggleActivo(id: number) {
+            return apiFetch(`/rap-seguimiento/${id}/estado`, {
+                method: 'PATCH',
+            })
+        },
+    },
+
+    users: {
+        getAll() {
+            return apiFetch('/auth/usuarios')
+        },
+        create(data: any) {
+            return apiFetch('/auth/register', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        update(id: number, data: any) {
+            return apiFetch(`/auth/usuarios/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(data),
+            })
+        },
+        toggleEstado(id: number) {
+            return apiFetch(`/auth/usuarios/${id}/estado`, {
+                method: 'PATCH',
+            })
+        },
+        asignarProgramas(liderId: number, programaIds: number[]) {
+            return apiFetch(`/auth/usuarios/${liderId}/programas`, {
+                method: 'PUT',
+                body: JSON.stringify({ programa_ids: programaIds }),
+            })
+        },
+    },
+}
+
+export type ApiResponse<T = unknown> = {
+    success: boolean
+    message: string
+    data: T
+}

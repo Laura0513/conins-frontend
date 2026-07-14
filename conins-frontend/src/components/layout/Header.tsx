@@ -165,4 +165,112 @@ export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }
           {isOpen && (
             <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50">
               {/* Header del dropdown */}
-       
+              <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                <h3 className="text-sm font-bold text-gray-900">
+                  Notificaciones
+                  {noLeidasCount > 0 && (
+                    <span className="ml-2 text-xs font-normal text-gray-500">
+                      {noLeidasCount} sin leer
+                    </span>
+                  )}
+                </h3>
+                {noLeidasCount > 0 && (
+                  <button
+                    onClick={handleMarcarTodas}
+                    className="text-xs text-sena hover:underline font-medium"
+                  >
+                    Marcar todas
+                  </button>
+                )}
+              </div>
+
+              {/* Lista */}
+              <div className="max-h-80 overflow-y-auto">
+                {loadingNotifs ? (
+                  <div className="py-8 flex items-center justify-center text-gray-400">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  </div>
+                ) : notificaciones.length === 0 ? (
+                  <div className="py-8 text-center text-sm text-gray-400">
+                    No hay notificaciones
+                  </div>
+                ) : (
+                  notificaciones.map((notif) => (
+                    <div
+                      key={notif.id}
+                      className={`px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors ${
+                        notif.leida ? "opacity-60" : ""
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span
+                          className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+                            notif.leida ? "bg-gray-300" : "bg-sena"
+                          }`}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-700">{notif.mensaje}</p>
+                          <div className="flex items-center justify-between mt-1">
+                            <p className="text-xs text-gray-400">
+                              {notif.created_at ? tiempoRelativo(notif.created_at) : ""}
+                            </p>
+                            {!notif.leida && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleMarcarLeida(notif.id)
+                                }}
+                                className="text-xs text-sena hover:underline flex items-center gap-1"
+                              >
+                                <Check className="w-3 h-3" />
+                                Leida
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="px-4 py-2.5 bg-gray-50 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    router.push("/alertas")
+                    setIsOpen(false)
+                  }}
+                  className="text-xs text-sena font-medium hover:underline w-full text-center"
+                >
+                  Ver todas las alertas
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Usuario */}
+        <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
+          <div className="text-right hidden sm:block">
+            <p className="text-sm font-semibold text-gray-900">
+              {user?.nombre || "Usuario"}
+            </p>
+            <p className="text-xs text-gray-500">{user?.roles?.[0] || "Rol"}</p>
+          </div>
+          <div className="w-9 h-9 bg-sena/10 rounded-full flex items-center justify-center text-sena font-semibold text-sm">
+            {user?.nombre?.charAt(0) || "U"}
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="ml-2 p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Cerrar sesion"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </header>
+  )
+}

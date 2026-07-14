@@ -302,4 +302,158 @@ export default function Home() {
             <p className="text-3xl font-bold text-gray-900">
               {dataLoading ? "..." : instructorCount}
             </p>
- 
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-sena" />
+              </div>
+              <p className="text-sm text-gray-500">Fichas activas</p>
+            </div>
+            <p className="text-3xl font-bold text-gray-900">
+              {dataLoading ? "..." : fichasCount}
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                <ClipboardList className="w-5 h-5 text-sena" />
+              </div>
+              <p className="text-sm text-gray-500">Asignaciones vigentes</p>
+            </div>
+            <p className="text-3xl font-bold text-gray-900">
+              {dataLoading ? "..." : asignacionesCount}
+            </p>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border-l-4 border-yellow-400 shadow-sm">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-yellow-600" />
+              </div>
+              <p className="text-sm text-gray-500">Alertas pendientes</p>
+            </div>
+            <p className="text-3xl font-bold text-yellow-600">
+              {dataLoading ? "..." : alertasPendientes}
+            </p>
+          </div>
+        </div>
+
+        {/* Contenido inferior: Tabla + Alertas */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Tabla de carga horaria */}
+          <div className="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Carga horaria semanal</h2>
+
+            {dataLoading ? (
+              <div className="py-8 flex items-center justify-center text-gray-400">
+                <Loader2 className="w-6 h-6 animate-spin" />
+              </div>
+            ) : cargaHoraria.length === 0 ? (
+              <p className="text-sm text-gray-500 py-4 text-center">
+                No hay datos de carga horaria disponibles.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-gray-500">
+                      <th className="text-left py-3 font-medium">Instructor</th>
+                      <th className="text-center py-3 font-medium">Horas</th>
+                      <th className="text-center py-3 font-medium">Limite</th>
+                      <th className="text-center py-3 font-medium">Progreso</th>
+                      <th className="text-center py-3 font-medium">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cargaHoraria.map((row) => (
+                      <tr
+                        key={row.instructor_id}
+                        className="border-b border-gray-100 last:border-0"
+                      >
+                        <td className="py-3 font-medium text-gray-900">
+                          {row.instructor_nombre}
+                        </td>
+                        <td className="py-3 text-center text-gray-700">
+                          {Number(row.total_horas).toFixed(0)}
+                        </td>
+                        <td className="py-3 text-center text-gray-500">40</td>
+                        <td className="py-3">
+                          <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div
+                              className={`h-2.5 rounded-full ${getProgressColor(Number(row.total_horas), 40)}`}
+                              style={{
+                                width: `${Math.min((Number(row.total_horas) / 40) * 100, 100)}%`,
+                              }}
+                            />
+                          </div>
+                        </td>
+                        <td className="py-3 text-center">
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(row.estado)}`}
+                          >
+                            {row.estado}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Alertas recientes */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Alertas recientes</h2>
+              <button
+                onClick={() => router.push("/alertas")}
+                className="text-sena text-sm font-medium hover:underline"
+              >
+                Ver todas
+              </button>
+            </div>
+
+            {dataLoading ? (
+              <div className="py-8 flex items-center justify-center text-gray-400">
+                <Loader2 className="w-6 h-6 animate-spin" />
+              </div>
+            ) : alertas.length === 0 ? (
+              <p className="text-sm text-gray-500 py-4 text-center">
+                No hay alertas registradas.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {alertas.map((alerta) => (
+                  <div
+                    key={alerta.id}
+                    className={`p-4 rounded-lg border ${
+                      alerta.atendida
+                        ? "bg-gray-50 border-gray-200 opacity-60"
+                        : "bg-gray-50 border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm text-gray-700 flex-1">{alerta.mensaje}</p>
+                      <span
+                        className={`shrink-0 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide ${getAlertBadgeColor(alerta.tipo)}`}
+                      >
+                        {alerta.tipo.replace("_", " ")}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      {alerta.created_at ? tiempoRelativo(alerta.created_at) : ""}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
+  )
+}

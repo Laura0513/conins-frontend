@@ -246,12 +246,12 @@ export function exportarCargaHorariaPDF(data: CargaHoraria[]) {
 type HorarioFicha = {
   ficha_numero: string
   programa: string
-  lunes: string
-  martes: string
-  miercoles: string
-  jueves: string
-  viernes: string
-  sabado: string
+  lunes: string | null
+  martes: string | null
+  miercoles: string | null
+  jueves: string | null
+  viernes: string | null
+  sabado: string | null
 }
 
 export function exportarHorarioFichaPDF(data: HorarioFicha[]) {
@@ -354,3 +354,4 @@ export function exportarOcupacionPDF(data: OcupacionAmbiente[]) {
   addFooter(doc)
   doc.save(`ocupacion-ambientes-${new Date().toISOString().split("T")[0]}.pdf`)
 }
+

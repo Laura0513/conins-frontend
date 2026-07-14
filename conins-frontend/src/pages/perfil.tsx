@@ -294,22 +294,22 @@ export default function PerfilPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Contraseña actual
                   </label>
-                  <div className="relative">
-                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+                  <div className="flex items-center border border-gray-300 rounded-lg px-4 py-2.5 gap-3 focus-within:ring-2 focus-within:ring-sena/50 focus-within:border-sena">
+                    <Key className="w-4 h-4 text-gray-400 shrink-0" />
                     <input
                       type={showActual ? "text" : "password"}
                       value={contrasenaActual}
                       onChange={(e) => setContrasenaActual(e.target.value)}
-                      className="w-full pl-10 pr-11 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
+                      className="flex-1 outline-none text-sm text-gray-700 bg-transparent"
                       placeholder="Tu contraseña actual"
                     />
                     <button
                       type="button"
                       tabIndex={-1}
                       onClick={() => setShowActual(!showActual)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="text-gray-400 hover:text-gray-600 shrink-0"
                     >
-                      {showActual ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showActual ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
@@ -318,22 +318,22 @@ export default function PerfilPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nueva contraseña
                   </label>
-                  <div className="relative">
-                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+                  <div className="flex items-center border border-gray-300 rounded-lg px-4 py-2.5 gap-3 focus-within:ring-2 focus-within:ring-sena/50 focus-within:border-sena">
+                    <Key className="w-4 h-4 text-gray-400 shrink-0" />
                     <input
                       type={showNueva ? "text" : "password"}
                       value={nuevaContrasena}
                       onChange={(e) => setNuevaContrasena(e.target.value)}
-                      className="w-full pl-10 pr-11 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
+                      className="flex-1 outline-none text-sm text-gray-700 bg-transparent"
                       placeholder="Minimo 6 caracteres"
                     />
                     <button
                       type="button"
                       tabIndex={-1}
                       onClick={() => setShowNueva(!showNueva)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                      className="text-gray-400 hover:text-gray-600 shrink-0"
                     >
-                      {showNueva ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showNueva ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                   </div>
                   {nuevaContrasena && nuevaContrasena.length < 6 && (
@@ -345,22 +345,22 @@ export default function PerfilPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Confirmar nueva contraseña
                   </label>
-                  <div className="relative">
-                    <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+                  <div className="flex items-center border border-gray-300 rounded-lg px-4 py-2.5 gap-3 focus-within:ring-2 focus-within:ring-sena/50 focus-within:border-sena">
+                    <Key className="w-4 h-4 text-gray-400 shrink-0" />
                     <input
                       type={showConfirmar ? "text" : "password"}
                       value={confirmarContrasena}
                       onChange={(e) => setConfirmarContrasena(e.target.value)}
-                      className="w-full pl-10 pr-11 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
+                      className="flex-1 outline-none text-sm text-gray-700 bg-transparent"
                       placeholder="Repite la nueva contraseña"
                     />
                     <button
                       type="button"
                       tabIndex={-1}
                       onClick={() => setShowConfirmar(!showConfirmar)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                      className="text-gray-400 hover:text-gray-600 shrink-0"
                     >
-                      {showConfirmar ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showConfirmar ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                     </button>
                   </div>
                   {confirmarContrasena && nuevaContrasena !== confirmarContrasena && (

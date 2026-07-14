@@ -47,13 +47,11 @@ export default function CrearBloqueHorarioModal({ isOpen, onClose, onSubmit }: C
         api.catalogo.getTiposActividad(),
         api.fichas.getAll(),
         api.ambientes.getAll(),
-        api.catalogo.getCompetenciasByPrograma(1), // Mock programa_id, ideally fetch all or filter
       ])
-        .then(([tiposRes, fichasRes, ambRes, compRes]) => {
+        .then(([tiposRes, fichasRes, ambRes]) => {
           setTiposActividad(tiposRes.data || [])
           setFichas(fichasRes.data || [])
           setAmbientes(ambRes.data || [])
-          setCompetencias(compRes.data || [])
           
           if (tiposRes.data && tiposRes.data.length > 0) {
             setFormData(prev => ({ ...prev, tipo_actividad_id: tiposRes.data[0].id.toString() }))
@@ -100,6 +98,16 @@ export default function CrearBloqueHorarioModal({ isOpen, onClose, onSubmit }: C
 
   const handleChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value })
+
+    // Cargar competencias al seleccionar ficha
+    if (field === "ficha_id" && value) {
+      const ficha = fichas.find(f => f.id.toString() === value)
+      if (ficha) {
+        api.catalogo.getCompetenciasByPrograma(ficha.id)
+          .then(res => setCompetencias(res.data || []))
+          .catch(() => setCompetencias([]))
+      }
+    }
   }
 
   return (

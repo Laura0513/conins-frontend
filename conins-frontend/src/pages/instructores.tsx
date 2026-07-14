@@ -23,7 +23,6 @@ type Instructor = {
   id: number
   nombre: string
   email: string
-  tipo_contrato: string
   tipo_area: string
   activo: boolean
   roles: string
@@ -53,7 +52,7 @@ export default function InstructoresPage() {
   }>({ isOpen: false, title: "", message: "", onConfirm: () => {} })
 
   const [search, setSearch] = useState("")
-  const [filtroContrato, setFiltroContrato] = useState("todos")
+
   const [filtroArea, setFiltroArea] = useState("todas")
   const [filtroEstado, setFiltroEstado] = useState("todos")
 
@@ -77,7 +76,7 @@ export default function InstructoresPage() {
     }
   }
 
-  const handleCreateInstructor = async (data: { nombre: string; email: string; tipo_contrato: string; tipo_area: string }) => {
+  const handleCreateInstructor = async (data: { nombre: string; email: string; tipo_area: string }) => {
     await api.instructors.create(data)
     showToast("Instructor registrado exitosamente", "success")
     setIsCreateModalOpen(false)
@@ -136,7 +135,6 @@ export default function InstructoresPage() {
   const listaFiltrada = instructores.filter((inst) => {
     const texto = search.toLowerCase()
     const coincideBusqueda = inst.nombre.toLowerCase().includes(texto) || inst.email.toLowerCase().includes(texto)
-    const coincideContrato = filtroContrato === "todos" || inst.tipo_contrato === filtroContrato
     const coincideArea = filtroArea === "todas" || inst.tipo_area === filtroArea
 
     let coincideEstado = true
@@ -148,7 +146,7 @@ export default function InstructoresPage() {
       coincideEstado = !inst.activo
     }
 
-    return coincideBusqueda && coincideContrato && coincideArea && coincideEstado
+    return coincideBusqueda && coincideArea && coincideEstado
   })
 
 
@@ -197,16 +195,6 @@ export default function InstructoresPage() {
 
           <div className="grid grid-cols-2 gap-3 w-full md:flex md:flex-wrap md:w-auto">
             <select
-              value={filtroContrato}
-              onChange={(e) => setFiltroContrato(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todos">Contrato: Todos</option>
-              <option value="de_planta">De Planta</option>
-              <option value="contratista">Contratista</option>
-            </select>
-
-            <select
               value={filtroArea}
               onChange={(e) => setFiltroArea(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
@@ -246,7 +234,6 @@ export default function InstructoresPage() {
                   <tr>
                     <th className="px-3 py-3 md:px-6 md:py-4">Nombre</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Correo</th>
-                    <th className="px-3 py-3 md:px-6 md:py-4">Contrato</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Area</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Horas/sem</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
@@ -258,13 +245,6 @@ export default function InstructoresPage() {
                     <tr key={inst.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{inst.nombre}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{inst.email}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          inst.tipo_contrato === 'de_planta' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {inst.tipo_contrato === 'de_planta' ? 'Planta' : 'Contratista'}
-                        </span>
-                      </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700 capitalize">{inst.tipo_area}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         {(() => {
@@ -414,4 +394,3 @@ export default function InstructoresPage() {
     </DashboardLayout>
   )
 }
-                                                                                                                                                                              
