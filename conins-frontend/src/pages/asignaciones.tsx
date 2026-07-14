@@ -57,6 +57,8 @@ export default function AsignacionesPage() {
   }>({ isOpen: false, title: "", message: "", onConfirm: () => {} })
 
   const [search, setSearch] = useState("")
+  const [paginaActual, setPaginaActual] = useState(1)
+  const porPagina = 10
   const [filtroPrograma, setFiltroPrograma] = useState("todos")
   const [filtroCoordinacion, setFiltroCoordinacion] = useState("todos")
 
@@ -97,6 +99,11 @@ export default function AsignacionesPage() {
     
     return coincideTab && coincideBusqueda && coincidePrograma && coincideCoordinacion
   })
+
+  const totalPaginas = Math.ceil(listaFiltrada.length / porPagina)
+  const listaPaginada = listaFiltrada.slice((paginaActual - 1) * porPagina, paginaActual * porPagina)
+
+  useEffect(() => { setPaginaActual(1) }, [search, filtroPrograma, filtroCoordinacion, activeTab])
 
   const handleCreate = async (data: any) => {
     try {
@@ -270,7 +277,7 @@ export default function AsignacionesPage() {
               <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
               <p>Cargando asignaciones...</p>
             </div>
-          ) : listaFiltrada.length === 0 ? (
+          ) : listaPaginada.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
               No se encontraron asignaciones con los filtros seleccionados.
             </div>
@@ -289,7 +296,7 @@ export default function AsignacionesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {listaFiltrada.map((asig) => (
+                  {listaPaginada.map((asig) => (
                     <tr key={asig.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{asig.instructor_nombre}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{asig.ficha_numero}</td>
@@ -347,14 +354,30 @@ export default function AsignacionesPage() {
 
           <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <span className="text-sm text-gray-500">
-              Mostrando {listaFiltrada.length} de {asignaciones.length}
+              Mostrando {(paginaActual - 1) * porPagina + 1}–{Math.min(paginaActual * porPagina, listaFiltrada.length)} de {listaFiltrada.length}
             </span>
             <div className="flex items-center gap-2">
-              <button className="p-1 rounded border border-gray-300 bg-white text-gray-400 cursor-not-allowed" disabled>
+              <button
+                onClick={() => setPaginaActual(p => Math.max(1, p - 1))}
+                disabled={paginaActual === 1}
+                className={`p-1 rounded border border-gray-300 bg-white ${paginaActual === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button className="px-3 py-1 rounded bg-sena text-white text-sm font-medium">1</button>
-              <button className="p-1 rounded border border-gray-300 bg-white text-gray-400 cursor-not-allowed" disabled>
+              {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPaginaActual(p)}
+                  className={`px-3 py-1 rounded text-sm font-medium ${p === paginaActual ? 'bg-sena text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  {p}
+                </button>
+              ))}
+              <button
+                onClick={() => setPaginaActual(p => Math.min(totalPaginas, p + 1))}
+                disabled={paginaActual === totalPaginas}
+                className={`p-1 rounded border border-gray-300 bg-white ${paginaActual === totalPaginas ? 'text-gray-400 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
