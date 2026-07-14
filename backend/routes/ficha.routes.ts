@@ -11,12 +11,26 @@ router.use(verifyToken);
 
 router.get('/', fichaController.getAll);
 router.get('/:id', fichaController.getById);
+router.get('/:id/novedades', fichaController.getNovedades);
+
+// Literal segment antes de /:id para evitar ambiguedad
+router.patch(
+  '/novedades/:id/toggle',
+  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
+  fichaController.toggleNovedad,
+);
 
 router.post(
   '/',
   requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
   validate(crearFichaSchema),
   fichaController.create,
+);
+
+router.post(
+  '/:id/novedades',
+  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
+  fichaController.crearNovedad,
 );
 
 router.patch(

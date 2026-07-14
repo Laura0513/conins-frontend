@@ -1276,6 +1276,21 @@ ORDER BY
 -- FIN DEL SCHEMA (v5 → 27 tablas a partir de 01/07/2026)
 -- Tablas nuevas: tipos_actividad (26), rap_ficha_seguimiento (27)
 -- ============================================================
+
+-- ============================================================
+-- 28. PASSWORD RESET TOKENS (recuperar contrasena)
+-- token: hex(32) = 64 chars, expira en 1 hora, un solo uso
+-- ============================================================
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id           INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id   INT NOT NULL,
+    token        VARCHAR(64) NOT NULL UNIQUE,
+    expira_en    DATETIME NOT NULL,
+    usado        BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- ============================================================
 -- 25. UTF-8 COLLATION
 -- Todas las tablas en utf8mb4_general_ci para caracteres especiales

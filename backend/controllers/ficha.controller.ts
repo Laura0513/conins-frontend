@@ -33,3 +33,20 @@ export const toggleEstado = asyncHandler(async (req: Request, res: Response) => 
   const message = result.activo ? 'Ficha activada' : 'Ficha desactivada';
   ApiResponse.success(res, result, message);
 });
+
+// RF-47: Novedades de ficha
+export const getNovedades = asyncHandler(async (req: Request, res: Response) => {
+  const novedades = await FichaService.getNovedades(Number(req.params.id));
+  ApiResponse.success(res, novedades);
+});
+
+export const crearNovedad = asyncHandler(async (req: Request, res: Response) => {
+  const novedad = await FichaService.crearNovedad(Number(req.params.id), req.body);
+  ApiResponse.created(res, novedad, 'Novedad registrada exitosamente');
+});
+
+export const toggleNovedad = asyncHandler(async (req: Request, res: Response) => {
+  const result = await FichaService.toggleNovedad(Number(req.params.id));
+  const message = result.activo ? 'Novedad activada' : 'Novedad desactivada';
+  ApiResponse.success(res, result, message);
+});

@@ -10,7 +10,7 @@ type TipoActividad = {
   requiere_competencia: boolean
 }
 
-type Ficha = { id: number; numero_ficha: string; programa: string }
+type Ficha = { id: number; numero_ficha: string; programa: string; programa_id: number }
 type Ambiente = { id: number; nombre: string; tipo: string }
 type Competencia = { id: number; nombre: string }
 
@@ -102,10 +102,12 @@ export default function CrearBloqueHorarioModal({ isOpen, onClose, onSubmit }: C
     // Cargar competencias al seleccionar ficha
     if (field === "ficha_id" && value) {
       const ficha = fichas.find(f => f.id.toString() === value)
-      if (ficha) {
-        api.catalogo.getCompetenciasByPrograma(ficha.id)
+      if (ficha && ficha.programa_id) {
+        api.catalogo.getCompetenciasByPrograma(ficha.programa_id)
           .then(res => setCompetencias(res.data || []))
           .catch(() => setCompetencias([]))
+      } else {
+        setCompetencias([])
       }
     }
   }

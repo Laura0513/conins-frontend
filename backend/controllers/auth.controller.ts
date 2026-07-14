@@ -16,8 +16,8 @@ export const crearPassword = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password, tipo_contrato, tipo_area } = req.body;
-  const result = await AuthService.register(email, password, tipo_contrato, tipo_area);
+  const { email, password, tipo_area } = req.body;
+  const result = await AuthService.register(email, password, tipo_area);
   ApiResponse.created(res, result, 'Cuenta activada exitosamente');
 });
 
@@ -45,7 +45,7 @@ export const getAllUsers = asyncHandler(async (_req: Request, res: Response) => 
 
 export const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { nombre, email, rol_ids, tipo_contrato, tipo_area, tipo_documento, documento } = req.body;
+  const { nombre, email, rol_ids, tipo_area, tipo_documento, documento } = req.body;
   await AuthService.updateUser(
     Number(id),
     req.user.id,
@@ -53,7 +53,6 @@ export const updateUser = asyncHandler(async (req: Request, res: Response) => {
     nombre,
     email,
     rol_ids,
-    tipo_contrato,
     tipo_area,
     tipo_documento,
     documento,
@@ -73,4 +72,17 @@ export const assignProgramasToLider = asyncHandler(async (req: Request, res: Res
   const { programa_ids } = req.body;
   await AuthService.assignProgramasToLider(Number(id), programa_ids);
   ApiResponse.success(res, null, 'Programas asignados al lider exitosamente');
+});
+
+export const recuperarContrasena = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  // Devuelve OK siempre para no revelar existencia del email
+  await AuthService.solicitarRecuperacion(email);
+  ApiResponse.success(res, null, 'Si el correo existe, recibiras un enlace de recuperacion');
+});
+
+export const resetearContrasena = asyncHandler(async (req: Request, res: Response) => {
+  const { token, nueva_contrasena } = req.body;
+  await AuthService.resetearContrasena(token, nueva_contrasena);
+  ApiResponse.success(res, null, 'Contrasena actualizada exitosamente');
 });

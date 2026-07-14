@@ -17,7 +17,6 @@ export const crearPasswordSchema = z.object({
 export const registerSchema = z.object({
   email: z.string().email('Email invalido').max(100),
   password: z.string().min(6, 'Minimo 6 caracteres'),
-  tipo_contrato: z.enum(['contratista', 'de_planta']).optional(),
   tipo_area: z.enum(['tecnica', 'transversal']).optional(),
 });
 
@@ -30,7 +29,6 @@ export const updateUserSchema = z.object({
   nombre: z.string().min(2).max(100).optional(),
   email: z.string().email('Email invalido').max(100).optional(),
   rol_ids: z.array(z.number().int().positive()).optional(),
-  tipo_contrato: z.enum(['contratista', 'de_planta']).optional(),
   tipo_area: z.enum(['tecnica', 'transversal']).optional(),
   tipo_documento: z.enum(['cc', 'ce', 'ti', 'pasaporte']).optional(),
   documento: z.string().max(20).optional(),
@@ -38,4 +36,13 @@ export const updateUserSchema = z.object({
 
 export const toggleEstadoSchema = z.object({
   activo: z.boolean(),
+});
+
+export const recuperarContrasenaSchema = z.object({
+  email: z.string().email('Email invalido').max(100),
+});
+
+export const resetearContrasenaSchema = z.object({
+  token: z.string().length(64, 'Token invalido'),
+  nueva_contrasena: z.string().min(6, 'Minimo 6 caracteres'),
 });

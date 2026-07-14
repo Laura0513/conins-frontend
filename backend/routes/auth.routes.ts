@@ -7,6 +7,8 @@ import {
   registerSchema,
   changePasswordSchema,
   updateUserSchema,
+  recuperarContrasenaSchema,
+  resetearContrasenaSchema,
 } from '../schemas/auth.schema.js';
 import * as authController from '../controllers/auth.controller.js';
 import { ROLES } from '../constants/roles.js';
@@ -17,6 +19,9 @@ const router = Router();
 router.post('/login', validate(loginSchema), authController.login);
 router.post('/crear-password', validate(crearPasswordSchema), authController.crearPassword);
 router.post('/register', validate(registerSchema), authController.register);
+
+router.post('/recuperar-contrasena', validate(recuperarContrasenaSchema), authController.recuperarContrasena);
+router.post('/resetear-contrasena', validate(resetearContrasenaSchema), authController.resetearContrasena);
 
 // Authenticated endpoints
 router.get('/perfil', verifyToken, authController.getOwnProfile);

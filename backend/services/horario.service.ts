@@ -100,6 +100,8 @@ export const HorarioService = {
       ...horario,
       alerta_ambiente_ocupado: ambienteOcupado,
       alerta_jornada_restringida: alertaJornadaRestringida,
+      total_horas: totalHoras,
+      instructor_id: data.instructor_id,
     };
   },
 

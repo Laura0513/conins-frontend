@@ -4,7 +4,6 @@ import { RowDataPacket } from 'mysql2';
 export interface InstructorRecord extends RowDataPacket {
   id: number;
   usuario_id: number;
-  tipo_contrato: string;
   tipo_area: string;
   activo: boolean;
 }
@@ -14,7 +13,6 @@ export interface InstructorDetail extends RowDataPacket {
   usuario_id: number;
   nombre: string;
   email: string;
-  tipo_contrato: string;
   tipo_area: string;
   activo: boolean;
   roles: string | null;
@@ -24,7 +22,7 @@ export interface InstructorDetail extends RowDataPacket {
 export const InstructorModel = {
   async findAll(): Promise<InstructorDetail[]> {
     const [rows] = await pool.query<InstructorDetail[]>(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_contrato, i.tipo_area, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles,
              GROUP_CONCAT(r.id ORDER BY r.nivel ASC SEPARATOR ',') AS rol_ids
       FROM instructores i
@@ -40,7 +38,7 @@ export const InstructorModel = {
 
   async findById(id: number): Promise<InstructorDetail | null> {
     const [rows] = await pool.query<InstructorDetail[]>(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_contrato, i.tipo_area, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles,
              GROUP_CONCAT(r.id ORDER BY r.nivel ASC SEPARATOR ',') AS rol_ids
       FROM instructores i
@@ -53,29 +51,25 @@ export const InstructorModel = {
     return rows[0] ?? null;
   },
 
-  async findByUsuarioId(usuarioId: number): Promise<{ id: number; tipo_contrato: string; tipo_area: string } | null> {
+  async findByUsuarioId(usuarioId: number): Promise<{ id: number; tipo_area: string } | null> {
     const [rows] = await pool.query(
-      'SELECT id, tipo_contrato, tipo_area FROM instructores WHERE usuario_id = ? AND activo = TRUE',
+      'SELECT id, tipo_area FROM instructores WHERE usuario_id = ? AND activo = TRUE',
       [usuarioId],
     );
     return (rows as any[])[0] ?? null;
   },
 
-  async create(usuarioId: number, tipo_contrato: string, tipo_area: string): Promise<void> {
+  async create(usuarioId: number, tipo_area: string): Promise<void> {
     await pool.query(
-      'INSERT INTO instructores (usuario_id, tipo_contrato, tipo_area) VALUES (?, ?, ?)',
-      [usuarioId, tipo_contrato, tipo_area],
+      'INSERT INTO instructores (usuario_id, tipo_area) VALUES (?, ?)',
+      [usuarioId, tipo_area],
     );
   },
 
-  async update(id: number, tipo_contrato?: string, tipo_area?: string): Promise<void> {
+  async update(id: number, tipo_area?: string): Promise<void> {
     const updates: string[] = [];
     const values: any[] = [];
 
-    if (tipo_contrato) {
-      updates.push('tipo_contrato = ?');
-      values.push(tipo_contrato);
-    }
     if (tipo_area) {
       updates.push('tipo_area = ?');
       values.push(tipo_area);
@@ -194,7 +188,7 @@ export const InstructorModel = {
 
   async getDetalle(instructorId: number) {
     const [instructorRows] = await pool.query(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_contrato, i.tipo_area, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles
       FROM instructores i
       JOIN usuarios u ON i.usuario_id = u.id

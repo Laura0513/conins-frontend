@@ -26,8 +26,27 @@ export interface FichaDetail extends RowDataPacket {
   etapa: string;
   modalidad: string;
   instructores_count: number;
+  ambiente: string | null;
+  lider_nombre: string | null;
+  fecha_inicio_lectiva: string | null;
+  fecha_fin_lectiva: string | null;
+  fecha_inicio_productiva: string | null;
+  fecha_fin_productiva: string | null;
+  fecha_fin_ficha: string | null;
   estado: string;
   activo: boolean;
+}
+
+export interface FichaNovedad extends RowDataPacket {
+  id: number;
+  ficha_id: number;
+  tipo_novedad_id: number;
+  tipo_novedad: string;
+  fecha_inicio: string;
+  fecha_regreso: string;
+  observacion: string | null;
+  activo: boolean;
+  created_at: string;
 }
 
 export const FichaModel = {
@@ -36,10 +55,16 @@ export const FichaModel = {
       SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
              f.etapa, p.modalidad,
              COUNT(DISTINCT a.id) AS instructores_count,
+             ab.nombre AS ambiente,
+             lu.nombre AS lider_nombre,
+             f.fecha_inicio_lectiva, f.fecha_fin_lectiva,
+             f.fecha_inicio_productiva, f.fecha_fin_productiva, f.fecha_fin_ficha,
              f.estado, f.activo
       FROM fichas f
       JOIN programas p ON f.programa_id = p.id
       JOIN jornadas j ON f.jornada_id = j.id
+      LEFT JOIN ambientes ab ON f.ambiente_id = ab.id
+      LEFT JOIN usuarios lu ON f.lider_id = lu.id
       LEFT JOIN asignacion a ON a.ficha_id = f.id AND a.activo = TRUE
       GROUP BY f.id
       ORDER BY f.numero_ficha
@@ -52,10 +77,16 @@ export const FichaModel = {
       SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
              f.etapa, p.modalidad,
              COUNT(DISTINCT a_all.id) AS instructores_count,
+             ab.nombre AS ambiente,
+             lu.nombre AS lider_nombre,
+             f.fecha_inicio_lectiva, f.fecha_fin_lectiva,
+             f.fecha_inicio_productiva, f.fecha_fin_productiva, f.fecha_fin_ficha,
              f.estado, f.activo
       FROM fichas f
       JOIN programas p ON f.programa_id = p.id
       JOIN jornadas j ON f.jornada_id = j.id
+      LEFT JOIN ambientes ab ON f.ambiente_id = ab.id
+      LEFT JOIN usuarios lu ON f.lider_id = lu.id
       JOIN asignacion a ON a.ficha_id = f.id AND a.activo = TRUE AND a.instructor_id = ?
       LEFT JOIN asignacion a_all ON a_all.ficha_id = f.id AND a_all.activo = TRUE
       GROUP BY f.id
@@ -69,10 +100,16 @@ export const FichaModel = {
       SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
              f.etapa, p.modalidad,
              COUNT(DISTINCT a.id) AS instructores_count,
+             ab.nombre AS ambiente,
+             lu.nombre AS lider_nombre,
+             f.fecha_inicio_lectiva, f.fecha_fin_lectiva,
+             f.fecha_inicio_productiva, f.fecha_fin_productiva, f.fecha_fin_ficha,
              f.estado, f.activo
       FROM fichas f
       JOIN programas p ON f.programa_id = p.id
       JOIN jornadas j ON f.jornada_id = j.id
+      LEFT JOIN ambientes ab ON f.ambiente_id = ab.id
+      LEFT JOIN usuarios lu ON f.lider_id = lu.id
       LEFT JOIN asignacion a ON a.ficha_id = f.id AND a.activo = TRUE
       WHERE f.id = ?
       GROUP BY f.id
@@ -168,6 +205,43 @@ export const FichaModel = {
     const current = (rows as any[])[0]?.activo ?? true;
     const nuevo = !current;
     await pool.query('UPDATE fichas SET activo = ? WHERE id = ?', [nuevo, id]);
+    return nuevo;
+  },
+
+  // RF-47: Novedades de ficha
+  async findNovedadesByFichaId(fichaId: number): Promise<FichaNovedad[]> {
+    const [rows] = await pool.query<FichaNovedad[]>(
+      `SELECT fn.id, fn.ficha_id, fn.tipo_novedad_id, tn.nombre AS tipo_novedad,
+              fn.fecha_inicio, fn.fecha_regreso, fn.observacion, fn.activo, fn.created_at
+       FROM ficha_novedades fn
+       JOIN tipos_novedad_ficha tn ON fn.tipo_novedad_id = tn.id
+       WHERE fn.ficha_id = ?
+       ORDER BY fn.created_at DESC`,
+      [fichaId],
+    );
+    return rows;
+  },
+
+  async createNovedad(data: {
+    ficha_id: number;
+    tipo_novedad_id: number;
+    fecha_inicio: string;
+    fecha_regreso: string;
+    observacion?: string | null;
+  }): Promise<number> {
+    const [result] = await pool.query(
+      `INSERT INTO ficha_novedades (ficha_id, tipo_novedad_id, fecha_inicio, fecha_regreso, observacion)
+       VALUES (?, ?, ?, ?, ?)`,
+      [data.ficha_id, data.tipo_novedad_id, data.fecha_inicio, data.fecha_regreso, data.observacion ?? null],
+    );
+    return (result as any).insertId;
+  },
+
+  async toggleNovedad(id: number): Promise<boolean> {
+    const [rows] = await pool.query('SELECT activo FROM ficha_novedades WHERE id = ?', [id]);
+    const current = (rows as any[])[0]?.activo ?? true;
+    const nuevo = !current;
+    await pool.query('UPDATE ficha_novedades SET activo = ? WHERE id = ?', [nuevo, id]);
     return nuevo;
   },
 };

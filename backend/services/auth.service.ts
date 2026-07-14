@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import pool from '../config/db.js';
@@ -150,7 +151,7 @@ export const AuthService = {
     await UsuarioModel.updatePassword(user.id, hashed);
   },
 
-  async register(email: string, password: string, tipo_contrato?: string, tipo_area?: string) {
+  async register(email: string, password: string, tipo_area?: string) {
     const existingUser = await UsuarioModel.findByEmail(email);
     if (!existingUser || !existingUser.activo) {
       throw new ForbiddenError(
@@ -171,7 +172,6 @@ export const AuthService = {
       if (!instructorExists) {
         await InstructorModel.create(
           existingUser.id,
-          tipo_contrato ?? 'contratista',
           tipo_area ?? 'tecnica',
         );
       }
@@ -249,7 +249,6 @@ export const AuthService = {
     nombre?: string,
     email?: string,
     rol_ids?: number[],
-    tipo_contrato?: string,
     tipo_area?: string,
     tipo_documento?: string,
     documento?: string,
@@ -282,7 +281,6 @@ export const AuthService = {
         if (!instructorExists) {
           await InstructorModel.create(
             targetUserId,
-            tipo_contrato ?? 'contratista',
             tipo_area ?? 'tecnica',
           );
         }
@@ -326,5 +324,74 @@ export const AuthService = {
         [instructor.id, programaId],
       );
     }
+  },
+
+  async solicitarRecuperacion(email: string) {
+    const user = await UsuarioModel.findByEmail(email);
+    // Siempre responde OK para no revelar si el email existe
+    if (!user || !user.activo) return;
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expira = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+    const expiraStr = expira.toISOString().slice(0, 19).replace('T', ' ');
+
+    // Invalidar tokens anteriores del usuario
+    await pool.query(
+      'UPDATE password_reset_tokens SET usado = TRUE WHERE usuario_id = ? AND usado = FALSE',
+      [user.id],
+    );
+
+    await pool.query(
+      'INSERT INTO password_reset_tokens (usuario_id, token, expira_en) VALUES (?, ?, ?)',
+      [user.id, token, expiraStr],
+    );
+
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:3000';
+    const link = `${frontendUrl}/reset-password?token=${token}`;
+
+    // Envio de correo condicional (solo si SMTP configurado)
+    try {
+      const transporter = (await import('../config/mail.js')).default;
+      if (transporter) {
+        await transporter.sendMail({
+          from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
+          to: email,
+          subject: 'CONINS — Recuperacion de contrasena',
+          html: `
+            <p>Hola ${user.nombre},</p>
+            <p>Recibimos una solicitud para restablecer tu contrasena en CONINS.</p>
+            <p><a href="${link}">Haz clic aqui para restablecer tu contrasena</a></p>
+            <p>Este enlace expira en 1 hora.</p>
+            <p>Si no solicitaste esto, ignora este correo.</p>
+          `,
+        });
+      }
+    } catch (_err) {
+      // Si SMTP falla no rompemos el flujo — el admin puede compartir el token manualmente
+    }
+
+    return { token }; // Solo en dev/log; en produccion no devolver el token
+  },
+
+  async resetearContrasena(token: string, nuevaContrasena: string) {
+    const [rows] = await pool.query(
+      `SELECT prt.id, prt.usuario_id, prt.expira_en, prt.usado
+       FROM password_reset_tokens prt
+       WHERE prt.token = ? LIMIT 1`,
+      [token],
+    );
+    const record = (rows as any[])[0];
+
+    if (!record) throw new NotFoundError('Token invalido');
+    if (record.usado) throw new ConflictError('El token ya fue utilizado');
+    if (new Date(record.expira_en) < new Date()) throw new ValidationError('El token ha expirado');
+
+    const hashed = await bcrypt.hash(nuevaContrasena, BCRYPT_ROUNDS);
+    await UsuarioModel.updatePassword(record.usuario_id, hashed);
+
+    await pool.query(
+      'UPDATE password_reset_tokens SET usado = TRUE WHERE id = ?',
+      [record.id],
+    );
   },
 };

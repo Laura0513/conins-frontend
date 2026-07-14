@@ -26,8 +26,8 @@ export const getOwnProfile = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const update = asyncHandler(async (req: Request, res: Response) => {
-  const { tipo_contrato, tipo_area } = req.body;
-  const updated = await InstructorService.update(Number(req.params.id), tipo_contrato, tipo_area);
+  const { tipo_area } = req.body;
+  const updated = await InstructorService.update(Number(req.params.id), tipo_area);
   ApiResponse.success(res, updated, 'Instructor actualizado exitosamente');
 });
 
@@ -57,8 +57,8 @@ export const toggleEstado = asyncHandler(async (req: Request, res: Response) => 
 });
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
-  const { nombre, email, tipo_contrato, tipo_area } = req.body;
-  const result = await InstructorService.create(nombre, email, tipo_contrato, tipo_area);
+  const { nombre, email, tipo_area } = req.body;
+  const result = await InstructorService.create(nombre, email, tipo_area);
   ApiResponse.created(res, result, 'Instructor creado exitosamente');
 });
 

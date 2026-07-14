@@ -36,7 +36,7 @@ export const InstructorService = {
     return detalle;
   },
 
-  async update(id: number, tipo_contrato?: string, tipo_area?: string) {
+  async update(id: number, tipo_area?: string) {
     const instructor = await InstructorModel.findById(id);
     if (!instructor) throw new NotFoundError('Instructor no encontrado');
 
@@ -47,7 +47,7 @@ export const InstructorService = {
       }
     }
 
-    await InstructorModel.update(id, tipo_contrato, tipo_area);
+    await InstructorModel.update(id, tipo_area);
     return InstructorModel.findById(id);
   },
 
@@ -94,7 +94,7 @@ export const InstructorService = {
     return InstructorModel.getCompetenciasHabilitadas(instructorId);
   },
 
-  async create(nombre: string, email: string, tipoContrato: string, tipoArea: string) {
+  async create(nombre: string, email: string, tipoArea: string) {
     const exists = await UsuarioModel.emailExists(email);
     if (exists) throw new ConflictError('Ya existe un usuario con ese email');
 
@@ -114,8 +114,8 @@ export const InstructorService = {
       );
 
       const [instResult] = await conn.query(
-        'INSERT INTO instructores (usuario_id, tipo_contrato, tipo_area) VALUES (?, ?, ?)',
-        [usuarioId, tipoContrato, tipoArea],
+        'INSERT INTO instructores (usuario_id, tipo_area) VALUES (?, ?)',
+        [usuarioId, tipoArea],
       );
 
       await conn.commit();

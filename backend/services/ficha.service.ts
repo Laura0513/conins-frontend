@@ -81,4 +81,30 @@ export const FichaService = {
     const nuevoEstado = await FichaModel.toggleActivo(id);
     return { activo: nuevoEstado };
   },
+
+  // RF-47: Novedades de ficha
+  async getNovedades(fichaId: number) {
+    const ficha = await FichaModel.findById(fichaId);
+    if (!ficha) throw new NotFoundError('Ficha no encontrada');
+    return FichaModel.findNovedadesByFichaId(fichaId);
+  },
+
+  async crearNovedad(fichaId: number, data: {
+    tipo_novedad_id: number;
+    fecha_inicio: string;
+    fecha_regreso: string;
+    observacion?: string | null;
+  }) {
+    const ficha = await FichaModel.findById(fichaId);
+    if (!ficha) throw new NotFoundError('Ficha no encontrada');
+
+    const id = await FichaModel.createNovedad({ ficha_id: fichaId, ...data });
+    const novedades = await FichaModel.findNovedadesByFichaId(fichaId);
+    return novedades.find(n => n.id === id) ?? null;
+  },
+
+  async toggleNovedad(novedadId: number) {
+    const activo = await FichaModel.toggleNovedad(novedadId);
+    return { activo };
+  },
 };

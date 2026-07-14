@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { HorarioService } from '../services/horario.service.js';
+import { NotificacionService } from '../services/notificacion.service.js';
+import { InstructorModel } from '../models/instructor.model.js';
 
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
   const horarios = await HorarioService.getAll(req.user?.id, req.user?.roles_globales);
@@ -16,9 +18,19 @@ export const getById = asyncHandler(async (req: Request, res: Response) => {
 export const create = asyncHandler(async (req: Request, res: Response) => {
   const result = await HorarioService.create(req.body);
 
+  // RN-07: alerta carga horaria si fuera de rango 20-40h (fire-and-forget)
+  if (result.total_horas !== undefined && (result.total_horas < 20 || result.total_horas > 40)) {
+    InstructorModel.findById(result.instructor_id).then((instructor) => {
+      if (instructor) {
+        NotificacionService.onAlertaCargaHoraria(instructor, result.total_horas!).catch(() => {});
+      }
+    }).catch(() => {});
+  }
+
   const alertas: string[] = [];
   if (result.alerta_ambiente_ocupado) alertas.push('AMBIENTE_OCUPADO');
   if (result.alerta_jornada_restringida) alertas.push('JORNADA_RESTRINGIDA');
+  if (result.total_horas !== undefined && result.total_horas < 20) alertas.push('HORAS_INSUFICIENTES');
 
   if (alertas.length > 0) {
     return res.status(201).json({
