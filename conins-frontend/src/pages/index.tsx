@@ -221,7 +221,7 @@ export default function Home() {
                 <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
                   <BookOpen className="w-5 h-5 text-sena" />
                 </div>
-                <p className="text-sm text-gray-500">Fichas asignadas</p>
+                <p className="text-sm text-gray-500">Grupos asignados</p>
               </div>
               <p className="text-3xl font-bold text-sena">
                 {dataLoading ? "..." : misFichasCount}
@@ -260,7 +260,7 @@ export default function Home() {
                   >
                     <div>
                       <p className="font-medium text-gray-900">
-                        Ficha {h.ficha_numero} — {h.competencia}
+                        Grupo {h.ficha_numero} — {h.competencia}
                       </p>
                       <p className="text-sm text-gray-500">
                         {h.ambiente} · {Array.isArray(h.dias) ? h.dias.join(", ") : h.dias}
@@ -309,7 +309,7 @@ export default function Home() {
               <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-sena" />
               </div>
-              <p className="text-sm text-gray-500">Fichas activas</p>
+              <p className="text-sm text-gray-500">Grupos activos</p>
             </div>
             <p className="text-3xl font-bold text-gray-900">
               {dataLoading ? "..." : fichasCount}

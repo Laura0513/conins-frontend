@@ -126,14 +126,14 @@ export default function RegistrarProvisionalModal({ isOpen, onClose, onSubmit }:
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ficha <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Grupo <span className="text-red-500">*</span></label>
                 <select
                   required
                   value={formData.ficha_id}
                   onChange={(e) => handleChange("ficha_id", e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
                 >
-                  <option value="">Seleccionar ficha</option>
+                  <option value="">Seleccionar grupo</option>
                   {fichas.map((f) => (
                     <option key={f.id} value={f.id}>{f.numero_ficha} — {f.programa}</option>
                   ))}

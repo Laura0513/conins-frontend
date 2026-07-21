@@ -82,7 +82,7 @@ export default function VerAgendaAmbienteModal({ isOpen, onClose, ambiente }: Ve
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">{h.instructor_nombre}</p>
-                        <p className="text-xs text-gray-500">Ficha {h.ficha_numero}</p>
+                        <p className="text-xs text-gray-500">Grupo {h.ficha_numero}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 text-sm font-medium text-gray-700">

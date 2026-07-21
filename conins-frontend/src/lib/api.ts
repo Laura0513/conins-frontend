@@ -268,6 +268,61 @@ export const api = {
         getAll() {
             return apiFetch('/programas')
         },
+        getById(id: number) {
+            return apiFetch(`/programas/${id}`)
+        },
+        setReferente(id: number, instructorId: number | null) {
+            return apiFetch(`/programas/${id}/referente`, {
+                method: 'PATCH',
+                body: JSON.stringify({ referente_id: instructorId }),
+            })
+        },
+    },
+
+    competencias: {
+        getAll() {
+            return apiFetch('/competencias')
+        },
+        getById(id: number) {
+            return apiFetch(`/competencias/${id}`)
+        },
+        create(data: any) {
+            return apiFetch('/competencias', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        update(id: number, data: any) {
+            return apiFetch(`/competencias/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            })
+        },
+        toggleEstado(id: number) {
+            return apiFetch(`/competencias/${id}/estado`, {
+                method: 'PATCH',
+            })
+        },
+        getRaps(competenciaId: number) {
+            return apiFetch(`/competencias/${competenciaId}/raps`)
+        },
+        createRap(competenciaId: number, data: any) {
+            return apiFetch(`/competencias/${competenciaId}/raps`, {
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+        },
+        updateRap(competenciaId: number, rapId: number, data: any) {
+            return apiFetch(`/competencias/${competenciaId}/raps/${rapId}`, {
+                method: 'PATCH',
+                body: JSON.stringify(data),
+            })
+        },
+        toggleRapEstado(competenciaId: number, rapId: number) {
+            return apiFetch(`/competencias/${competenciaId}/raps/${rapId}/estado`, {
+                method: 'PATCH',
+            })
+        },
     },
 
     catalogo: {

@@ -99,7 +99,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">Registrar ficha</h2>
+          <h2 className="text-lg font-bold text-gray-900">Registrar grupo</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
@@ -107,7 +107,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
 
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5 max-h-[70vh] overflow-y-auto">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Número de ficha</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Número de grupo</label>
             <input
               type="text"
               required
@@ -245,7 +245,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin ficha</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin grupo</label>
             <input
               type="date"
               value={formData.fecha_fin_ficha}

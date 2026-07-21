@@ -194,7 +194,7 @@ export default function ConsultasPage() {
         <div className="flex gap-2 border-b border-gray-200 print:hidden">
           {[
             { id: "carga", label: "Carga Horaria", icon: Users },
-            { id: "ficha", label: "Horario por Ficha", icon: Calendar },
+            { id: "ficha", label: "Horario por Grupo", icon: Calendar },
             { id: "ocupacion", label: "Ocupacion Ambientes", icon: Building2 },
           ].map((tab) => (
             <button
@@ -259,7 +259,7 @@ export default function ConsultasPage() {
                             <th className="px-3 py-3 md:px-6 md:py-4">Instructor</th>
                             <th className="px-3 py-3 md:px-6 md:py-4 text-center">Horas</th>
                             <th className="px-3 py-3 md:px-6 md:py-4 text-center">Progreso</th>
-                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Fichas</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4 text-center">Grupos</th>
                             <th className="px-3 py-3 md:px-6 md:py-4 text-center">Competencias</th>
                             <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
                           </tr>
@@ -346,7 +346,7 @@ export default function ConsultasPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="Buscar por ficha o programa..."
+                      placeholder="Buscar por grupo o programa..."
                       value={filtroFicha}
                       onChange={(e) => setFiltroFicha(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
@@ -357,14 +357,14 @@ export default function ConsultasPage() {
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   {fichasFiltradas.length === 0 ? (
                     <div className="p-12 text-center text-gray-500">
-                      No se encontraron fichas con horarios activos.
+                      No se encontraron grupos con horarios activos.
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm text-left">
                         <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                           <tr>
-                            <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                            <th className="px-3 py-3 md:px-6 md:py-4">Grupo</th>
                             <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
                             <th className="px-3 py-3 md:px-6 md:py-4 text-center">Lun</th>
                             <th className="px-3 py-3 md:px-6 md:py-4 text-center">Mar</th>
@@ -402,7 +402,7 @@ export default function ConsultasPage() {
                     </div>
                   )}
                   <div className="px-3 py-3 md:px-6 md:py-4 border-t border-gray-200 bg-gray-50 text-sm text-gray-500">
-                    Mostrando {fichasFiltradas.length} de {horariosFicha.length} fichas
+                    Mostrando {fichasFiltradas.length} de {horariosFicha.length} grupos
                   </div>
                 </div>
               </div>

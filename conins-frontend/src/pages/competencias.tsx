@@ -71,7 +71,7 @@ export default function CompetenciasPage() {
                   <tr>
                     <th className="px-3 py-3 md:px-6 md:py-4">Competencia</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
-                    <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Grupo</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
                   </tr>

@@ -14,6 +14,7 @@ type Ficha = {
   activo: boolean
   ambiente?: string
   lider_nombre?: string
+  referente_nombre?: string
   fecha_inicio_lectiva?: string | null
   fecha_fin_lectiva?: string | null
   fecha_inicio_productiva?: string | null
@@ -74,7 +75,7 @@ export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFicha
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
-          <h2 className="text-lg font-bold text-gray-900">Detalle de ficha</h2>
+          <h2 className="text-lg font-bold text-gray-900">Detalle de grupo</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
@@ -87,7 +88,7 @@ export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFicha
               <BookOpen className="w-8 h-8 text-sena" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Ficha {data.numero_ficha}</h3>
+              <h3 className="text-xl font-bold text-gray-900">Grupo {data.numero_ficha}</h3>
               <p className="text-sm text-gray-500">{data.programa}</p>
             </div>
           </div>
@@ -140,6 +141,15 @@ export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFicha
                 </div>
               </div>
             )}
+            {data.referente_nombre && (
+              <div className="flex items-start gap-3">
+                <Users className="w-5 h-5 text-gray-400 mt-0.5" />
+                <div>
+                  <p className="text-xs text-gray-500">Referente del grupo</p>
+                  <p className="text-sm text-gray-900">{data.referente_nombre}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Fechas */}
@@ -167,7 +177,7 @@ export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFicha
               </div>
             </div>
             <div className="pt-2 border-t border-gray-200">
-              <p className="text-xs text-gray-500">Fecha fin ficha</p>
+              <p className="text-xs text-gray-500">Fecha fin grupo</p>
               <p className="text-sm font-medium text-gray-900">{formatDate(data.fecha_fin_ficha)}</p>
             </div>
           </div>

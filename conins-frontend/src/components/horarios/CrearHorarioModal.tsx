@@ -90,7 +90,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
       const finalAmbienteId = formData.ambiente_id ? Number(formData.ambiente_id) : selected.ambiente_id
 
       if (!finalAmbienteId) {
-        showToast("Esta ficha no tiene un ambiente asignado. Por favor selecciona uno manualmente.", "error")
+        showToast("Este grupo no tiene un ambiente asignado. Por favor selecciona uno manualmente.", "error")
         setSubmitting(false)
         return
       }
@@ -172,7 +172,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
                   <option value="">Seleccionar asignación</option>
                   {asignaciones.map((a) => (
                     <option key={a.id} value={a.id}>
-                      {a.instructor_nombre} — Ficha {a.ficha_numero} — {a.competencia}
+                      {a.instructor_nombre} — Grupo {a.ficha_numero} — {a.competencia}
                     </option>
                   ))}
                 </select>
@@ -187,7 +187,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-700">
                     <Hash className="w-4 h-4 text-gray-400" />
-                    <span>Ficha {selectedAsignacion.ficha_numero}</span>
+                    <span>Grupo {selectedAsignacion.ficha_numero}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-700">
                     <BookOpen className="w-4 h-4 text-gray-400" />
@@ -266,7 +266,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
                   onChange={(e) => handleChange("ambiente_id", e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
                 >
-                  <option value="">Sin asignar (usa el de la ficha)</option>
+                  <option value="">Sin asignar (usa el del grupo)</option>
                   {ambientes.map((a) => (
                     <option key={a.id} value={a.id}>{a.nombre}</option>
                   ))}

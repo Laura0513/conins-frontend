@@ -132,8 +132,8 @@ export default function NovedadFichaModal({ isOpen, onClose, ficha, puedeEditar 
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Novedades de ficha</h2>
-            <p className="text-sm text-gray-500">Ficha {ficha.numero_ficha}</p>
+            <h2 className="text-lg font-bold text-gray-900">Novedades de grupo</h2>
+            <p className="text-sm text-gray-500">Grupo {ficha.numero_ficha}</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
@@ -145,7 +145,7 @@ export default function NovedadFichaModal({ isOpen, onClose, ficha, puedeEditar 
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex gap-3 items-start">
             <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
             <p className="text-sm text-yellow-800 leading-relaxed">
-              La ficha queda excluida de nuevas asignaciones de horarios mientras una novedad este vigente.
+              El grupo queda excluido de nuevas asignaciones de horarios mientras una novedad esté vigente.
             </p>
           </div>
 
@@ -243,7 +243,7 @@ export default function NovedadFichaModal({ isOpen, onClose, ficha, puedeEditar 
           ) : novedades.length === 0 ? (
             <div className="py-12 text-center text-gray-400">
               <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">No hay novedades registradas para esta ficha.</p>
+              <p className="text-sm">No hay novedades registradas para este grupo.</p>
             </div>
           ) : (
             <div className="space-y-3">

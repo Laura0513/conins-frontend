@@ -146,7 +146,7 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor }: D
                       <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                           <p className="text-sm font-medium text-gray-900">
-                            Ficha {asig.ficha_numero}
+                            Grupo {asig.ficha_numero}
                             {asig.es_lider && (
                               <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sena/10 text-sena">
                                 Lider

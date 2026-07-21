@@ -15,6 +15,7 @@ type Ficha = {
   estado: string
   activo: boolean
   lider_id?: number | null
+  referente_id?: number | null
   ambiente_id?: number | null
   fecha_inicio_lectiva?: string | null
   fecha_fin_lectiva?: string | null
@@ -41,6 +42,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
   const [submitting, setSubmitting] = useState(false)
   const [programas, setProgramas] = useState<{ id: number; nombre: string }[]>([])
   const [lideres, setLideres] = useState<{ id: number; nombre: string }[]>([])
+  const [instructores, setInstructores] = useState<{ id: number; nombre: string }[]>([])
   const [ambientes, setAmbientes] = useState<{ id: number; nombre: string }[]>([])
   const [formData, setFormData] = useState({
     numero_ficha: "",
@@ -48,6 +50,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
     jornada_id: "",
     etapa: "lectiva",
     lider_id: "",
+    referente_id: "",
     ambiente_id: "",
     fecha_inicio_lectiva: "",
     fecha_fin_lectiva: "",
@@ -67,8 +70,9 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
       Promise.allSettled([
         api.programs.getAll(),
         api.users.getAll(),
+        api.instructors.getAll(),
         api.ambientes.getAll(),
-      ]).then(([programsRes, usersRes, ambientesRes]) => {
+      ]).then(([programsRes, usersRes, instructoresRes, ambientesRes]) => {
         if (programsRes.status === "fulfilled") setProgramas(programsRes.value.data || [])
         if (usersRes.status === "fulfilled") {
           const lideresList = (usersRes.value.data || []).filter(
@@ -76,6 +80,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
           )
           setLideres(lideresList)
         }
+        if (instructoresRes.status === "fulfilled") setInstructores(instructoresRes.value.data || [])
         if (ambientesRes.status === "fulfilled") setAmbientes(ambientesRes.value.data || [])
       })
 
@@ -86,6 +91,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
         jornada_id: String(ficha.jornada_id || ""),
         etapa: ficha.etapa || "lectiva",
         lider_id: String(ficha.lider_id || ""),
+        referente_id: String(ficha.referente_id || ""),
         ambiente_id: String(ficha.ambiente_id || ""),
         fecha_inicio_lectiva: formatDateForInput(ficha.fecha_inicio_lectiva),
         fecha_fin_lectiva: formatDateForInput(ficha.fecha_fin_lectiva),
@@ -108,6 +114,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
         jornada_id: Number(formData.jornada_id) || undefined,
         etapa: formData.etapa,
         lider_id: Number(formData.lider_id) || null,
+        referente_id: Number(formData.referente_id) || null,
         ambiente_id: Number(formData.ambiente_id) || null,
         fecha_inicio_lectiva: formData.fecha_inicio_lectiva || undefined,
         fecha_fin_lectiva: formData.fecha_fin_lectiva || undefined,
@@ -129,7 +136,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
-          <h2 className="text-lg font-bold text-gray-900">Editar ficha {ficha.numero_ficha}</h2>
+          <h2 className="text-lg font-bold text-gray-900">Editar grupo {ficha.numero_ficha}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
@@ -137,7 +144,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
 
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5 overflow-y-auto flex-1">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Numero de ficha</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Número de grupo</label>
             <input
               type="text"
               required
@@ -189,6 +196,21 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
                 ))}
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Referente del grupo</label>
+            <select
+              value={formData.referente_id}
+              onChange={(e) => handleChange("referente_id", e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+            >
+              <option value="">Sin asignar</option>
+              {instructores.map((inst) => (
+                <option key={inst.id} value={inst.id}>{inst.nombre}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-400 mt-1">Instructor de referencia para este grupo (informativo)</p>
           </div>
 
           <div>
@@ -289,7 +311,7 @@ export default function EditFichaModal({ isOpen, onClose, ficha, onSubmit }: Edi
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin ficha</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin grupo</label>
             <input
               type="date"
               value={formData.fecha_fin_ficha}

@@ -134,16 +134,16 @@ export default function FichasPage() {
   const handleFinalizarFicha = (ficha: Ficha) => {
     setConfirmDialog({
       isOpen: true,
-      title: "Finalizar ficha",
-      message: `¿Estas seguro de finalizar la ficha ${ficha.numero_ficha}? No se podran hacer nuevas asignaciones.`,
+      title: "Finalizar grupo",
+      message: `¿Estás seguro de finalizar el grupo ${ficha.numero_ficha}? No se podrán hacer nuevas asignaciones.`,
       onConfirm: async () => {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
         try {
           await api.fichas.finalizar(ficha.id)
-          showToast(`Ficha ${ficha.numero_ficha} finalizada`, "success")
+          showToast(`Grupo ${ficha.numero_ficha} finalizado`, "success")
           cargarFichas()
         } catch (err: any) {
-          showToast(err.message || "Error al finalizar ficha", "error")
+          showToast(err.message || "Error al finalizar grupo", "error")
         }
       },
     })
@@ -153,11 +153,11 @@ export default function FichasPage() {
     if (!selectedFicha) return
     try {
       await api.fichas.update(selectedFicha.id, data)
-      showToast("Ficha actualizada exitosamente", "success")
+      showToast("Grupo actualizado exitosamente", "success")
       setIsEditModalOpen(false)
       cargarFichas()
     } catch (err: any) {
-      showToast(err.message || "Error al actualizar ficha", "error")
+      showToast(err.message || "Error al actualizar grupo", "error")
     }
   }
 
@@ -178,8 +178,8 @@ export default function FichasPage() {
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Fichas</h1>
-            <p className="text-gray-500 text-sm">{puedeEditar ? "Gestion de fichas de formacion" : "Mis fichas asignadas"}</p>
+            <h1 className="text-2xl font-bold text-gray-900">Grupos</h1>
+            <p className="text-gray-500 text-sm">{puedeEditar ? "Gestión de grupos de formación" : "Mis grupos asignados"}</p>
           </div>
           {puedeEditar && (
             <button
@@ -187,7 +187,7 @@ export default function FichasPage() {
               className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
             >
               <Plus className="w-4 h-4" />
-              Registrar ficha
+              Registrar grupo
             </button>
           )}
         </div>
@@ -255,18 +255,18 @@ export default function FichasPage() {
           {loading ? (
             <div className="p-12 flex flex-col items-center justify-center text-gray-500">
               <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando fichas...</p>
+              <p>Cargando grupos...</p>
             </div>
           ) : listaPaginada.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
-              No se encontraron fichas con los filtros seleccionados.
+              No se encontraron grupos con los filtros seleccionados.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                   <tr>
-                    <th className="px-3 py-3 md:px-6 md:py-4">No. Ficha</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">No. Grupo</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Jornada</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Etapa</th>
@@ -338,7 +338,7 @@ export default function FichasPage() {
                             <button
                               onClick={() => handleFinalizarFicha(ficha)}
                               className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                              title="Finalizar ficha"
+                              title="Finalizar grupo"
                             >
                               <Power className="w-4 h-4" />
                             </button>
@@ -408,11 +408,11 @@ export default function FichasPage() {
         onSubmit={async (data) => {
           try {
             await api.fichas.create(data)
-            showToast("Ficha registrada exitosamente", "success")
+            showToast("Grupo registrado exitosamente", "success")
             setIsCreateModalOpen(false)
             cargarFichas()
           } catch (err: any) {
-            showToast(err.message || "Error al crear ficha", "error")
+            showToast(err.message || "Error al crear grupo", "error")
           }
         }}
       />

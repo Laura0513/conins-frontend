@@ -94,7 +94,7 @@ export default function EditAsignacionModal({ isOpen, onClose, asignacion, onSub
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">{asignacion.instructor_nombre}</p>
-              <p className="text-xs text-gray-500">Ficha {asignacion.ficha_numero}</p>
+              <p className="text-xs text-gray-500">Grupo {asignacion.ficha_numero}</p>
             </div>
           </div>
 
@@ -119,12 +119,12 @@ export default function EditAsignacionModal({ isOpen, onClose, asignacion, onSub
               onChange={(e) => handleChange("ambiente_excepcion_id", e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
-              <option value="">Usar ambiente de la ficha</option>
+              <option value="">Usar ambiente del grupo</option>
               {ambientes.map((a) => (
                 <option key={a.id} value={a.id}>{a.nombre}</option>
               ))}
             </select>
-            <p className="text-xs text-gray-500 mt-1">Deja en blanco para usar el aula asignada a la ficha.</p>
+            <p className="text-xs text-gray-500 mt-1">Deja en blanco para usar el aula asignada al grupo.</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -142,7 +142,7 @@ export default function EditAsignacionModal({ isOpen, onClose, asignacion, onSub
               />
             </button>
             <div>
-              <span className="text-sm font-medium text-gray-700">¿Es líder de esta ficha?</span>
+              <span className="text-sm font-medium text-gray-700">¿Es líder de este grupo?</span>
               <p className="text-xs text-gray-500">Función administrativa. No modifica permisos.</p>
             </div>
           </div>

@@ -144,7 +144,7 @@ export function exportarHorariosPDF(horarios: Horario[], titulo: string = "Malla
 
   autoTable(doc, {
     startY: 46,
-    head: [["Ficha", "Instructor", "Competencia", "Ambiente", "Jornada", "Actividad", "Días", "Horas", "Estado"]],
+    head: [["Grupo", "Instructor", "Competencia", "Ambiente", "Jornada", "Actividad", "Días", "Horas", "Estado"]],
     body: tableData,
     ...tableDefaults,
     headStyles: {
@@ -213,7 +213,7 @@ export function exportarCargaHorariaPDF(data: CargaHoraria[]) {
 
   autoTable(doc, {
     startY: 46,
-    head: [["Instructor", "Horas semanales", "Fichas", "Competencias", "Estado"]],
+    head: [["Instructor", "Horas semanales", "Grupos", "Competencias", "Estado"]],
     body: tableData,
     ...tableDefaults,
     columnStyles: {
@@ -256,7 +256,7 @@ type HorarioFicha = {
 
 export function exportarHorarioFichaPDF(data: HorarioFicha[]) {
   const doc = new jsPDF("landscape")
-  addHeader(doc, "Horario Semanal por Ficha", `${data.length} fichas`, "landscape")
+  addHeader(doc, "Horario Semanal por Grupo", `${data.length} grupos`, "landscape")
 
   const tableData = data.map((h) => [
     h.ficha_numero,
@@ -271,7 +271,7 @@ export function exportarHorarioFichaPDF(data: HorarioFicha[]) {
 
   autoTable(doc, {
     startY: 46,
-    head: [["Ficha", "Programa", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]],
+    head: [["Grupo", "Programa", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]],
     body: tableData,
     ...tableDefaults,
     headStyles: {
@@ -295,7 +295,7 @@ export function exportarHorarioFichaPDF(data: HorarioFicha[]) {
   })
 
   addFooter(doc)
-  doc.save(`horario-por-ficha-${new Date().toISOString().split("T")[0]}.pdf`)
+  doc.save(`horario-por-grupo-${new Date().toISOString().split("T")[0]}.pdf`)
 }
 
 // ─── 4. Ocupación de Ambientes ───

@@ -2,10 +2,10 @@
 // Para cambiar "Ficha" por "Grupo" en el futuro, solo modificar este archivo.
 
 export const TERMINOLOGY = {
-  ficha: "Ficha",
-  fichas: "Fichas",
-  registrarFicha: "Registrar ficha",
-  noFicha: "No. Ficha",
+  ficha: "Grupo",
+  fichas: "Grupos",
+  registrarFicha: "Registrar grupo",
+  noFicha: "No. Grupo",
   fichaPlaceholder: "2995403",
-  fichasGestion: "Gestión de fichas de formación",
+  fichasGestion: "Gestión de grupos de formación",
 } as const

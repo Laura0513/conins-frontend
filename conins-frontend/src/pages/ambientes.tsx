@@ -244,7 +244,7 @@ export default function AmbientesPage() {
                         {amb.ocupante_actual ? (
                           <div className="text-sm">
                             <p className="font-medium text-gray-900">{amb.ocupante_actual.instructor}</p>
-                            <p className="text-xs text-gray-500">Ficha {amb.ocupante_actual.ficha} · {amb.ocupante_actual.competencia}</p>
+                            <p className="text-xs text-gray-500">Grupo {amb.ocupante_actual.ficha} · {amb.ocupante_actual.competencia}</p>
                           </div>
                         ) : (
                           <span className="text-xs text-gray-400">-</span>

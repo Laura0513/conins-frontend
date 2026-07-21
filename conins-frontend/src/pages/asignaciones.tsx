@@ -153,7 +153,7 @@ export default function AsignacionesPage() {
     setConfirmDialog({
       isOpen: true,
       title: "Desactivar asignación",
-      message: `¿Estas seguro de desactivar la asignación de ${asig.instructor_nombre} en la ficha ${asig.ficha_numero}? Pasará a estado histórico.`,
+      message: `¿Estás seguro de desactivar la asignación de ${asig.instructor_nombre} en el grupo ${asig.ficha_numero}? Pasará a estado histórico.`,
       onConfirm: async () => {
         setConfirmDialog({ ...confirmDialog, isOpen: false })
         try {
@@ -287,7 +287,7 @@ export default function AsignacionesPage() {
                 <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                   <tr>
                     <th className="px-3 py-3 md:px-6 md:py-4">Instructor</th>
-                    <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Grupo</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Competencia</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Jornada</th>

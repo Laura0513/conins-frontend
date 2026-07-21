@@ -4040,3 +4040,564 @@ Error: Token invalido o expirado
     at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
     at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
 ---
+[2026-07-14T16:39:52.479Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-14T16:39:53.952Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-14T16:42:45.444Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-14T19:35:46.058Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:35:46.071Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:36:01.818Z] Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:43:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:18:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:9:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:36:01.825Z] Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:43:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:18:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:9:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:36:09.827Z] Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:43:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:18:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:9:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:36:09.829Z] Error: Usuario no encontrado
+Error: Usuario no encontrado
+    at Object.getOwnProfile (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:213:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:31:19)
+---
+[2026-07-14T19:36:18.148Z] Error: Credenciales invalidas
+Error: Credenciales invalidas
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:87:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-14T19:36:24.082Z] Error: Credenciales invalidas
+Error: Credenciales invalidas
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:87:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-14T19:38:57.099Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:38:57.104Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:38:57.109Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:38:57.115Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:39:03.061Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:39:03.067Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:39:04.865Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:39:04.868Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:39:04.874Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:39:04.879Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:39:06.116Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:39:06.121Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:39:06.694Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:39:06.697Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:39:06.703Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:39:06.709Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:40:00.958Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:40:00.964Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:40:01.821Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:40:01.825Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:40:29.025Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:40:29.028Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:40:29.035Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:40:29.043Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:40:29.560Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:40:29.565Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:40:30.392Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:40:30.399Z] Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+Error: Unknown column 'f.fecha_inicio_productiva' in 'field list'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\ficha.model.ts:54:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:14:23)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:7:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:40:31.200Z] Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:43:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:18:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:9:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:40:31.206Z] Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+Error: Unknown column 'h.tipo_actividad_id' in 'on clause'
+    at Object.findAll (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:43:31)
+    at Object.getAll (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:18:25)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:9:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+---
+[2026-07-14T19:40:34.809Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-14T19:40:34.813Z] Error: Acceso denegado — rol insuficiente
+Error: Acceso denegado — rol insuficiente
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:50:13)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:39:5)
+---
+[2026-07-15T20:05:14.586Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-07-15T20:05:37.362Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-15T20:29:24.205Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:35:24)
+---
+[2026-07-15T20:29:24.218Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:35:24)
+---
+[2026-07-21T12:32:58.747Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---

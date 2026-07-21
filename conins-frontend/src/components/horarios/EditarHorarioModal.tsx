@@ -178,7 +178,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-700">
               <Hash className="w-4 h-4 text-gray-400" />
-              <span>Ficha {horario.ficha_numero}</span>
+              <span>Grupo {horario.ficha_numero}</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-700">
               <BookOpen className="w-4 h-4 text-gray-400" />
@@ -266,7 +266,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
                   onChange={(e) => handleChange("ambiente_id", e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
                 >
-                  <option value="">Usar ambiente de la ficha</option>
+                  <option value="">Usar ambiente del grupo</option>
                   {ambientes.map((a) => (
                     <option key={a.id} value={a.id}>{a.nombre}</option>
                   ))}

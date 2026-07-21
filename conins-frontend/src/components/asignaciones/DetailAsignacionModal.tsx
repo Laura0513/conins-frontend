@@ -40,7 +40,7 @@ export default function DetailAsignacionModal({ isOpen, onClose, asignacion }: D
             </div>
             <div>
               <h3 className="text-lg font-bold text-gray-900">{asignacion.instructor_nombre}</h3>
-              <p className="text-sm text-gray-500">Ficha {asignacion.ficha_numero}</p>
+              <p className="text-sm text-gray-500">Grupo {asignacion.ficha_numero}</p>
             </div>
           </div>
 

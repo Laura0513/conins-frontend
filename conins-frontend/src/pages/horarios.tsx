@@ -292,7 +292,7 @@ export default function HorariosPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por ficha o instructor..."
+              placeholder="Buscar por grupo o instructor..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
@@ -305,7 +305,7 @@ export default function HorariosPage() {
               onChange={(e) => setFiltroFicha(e.target.value)}
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
-              <option value="todas">Ficha: Todas</option>
+              <option value="todas">Grupo: Todos</option>
               {[...new Set(horarios.map((h) => h.ficha_numero))].sort().map((f) => (
                 <option key={f} value={f}>{f}</option>
               ))}
@@ -365,7 +365,7 @@ export default function HorariosPage() {
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                   <tr>
-                    <th className="px-3 py-3 md:px-6 md:py-4">Ficha</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Grupo</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Instructor</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Competencia</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>

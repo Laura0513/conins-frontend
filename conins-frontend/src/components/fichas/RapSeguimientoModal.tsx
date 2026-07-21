@@ -187,7 +187,7 @@ export default function RapSeguimientoModal({
         <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Seguimiento RAPs</h2>
-            <p className="text-sm text-gray-500">Ficha {fichaNumero}</p>
+            <p className="text-sm text-gray-500">Grupo {fichaNumero}</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
@@ -235,7 +235,7 @@ export default function RapSeguimientoModal({
             </div>
           ) : totalRaps === 0 && disponibles.length === 0 ? (
             <div className="py-12 text-center text-gray-500">
-              <p>No hay RAPs registrados ni disponibles para esta ficha.</p>
+              <p>No hay RAPs registrados ni disponibles para este grupo.</p>
               <p className="text-xs mt-1">Primero debe haber asignaciones con competencias asociadas.</p>
             </div>
           ) : (
