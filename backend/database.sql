@@ -109,13 +109,12 @@ INSERT INTO roles (id, nombre, nivel) VALUES
 
 -- ============================================================
 -- 5. INSTRUCTORES (perfil extendido de usuarios)
--- tipo_contrato: contratista | de_planta
--- tipo_area:     transversal | tecnica  ← eje pedagógico del instructor
+-- tipo_area: transversal | tecnica  ← eje pedagógico del instructor
+-- tipo_contrato eliminado en sesión 14/07/2026 — RN-03 activa para todos.
 -- ============================================================
 CREATE TABLE IF NOT EXISTS instructores (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id    INT NOT NULL UNIQUE,
-    tipo_contrato ENUM('contratista','de_planta') NOT NULL,
     tipo_area     ENUM('transversal','tecnica')   NOT NULL,
     activo        BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
@@ -342,7 +341,7 @@ CREATE TABLE IF NOT EXISTS tipos_actividad (
     activo               BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
-INSERT INTO tipos_actividad
+INSERT IGNORE INTO tipos_actividad
     (nombre,                          suma_carga_horaria, requiere_ficha, requiere_ambiente, requiere_competencia) VALUES
     ('Formación Titulada',            TRUE,  TRUE,  TRUE,  TRUE),
     ('Complementaria',                TRUE,  TRUE,  TRUE,  FALSE),
@@ -567,7 +566,7 @@ FOR EACH ROW
 BEGIN
     INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_nuevos)
     VALUES (@audit_usuario_id, 'INSERT', 'instructores', NEW.id,
-            JSON_OBJECT('usuario_id', NEW.usuario_id, 'tipo_contrato', NEW.tipo_contrato, 'tipo_area', NEW.tipo_area, 'activo', NEW.activo));
+            JSON_OBJECT('usuario_id', NEW.usuario_id, 'tipo_area', NEW.tipo_area, 'activo', NEW.activo));
 END$$
 DELIMITER ;
 
@@ -579,8 +578,8 @@ FOR EACH ROW
 BEGIN
     INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores, datos_nuevos)
     VALUES (@audit_usuario_id, 'UPDATE', 'instructores', NEW.id,
-            JSON_OBJECT('usuario_id', OLD.usuario_id, 'tipo_contrato', OLD.tipo_contrato, 'tipo_area', OLD.tipo_area, 'activo', OLD.activo),
-            JSON_OBJECT('usuario_id', NEW.usuario_id, 'tipo_contrato', NEW.tipo_contrato, 'tipo_area', NEW.tipo_area, 'activo', NEW.activo));
+            JSON_OBJECT('usuario_id', OLD.usuario_id, 'tipo_area', OLD.tipo_area, 'activo', OLD.activo),
+            JSON_OBJECT('usuario_id', NEW.usuario_id, 'tipo_area', NEW.tipo_area, 'activo', NEW.activo));
 END$$
 DELIMITER ;
 
@@ -592,7 +591,7 @@ FOR EACH ROW
 BEGIN
     INSERT INTO auditoria (usuario_id, accion, tabla_afectada, registro_id, datos_anteriores)
     VALUES (@audit_usuario_id, 'DELETE', 'instructores', OLD.id,
-            JSON_OBJECT('usuario_id', OLD.usuario_id, 'tipo_contrato', OLD.tipo_contrato, 'tipo_area', OLD.tipo_area, 'activo', OLD.activo));
+            JSON_OBJECT('usuario_id', OLD.usuario_id, 'tipo_area', OLD.tipo_area, 'activo', OLD.activo));
 END$$
 DELIMITER ;
 
@@ -972,7 +971,6 @@ CREATE PROCEDURE sp_crear_instructor(
     IN p_nombre VARCHAR(100),
     IN p_email VARCHAR(100),
     IN p_password VARCHAR(255),
-    IN p_tipo_contrato VARCHAR(20),
     IN p_tipo_area VARCHAR(20),
     OUT p_usuario_id INT,
     OUT p_instructor_id INT
@@ -990,8 +988,8 @@ BEGIN
     VALUES (p_nombre, p_email, p_password);
     SET p_usuario_id = LAST_INSERT_ID();
 
-    INSERT INTO instructores (usuario_id, tipo_contrato, tipo_area)
-    VALUES (p_usuario_id, p_tipo_contrato, p_tipo_area);
+    INSERT INTO instructores (usuario_id, tipo_area)
+    VALUES (p_usuario_id, p_tipo_area);
     SET p_instructor_id = LAST_INSERT_ID();
 
     INSERT INTO usuario_roles (usuario_id, rol_id)
@@ -1158,7 +1156,6 @@ CREATE OR REPLACE VIEW vw_carga_horaria_instructor AS
 SELECT
     i.id AS instructor_id,
     u.nombre AS instructor_nombre,
-    i.tipo_contrato,
     i.tipo_area,
     h.semana,
     COUNT(DISTINCT h.dia_semana) AS dias_trabajados,
@@ -1168,7 +1165,7 @@ SELECT
 FROM instructores i
 JOIN usuarios u ON i.usuario_id = u.id
 LEFT JOIN horarios h ON h.instructor_id = i.id AND h.activo = TRUE
-GROUP BY i.id, u.nombre, i.tipo_contrato, i.tipo_area, h.semana, i.activo;
+GROUP BY i.id, u.nombre, i.tipo_area, h.semana, i.activo;
 
 -- --- vw_ambientes_ocupados: Ambientes con horarios activos ---
 CREATE OR REPLACE VIEW vw_ambientes_ocupados AS
@@ -1199,7 +1196,6 @@ CREATE OR REPLACE VIEW vw_asignaciones_activas AS
 SELECT
     a.id AS asignacion_id,
     u.nombre AS instructor_nombre,
-    i.tipo_contrato,
     f.numero_ficha,
     p.nombre AS programa_nombre,
     p.tipo_linea,

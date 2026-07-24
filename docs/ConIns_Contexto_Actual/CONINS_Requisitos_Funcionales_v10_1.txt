@@ -1,0 +1,526 @@
+REQUISITOS FUNCIONALES — CONINS v10.1
+Centro del Diseño y Manufactura del Cuero — CDMC SENA
+Actualizado: 21 de Julio 2026 (62 RF — v10.1)
+
+========================================================================================
+
+CAMBIOS RESPECTO A v10.0:
+
+  Sintaxis normativa estándar en cada requisito: "El sistema debe
+  permitir a [rol] [acción]..." en una sola oración bien formada, sin
+  los párrafos expandidos de v9.0 y sin las descripciones telegráficas
+  de v10.0. El detalle de fondo permanece en Reglas y Relaciones.
+
+CAMBIOS DE v10.0 RESPECTO A v9.0 (feedback líder técnico 21/07/2026):
+
+  1. RAP directo al instructor: se revierte la herencia automática. La
+     asignación llega hasta el RAP (instructor → grupo → competencia →
+     RAP), con un máximo de un instructor por RAP en cada grupo (RN-15
+     redefinida, RN-06 reforzada).
+  2. CRUD de competencias y RAPs: dejan de ser solo precarga. Se conserva
+     el seed inicial de Sofía Plus como carga base y se habilita gestión
+     por parte de los administradores (RF-25 a RF-28).
+  3. Horario vinculado a RAP: el bloque referencia el RAP que se dicta,
+     validando que pertenezca al programa del grupo (RN-27).
+  4. Etapas con fechas propias vía requisito dedicado (RF-18, RN-19).
+  5. Total: 62 RF en 12 módulos.
+
+NOTA DE LECTURA:
+  - Reglas de negocio (RN-XX): CONINS_Logica_Negocio_v5_6.txt
+  - Requisitos no funcionales (RNF-XX): CONINS_Requisitos_No_Funcionales_v1_0.txt
+  - "Administradores" = Subdirector, Coordinadora Académica y Asistente
+    de Coordinación.
+
+Estructura de cada requisito:
+  Código | Nombre | Descripción (sintaxis normativa) | Reglas | Relaciones
+
+========================================================================================
+
+MODULO AUTH — AUTENTICACIÓN Y GESTIÓN DE CUENTAS
+
+RF-01 | Creación de contraseña
+Desc:  El sistema debe permitir al usuario establecer su contraseña por
+       primera vez a partir del correo previamente habilitado por un
+       administrador.
+Reglas: RN-01, RN-02
+Rel:   Requiere RF-07.
+
+RF-02 | Inicio de sesión
+Desc:  El sistema debe permitir a los usuarios registrados iniciar sesión
+       con su correo y contraseña, dirigiéndolos a la vista que
+       corresponde a su rol.
+Reglas: RN-02
+Rel:   Requiere RF-01. Alcance por rol: RF-53.
+
+RF-03 | Edición de perfil propio
+Desc:  El sistema debe permitir a todo usuario consultar y actualizar su
+       nombre y su documento de identidad.
+Reglas: RN-02
+Rel:   Requiere RF-02.
+
+RF-04 | Recuperación de contraseña
+Desc:  El sistema debe permitir al usuario recuperar su acceso mediante un
+       enlace de un solo uso enviado a su correo registrado.
+Reglas: RN-02
+Rel:   Requiere RF-07. Depende de RNF-17.
+
+RF-05 | Cambio de contraseña
+Desc:  El sistema debe permitir a todo usuario con sesión activa cambiar
+       su contraseña ingresando la actual y la nueva.
+Reglas: —
+Rel:   Requiere RF-02.
+
+RF-06 | Cierre de sesión
+Desc:  El sistema debe permitir a todo usuario cerrar su sesión de forma
+       segura desde cualquier pantalla del sistema.
+Reglas: —
+Rel:   Requiere RF-02.
+
+RF-07 | Creación de cuentas
+Desc:  El sistema debe permitir a los administradores crear cuentas de
+       usuario indicando nombre, correo, rol, tipo y número de documento.
+Reglas: RN-01, RN-02
+Rel:   Prerequisito de RF-01.
+
+RF-08 | Edición de cuentas ajenas
+Desc:  El sistema debe permitir a los administradores editar los datos de
+       las cuentas de usuarios de menor jerarquía.
+Reglas: RN-02
+Rel:   Requiere RF-07.
+
+RF-09 | Deshabilitar y reactivar cuentas
+Desc:  El sistema debe permitir a los administradores deshabilitar y
+       reactivar cuentas de menor jerarquía conservando su historial.
+Reglas: RN-10
+Rel:   Requiere RF-07. Notifica: RF-49.
+
+RF-10 | Historial de acceso
+Desc:  El sistema debe permitir a los administradores consultar la fecha
+       del último ingreso de cada usuario.
+Reglas: —
+Rel:   Dato registrado por RNF-21.
+
+RF-11 | Rol instructor para directivos
+Desc:  El sistema debe permitir a los directivos con perfil docente
+       ingresar bajo el rol de instructor, operando con el alcance de ese
+       rol sin mezclar permisos.
+Reglas: RN-18
+Rel:   Requiere RF-02 y RF-07. Alcance: RF-53.
+
+========================================================================================
+
+MODULO INSTRUCTORES
+
+RF-12 | Registro de instructores
+Desc:  El sistema debe permitir a los administradores registrar
+       instructores indicando el área o áreas (técnica, transversal o
+       ambas) en que pueden impartir formación.
+Reglas: RN-13
+Rel:   Requiere RF-07. Prerequisito de RF-38.
+
+RF-13 | Competencias habilitadas
+Desc:  El sistema debe permitir a los administradores definir y mantener
+       las competencias que cada instructor está habilitado para impartir.
+Reglas: RN-13
+Rel:   Requiere RF-12. Prerequisito de RF-38.
+
+RF-14 | Novedad del instructor
+Desc:  El sistema debe permitir a los administradores registrar novedades
+       administrativas de un instructor (licencia, incapacidad u otra) con
+       fecha de inicio, fecha de regreso y observación.
+Reglas: RN-08, RN-22
+Rel:   Requiere RF-12. Notifica: RF-47. Afecta RF-31 y RF-38.
+
+RF-15 | Consulta de instructores
+Desc:  El sistema debe permitir a los administradores consultar y filtrar
+       el listado de instructores por área, programa y estado.
+Reglas: —
+Rel:   Requiere RF-12.
+
+RF-16 | Deshabilitar y reactivar instructores
+Desc:  El sistema debe permitir a los administradores deshabilitar y
+       reactivar instructores conservando su historial de asignaciones y
+       novedades.
+Reglas: RN-10
+Rel:   Requiere RF-12. Notifica: RF-49.
+
+========================================================================================
+
+MODULO GRUPOS (antes Fichas)
+
+RF-17 | Registro de grupos
+Desc:  El sistema debe permitir a los administradores registrar grupos
+       indicando número, programa, jornada, ambiente, instructor líder y
+       etapa.
+Reglas: RN-19, RN-20, RN-14
+Rel:   Requiere RF-23 y RF-28. Prerequisito de RF-31 y RF-38.
+
+RF-18 | Etapas del grupo con fechas
+Desc:  El sistema debe permitir a los administradores registrar las fechas
+       de inicio y fin de las etapas lectiva y productiva de cada grupo.
+Reglas: RN-19
+Rel:   Requiere RF-17.
+
+RF-19 | Edición de grupos
+Desc:  El sistema debe permitir a los administradores editar la
+       información de un grupo y avanzar su etapa de lectiva a productiva.
+Reglas: RN-19, RN-20, RN-22
+Rel:   Requiere RF-17. Cambio de ambiente valida RF-45 y RN-09.
+
+RF-20 | Finalizar o deshabilitar grupos
+Desc:  El sistema debe permitir a los administradores finalizar o
+       deshabilitar grupos sin eliminarlos, conservando su historial.
+Reglas: RN-10
+Rel:   Requiere RF-17.
+
+RF-21 | Consulta de grupos
+Desc:  El sistema debe permitir a los usuarios consultar los grupos con
+       sus etapas, RAP y competencia vigentes, según el alcance de su rol.
+Reglas: RN-19
+Rel:   Requiere RF-17. Fechas de RAP: RF-57. Alcance: RF-53.
+
+RF-22 | Novedad del grupo
+Desc:  El sistema debe permitir a los administradores registrar novedades
+       de un grupo (comité, paro, salida) con fecha de inicio, fecha de
+       regreso y observación.
+Reglas: RN-22
+Rel:   Requiere RF-17. Afecta RF-31. Libera ambiente (sección 10 lógica).
+
+========================================================================================
+
+MODULO PROGRAMAS
+
+RF-23 | Consulta de programas
+Desc:  El sistema debe ofrecer el listado de programas de formación con su
+       línea, área y modalidad para su uso en los formularios.
+Reglas: —
+Rel:   Prerequisito de RF-17.
+
+RF-24 | Referente de programa
+Desc:  El sistema debe permitir a los administradores registrar el
+       instructor referente de cada programa como dato informativo.
+Reglas: —
+Rel:   Requiere RF-12 y RF-23.
+
+========================================================================================
+
+MODULO COMPETENCIAS Y RAPS
+
+RF-25 | Gestión de competencias
+Desc:  El sistema debe permitir a los administradores crear, editar y
+       deshabilitar competencias sobre la carga base precargada de
+       Sofía Plus.
+Reglas: RN-10, RN-25
+Rel:   Base para RF-27 y RF-38.
+
+RF-26 | Consulta de competencias
+Desc:  El sistema debe permitir a los administradores consultar y filtrar
+       las competencias por programa y estado.
+Reglas: —
+Rel:   Requiere RF-25.
+
+RF-27 | Gestión de RAPs
+Desc:  El sistema debe permitir a los administradores crear, editar y
+       deshabilitar los resultados de aprendizaje asociados a cada
+       competencia.
+Reglas: RN-10, RN-25, RN-26
+Rel:   Requiere RF-25. Base para RF-39.
+
+RF-28 | Consulta de RAPs
+Desc:  El sistema debe permitir a los administradores consultar los RAPs
+       de una competencia y su estado de asignación.
+Reglas: RN-26
+Rel:   Requiere RF-27.
+
+========================================================================================
+
+MODULO AMBIENTES
+
+RF-29 | Registro de ambientes
+Desc:  El sistema debe permitir a los administradores registrar y
+       actualizar ambientes con nombre, tipo, capacidad máxima y área.
+Reglas: RN-14
+Rel:   Prerequisito de RF-17 y RF-31.
+
+RF-30 | Deshabilitar y reactivar ambientes
+Desc:  El sistema debe permitir a los administradores deshabilitar y
+       reactivar ambientes conservando su historial.
+Reglas: RN-10
+Rel:   Requiere RF-29.
+
+RF-31 | Consulta de ambientes
+Desc:  El sistema debe permitir a los administradores consultar los
+       ambientes con su tipo, área, estado y ocupación por jornada.
+Reglas: —
+Rel:   Requiere RF-29. Ocupación deriva de RF-32.
+
+RF-32 | Bloqueo temporal de ambiente
+Desc:  El sistema debe permitir a los administradores bloquear
+       temporalmente un ambiente indicando fecha de inicio, fin y motivo.
+Reglas: RN-09, RN-22
+Rel:   Requiere RF-29. Afecta RF-33. Notifica: RF-49.
+
+RF-33 | Consulta de bloqueos
+Desc:  El sistema debe permitir a los administradores consultar los
+       bloqueos activos e históricos de cada ambiente.
+Reglas: —
+Rel:   Requiere RF-32.
+
+========================================================================================
+
+MODULO HORARIOS
+
+RF-34 | Registro de horario
+Desc:  El sistema debe permitir a los administradores registrar un bloque
+       de horario asignando grupo, instructor, ambiente, RAP y jornada.
+Reglas: RN-03, RN-04, RN-05, RN-08, RN-09, RN-26, RN-27
+Rel:   Requiere RF-17, RF-38, RF-39. Aprobación: RF-37.
+
+RF-35 | Edición de horario
+Desc:  El sistema debe permitir a los administradores editar un bloque de
+       horario, revalidando todas las reglas de disponibilidad y conflicto.
+Reglas: RN-03, RN-04, RN-05, RN-09, RN-27
+Rel:   Requiere RF-34.
+
+RF-36 | Deshabilitar horario
+Desc:  El sistema debe permitir a los administradores deshabilitar un
+       bloque de horario, liberando al instructor, el grupo y el ambiente.
+Reglas: RN-10
+Rel:   Requiere RF-34.
+
+RF-37 | Aprobar o rechazar horario
+Desc:  El sistema debe permitir a los administradores aprobar o rechazar
+       los bloques de horario pendientes, exigiendo motivo en el rechazo.
+Reglas: RN-07
+Rel:   Requiere RF-34. Alimenta RF-51.
+
+RF-38 | Malla de horarios
+Desc:  El sistema debe mostrar la malla de horarios de un grupo o
+       instructor en formato de grilla semanal.
+Reglas: —
+Rel:   Requiere RF-34. Base de RF-54.
+
+RF-39 | Suspensión de horario
+Desc:  El sistema debe permitir a los administradores suspender un bloque
+       de horario aprobado registrando el motivo.
+Reglas: RN-22
+Rel:   Requiere RF-37.
+
+RF-40 | Tipo de actividad del bloque
+Desc:  El sistema debe permitir a los administradores categorizar cada
+       bloque con un tipo de actividad que define si suma a la carga
+       horaria.
+Reglas: RN-07
+Rel:   Requiere RF-34. Alimenta RF-51.
+
+========================================================================================
+
+MODULO ASIGNACIONES
+
+RF-41 | Asignar instructor a grupo con competencia
+Desc:  El sistema debe permitir a los administradores asignar un instructor
+       a un grupo con una de sus competencias habilitadas.
+Reglas: RN-08, RN-13
+Rel:   Requiere RF-12, RF-13, RF-17. RAP: RF-42. Notifica: RF-47.
+
+RF-42 | Asignar RAP al instructor
+Desc:  El sistema debe permitir a los administradores asignar a cada
+       instructor los RAPs que dictará dentro de la competencia, con un
+       máximo de un instructor por RAP en el grupo.
+Reglas: RN-06, RN-15, RN-26
+Rel:   Requiere RF-41 y RF-27. Seguimiento: RF-57.
+
+RF-43 | Asignación provisional
+Desc:  El sistema debe permitir a los administradores registrar
+       asignaciones provisionales fuera de área con autorizante, fecha y
+       motivo.
+Reglas: RN-11, RN-12
+Rel:   Requiere RF-12 y RF-17. Notifica: RF-48, RF-49.
+
+RF-44 | Referente de grupo
+Desc:  El sistema debe permitir a los administradores señalar al instructor
+       referente de un grupo como dato informativo.
+Reglas: —
+Rel:   Requiere RF-41.
+
+RF-45 | Desactivar asignación
+Desc:  El sistema debe permitir a los administradores desactivar una
+       asignación en cascada, registrando el motivo y conservando el
+       historial.
+Reglas: RN-10, RN-16
+Rel:   Requiere RF-41. Afecta RF-34.
+
+RF-46 | Consulta de asignaciones
+Desc:  El sistema debe permitir a los usuarios consultar las asignaciones
+       activas, provisionales e históricas según el alcance de su rol.
+Reglas: —
+Rel:   Requiere RF-41. Alcance: RF-53.
+
+========================================================================================
+
+MODULO ALERTAS Y NOTIFICACIONES
+
+RF-47 | Notificación al instructor
+Desc:  El sistema debe notificar al instructor los cambios en sus
+       asignaciones o cuenta, mediante notificación interna y correo.
+Reglas: —
+Rel:   Desde RF-41, RF-42, RF-14. Historial: RF-52.
+
+RF-48 | Notificación a la coordinación
+Desc:  El sistema debe notificar a la coordinación los cambios de
+       asignación, novedades y provisionales, mediante notificación interna.
+Reglas: —
+Rel:   Desde RF-41, RF-14, RF-43.
+
+RF-49 | Notificación a la dirección
+Desc:  El sistema debe notificar a la dirección las alertas de carga,
+       bloqueos y deshabilitaciones, mediante notificación interna.
+Reglas: —
+Rel:   Desde RF-50, RF-43, RF-32, RF-09, RF-16.
+
+RF-50 | Alerta de carga horaria
+Desc:  El sistema debe alertar cuando la carga horaria semanal de un
+       instructor quede por debajo de 20 o por encima de 40 horas, sin
+       bloquear el registro.
+Reglas: RN-07
+Rel:   Desde RF-34, RF-37. Visible en RF-51.
+
+RF-51 | Alerta de jornada restringida
+Desc:  El sistema debe alertar al registrar un horario en jornada nocturna
+       o de fin de semana, sin bloquear el registro.
+Reglas: RN-03
+Rel:   Desde RF-34, RF-35.
+
+RF-52 | Alerta de ambiente ocupado
+Desc:  El sistema debe alertar cuando el ambiente ya esté ocupado en la
+       misma jornada y día, sin bloquear el registro.
+Reglas: RN-05
+Rel:   Desde RF-34, RF-35, RF-19.
+
+RF-53 | Impedimento por cruce de horario
+Desc:  El sistema debe impedir el registro de un horario que se cruce con
+       otro horario activo del mismo instructor en el mismo día.
+Reglas: RN-04, RN-27
+Rel:   Aplica en RF-34, RF-35, RF-41.
+
+========================================================================================
+
+MODULO CONSULTA Y REPORTES
+
+RF-54 | Panel de carga horaria
+Desc:  El sistema debe mostrar la carga horaria semanal de cada instructor
+       comparada con el rango permitido de 20 a 40 horas.
+Reglas: RN-07
+Rel:   Desde RF-34, RF-37, RF-40. Alcance: RF-53.
+
+RF-55 | Consulta global
+Desc:  El sistema debe permitir a los administradores consultar y filtrar
+       toda la información del sistema desde vistas dedicadas.
+Reglas: —
+Rel:   Integra RF-15, RF-21, RF-31, RF-46.
+
+RF-56 | Historial de notificaciones
+Desc:  El sistema debe permitir a todo usuario consultar su historial de
+       notificaciones y marcarlas como leídas.
+Reglas: —
+Rel:   Desde RF-47, RF-48, RF-49.
+
+RF-57 | Exportar malla en PDF
+Desc:  El sistema debe permitir a los administradores exportar la malla de
+       horarios de un grupo o instructor en formato PDF.
+Reglas: —
+Rel:   Requiere RF-38.
+
+========================================================================================
+
+MODULO SEGURIDAD Y TRAZABILIDAD
+
+RF-58 | Alcance por rol
+Desc:  El sistema debe mostrar a cada usuario únicamente la información
+       correspondiente a su rol.
+Reglas: RN-18
+Rel:   Aplica a todas las consultas.
+
+RF-59 | Bitácora de auditoría
+Desc:  El sistema debe registrar automáticamente cada creación,
+       modificación o desactivación con el usuario y la fecha, y permitir
+       su consulta.
+Reglas: RN-21, RN-22
+Rel:   Cubre todos los módulos.
+
+RF-60 | Catálogos de referencia
+Desc:  El sistema debe ofrecer los catálogos de referencia necesarios para
+       los formularios del sistema.
+Reglas: —
+Rel:   Alimenta RF-17, RF-34, RF-40, RF-41.
+
+========================================================================================
+
+MODULO SEGUIMIENTO DE RAPS
+
+RF-61 | Seguimiento de RAPs
+Desc:  El sistema debe permitir a los administradores registrar el
+       seguimiento de cada RAP por grupo, con sus fechas de inicio y fin.
+Reglas: RN-06, RN-26
+Rel:   Requiere RF-42. Fechas visibles en RF-21.
+
+RF-62 | Estado de avance del RAP
+Desc:  El sistema debe permitir a los administradores registrar el estado
+       de cada RAP (pendiente por evaluar, aprobado o no aprobado).
+Reglas: RN-21, RN-22
+Rel:   Requiere RF-61. Registro en RF-59.
+
+========================================================================================
+
+RESUMEN
+Total de requisitos funcionales: 62 (RF-01 a RF-62, secuencia continua)
+
+Modulo AUTH:                            11  (RF-01 al RF-11)
+Modulo Instructores:                     5  (RF-12 al RF-16)
+Modulo Grupos:                           6  (RF-17 al RF-22)
+Modulo Programas:                        2  (RF-23 al RF-24)
+Modulo Competencias y RAPs:              4  (RF-25 al RF-28)
+Modulo Ambientes:                        5  (RF-29 al RF-33)
+Modulo Horarios:                         7  (RF-34 al RF-40)
+Modulo Asignaciones:                     6  (RF-41 al RF-46)
+Modulo Alertas y Notificaciones:         7  (RF-47 al RF-53)
+Modulo Consulta y Reportes:              4  (RF-54 al RF-57)
+Modulo Seguridad y Trazabilidad:         3  (RF-58 al RF-60)
+Modulo Seguimiento de RAPs:              2  (RF-61 al RF-62)
+                                        ───
+                                         62
+
+========================================================================================
+
+INTEGRACIÓN DEL FEEDBACK DEL LÍDER TÉCNICO — mapa de decisiones
+
+  Observación del líder técnico          Resolución en v10.x
+  RAP asociado al instructor,            ADOPTADO. RF-42 asigna RAP
+  máx. 1 instructor a la vez             directo; RN-15 redefinida;
+                                         RN-06 refuerza unicidad.
+  CRUD de competencias y RAPs            ADOPTADO. Módulo nuevo
+                                         Competencias y RAPs (RF-25 a
+                                         RF-28) + seed base conservado.
+  Horario vinculado al RAP              ADOPTADO. RF-34 referencia el
+                                         RAP; RN-27 valida que el RAP
+                                         pertenezca al programa del grupo.
+  Etapas con fechas propias             ADOPTADO. RF-18 dedicado + RN-19.
+  Trazabilidad de cambios (3FN)         YA EXISTÍA. RF-59 (bitácora) +
+                                         RNF-18 (arquitectura por capas).
+  Validación RAP ⊂ programa del grupo   ADOPTADO como RN-27.
+  Instructor asocia RAPs                AJUSTADO. El instructor NO asocia;
+                                         el administrador asigna (RF-42).
+                                         El instructor conserva solo
+                                         lectura (RN-18).
+
+========================================================================================
+
+Roles del sistema (vigente al 21/07/2026):
+  1  Subdirector              — CDMC completo
+  2  Coordinadora Academica   — gestión completa
+  3  Asistente Coordinacion   — igual que Coordinadora
+  4  Instructor               — solo lectura de sus grupos
+
+  Un directivo puede tener además el rol Instructor (RF-11).
+
+========================================================================================

@@ -1,0 +1,207 @@
+COMPETENCIAS Y RESULTADOS DE APRENDIZAJE — PROGRAMA ADSO 228118
+Jair Enrique González Buelvas · CC 92549388 · Ficha 2995403
+Extraído de: Reporte de Juicios Evaluativos — Centro del Diseño y Manufactura del Cuero
+Fecha de extracción: Julio 2026
+
+════════════════════════════════════════════════════════════════
+COMPETENCIAS TÉCNICAS DEL PROGRAMA (aplicables a etapa productiva)
+════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────
+38392 — Establecer requisitos de la solución de software de
+acuerdo con estándares y procedimiento técnico
+────────────────────────────────────────────────────────────────
+593346 [APROBADO] — 01 Caracterizar los procesos de la organización de acuerdo con el software a construir.
+593344 [APROBADO] — 02 Recolectar información del software a construir de acuerdo con las necesidades del cliente.
+593347 [APROBADO] — 03 Establecer los requisitos del software de acuerdo con la información recolectada.
+593345 [APROBADO] — 04 Validar el informe de requisitos de acuerdo con las necesidades del cliente.
+
+────────────────────────────────────────────────────────────────
+38376 — Evaluar requisitos de la solución de software de
+acuerdo con metodologías de análisis y estándares
+────────────────────────────────────────────────────────────────
+592375 [APROBADO] — 01 Planear actividades de análisis de acuerdo con la metodología seleccionada.
+592373 [APROBADO] — 02 Modelar las funciones del software de acuerdo con el informe de requisitos.
+592376 [APROBADO] — 03 Desarrollar procesos lógicos a través de la implementación de algoritmos.
+592374 [APROBADO] — 04 Verificar los modelos realizados en la fase de análisis de acuerdo con lo establecido en el informe de requisitos.
+
+────────────────────────────────────────────────────────────────
+38362 — Diseñar la solución de software de acuerdo con
+procedimientos y requisitos técnicos
+────────────────────────────────────────────────────────────────
+593103 [APROBADO] — 01 Elaborar los artefactos de diseño del software siguiendo las prácticas de la metodología seleccionada.
+593101 [APROBADO] — 02 Estructurar el modelo de datos del software de acuerdo con las especificaciones del análisis.
+593100 [APROBADO] — 03 Determinar las características técnicas de la interfaz gráfica del software adoptando estándares.
+593102 [APROBADO] — 04 Verificar los entregables de la fase de diseño del software de acuerdo con lo establecido en el informe de análisis.
+
+────────────────────────────────────────────────────────────────
+38367 — Estructurar propuesta técnica de servicio de tecnología
+de la información según requisitos técnicos y normativa
+────────────────────────────────────────────────────────────────
+593060 [APROBADO] — 01 Definir especificaciones técnicas del software de acuerdo con las características del software a construir.
+593062 [APROBADO] — 02 Elaborar propuesta técnica del software de acuerdo con las especificaciones técnicas definidas.
+593061 [APROBADO] — 03 Validar las condiciones de la propuesta técnica del software de acuerdo con los intereses de las partes.
+
+────────────────────────────────────────────────────────────────
+38368 — Desarrollar la solución de software de acuerdo con el
+diseño y metodologías de desarrollo
+────────────────────────────────────────────────────────────────
+593106 [APROBADO] — 01 Planear actividades de construcción del software de acuerdo con el diseño establecido.
+593107 [APROBADO] — 02 Construir la base de datos para el software a partir del modelo de datos.
+593104 [APROBADO] — 03 Crear componentes front-end del software de acuerdo con el diseño.
+593108 [APROBADO] — 04 Codificar el software de acuerdo con el diseño establecido.
+593105 [APROBADO] — 05 Realizar pruebas al software para verificar su funcionalidad.
+
+────────────────────────────────────────────────────────────────
+38356 — Implementar la solución de software de acuerdo con los
+requisitos de operación y modelos de referencia
+────────────────────────────────────────────────────────────────
+593111 [APROBADO] — 01 Planear actividades de implantación del software de acuerdo con las condiciones del sistema.
+593110 [APROBADO] — 02 Desplegar el software de acuerdo con la arquitectura y las políticas establecidas.
+593109 [APROBADO] — 03 Documentar el proceso de implantación de software siguiendo estándares de calidad.
+593112 [APROBADO] — 04 Implantar el software de acuerdo con los niveles de servicio establecidos con el cliente.
+
+────────────────────────────────────────────────────────────────
+38369 — Controlar la calidad del servicio de software de
+acuerdo con los estándares técnicos
+────────────────────────────────────────────────────────────────
+593146 [APROBADO] — 01 Incorporar actividades de aseguramiento de la calidad del software de acuerdo con estándares de la industria.
+593144 [APROBADO] — 02 Verificar la calidad del software de acuerdo con las prácticas asociadas en los procesos de desarrollo.
+593145 [APROBADO] — 03 Realizar actividades de mejora de la calidad del software a partir de los resultados de la verificación.
+
+════════════════════════════════════════════════════════════════
+COMPETENCIAS TRANSVERSALES (etapa lectiva)
+════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────
+36180 — Enrique Low Murtra — Interactuar en el contexto
+productivo y social de acuerdo con principios éticos para la
+construcción de una cultura de paz
+────────────────────────────────────────────────────────────────
+593149 [APROBADO] — 01 Promover mi dignidad y la del otro a partir de los principios y valores éticos como aporte en la instauración de una cultura de paz.
+593147 [APROBADO] — 02 Establecer relaciones de crecimiento personal y comunitario a partir del bien común como aporte para el desarrollo social.
+593148 [APROBADO] — 03 Promover el uso racional de los recursos naturales a partir de criterios de sostenibilidad y sustentabilidad ética y normativa vigente.
+593150 [APROBADO] — 04 Contribuir con el fortalecimiento de la cultura de paz a partir de la dignidad humana y las estrategias para la transformación de conflictos.
+
+────────────────────────────────────────────────────────────────
+36182 — Resultado de Aprendizaje de la Inducción
+────────────────────────────────────────────────────────────────
+593343 [APROBADO] — 01 Identificar la dinámica organizacional del SENA y el rol de la formación profesional integral de acuerdo con su proyecto de vida y el desarrollo profesional.
+
+────────────────────────────────────────────────────────────────
+37371 — Utilizar herramientas informáticas de acuerdo con las
+necesidades de manejo de información
+────────────────────────────────────────────────────────────────
+593154 [APROBADO] — 01 Alistar herramientas de tecnologías de la información y la comunicación (TIC), de acuerdo con las necesidades de procesamiento de información y comunicación.
+593151 [APROBADO] — 02 Aplicar funcionalidades de herramientas y servicios TIC, de acuerdo con manuales de uso, procedimientos establecidos y buenas prácticas.
+593153 [APROBADO] — 03 Evaluar los resultados, de acuerdo con los requerimientos.
+593152 [APROBADO] — 04 Optimizar los resultados, de acuerdo con la verificación.
+
+────────────────────────────────────────────────────────────────
+37714 — Interactuar en lengua inglesa de forma oral y escrita
+dentro de contextos sociales y laborales
+────────────────────────────────────────────────────────────────
+593117 [APROBADO] — 01 Comprender información sobre situaciones cotidianas y laborales actuales y futuras a través de interacciones sociales de forma oral y escrita.
+593115 [APROBADO] — 02 Intercambiar opiniones sobre situaciones cotidianas y laborales actuales, pasadas y futuras en contextos sociales orales y escritos.
+593118 [APROBADO] — 03 Discutir sobre posibles soluciones a problemas dentro de un rango variado de contextos sociales y laborales.
+593114 [APROBADO] — 04 Implementar acciones de mejora relacionadas con el uso de expresiones, estructuras y desempeño según los resultados de aprendizaje formulados para el programa.
+593116 [APROBADO] — 05 Presentar un proceso para la realización de una actividad en su quehacer laboral de acuerdo con los procedimientos establecidos desde su programa de formación.
+593113 [APROBADO] — 06 Explicar las funciones de su ocupación laboral usando expresiones de acuerdo al nivel requerido por el programa de formación.
+
+────────────────────────────────────────────────────────────────
+37799 — Aplicar prácticas de protección ambiental, seguridad y
+salud en el trabajo de acuerdo con las políticas
+organizacionales y la normatividad vigente
+────────────────────────────────────────────────────────────────
+593156 [APROBADO] — 01 Analizar las estrategias para la prevención y control de los impactos ambientales y de los accidentes y enfermedades laborales (ATEL).
+593158 [APROBADO] — 02 Implementar estrategias para el control de los impactos ambientales y de los accidentes y enfermedades de acuerdo con los planes y programas establecidos.
+593157 [APROBADO] — 03 Realizar seguimiento y acompañamiento al desarrollo de los planes y programas ambientales y SST.
+593155 [APROBADO] — 04 Proponer acciones de mejora para el manejo ambiental y el control de la SST, de acuerdo con estrategias de trabajo colaborativo.
+
+────────────────────────────────────────────────────────────────
+37800 — Generar hábitos saludables de vida mediante la
+aplicación de programas de actividad física
+────────────────────────────────────────────────────────────────
+593120 [APROBADO] — 01 Desarrollar habilidades psicomotrices en el contexto productivo y social.
+593119 [APROBADO] — 02 Practicar hábitos saludables mediante la aplicación de fundamentos de nutrición e higiene.
+593121 [APROBADO] — 03 Ejecutar actividades de acondicionamiento físico orientadas hacia el mejoramiento de la condición física.
+593122 [APROBADO] — 04 Implementar un plan de ergonomía y pausas activas según las características de la función productiva.
+
+────────────────────────────────────────────────────────────────
+37801 — Aplicación de conocimientos de las ciencias naturales
+de acuerdo con situaciones del contexto productivo y social
+────────────────────────────────────────────────────────────────
+593162 [APROBADO] — 01 Identificar los principios y leyes de la física en la solución de problemas de acuerdo al contexto productivo.
+593159 [APROBADO] — 02 Solucionar problemas asociados con el sector productivo con base en los principios y leyes de la física.
+593161 [APROBADO] — 03 Verificar las transformaciones físicas de la materia utilizando herramientas tecnológicas.
+593160 [APROBADO] — 04 Proponer acciones de mejora en los procesos productivos de acuerdo con los principios y leyes de la física.
+
+────────────────────────────────────────────────────────────────
+37802 — Desarrollar procesos de comunicación eficaces y
+efectivos, teniendo en cuenta situaciones de orden social,
+personal y productivo
+────────────────────────────────────────────────────────────────
+593225 [APROBADO] — 01 Analizar los componentes de la comunicación según sus características, intencionalidad y contexto.
+593227 [APROBADO] — 02 Argumentar en forma oral y escrita atendiendo las exigencias y particularidades de las diversas situaciones comunicativas.
+593224 [APROBADO] — 03 Relacionar los procesos comunicativos teniendo en cuenta criterios de lógica y racionalidad.
+593226 [APROBADO] — 04 Establecer procesos de enriquecimiento lexical y acciones de mejoramiento en el desarrollo de procesos comunicativos.
+
+────────────────────────────────────────────────────────────────
+38199 — Orientar investigación formativa según referentes
+técnicos
+────────────────────────────────────────────────────────────────
+593236 [APROBADO] — 01 Analizar el contexto productivo según sus características y necesidades.
+593238 [APROBADO] — 02 Estructurar el proyecto de acuerdo a criterios de la investigación.
+593237 [APROBADO] — 03 Argumentar aspectos teóricos del proyecto según referentes nacionales e internacionales.
+593235 [APROBADO] — 04 Proponer soluciones a las necesidades del contexto según resultados de la investigación.
+
+────────────────────────────────────────────────────────────────
+38558 — Ejercer derechos fundamentales del trabajo en el marco
+de la constitución política y los convenios internacionales
+────────────────────────────────────────────────────────────────
+593243 [APROBADO] — 01 Reconocer el trabajo como factor de movilidad social y transformación vital con referencia a la fenomenología y los derechos fundamentales en el trabajo.
+593245 [APROBADO] — 02 Valorar la importancia de la ciudadanía laboral con base en el estudio de los derechos humanos y fundamentales en el trabajo.
+593244 [APROBADO] — 03 Practicar los derechos fundamentales en el trabajo de acuerdo con la Constitución Política y los Convenios Internacionales.
+593246 [APROBADO] — 04 Participar en acciones solidarias teniendo en cuenta el ejercicio de los derechos humanos, de los pueblos y de la naturaleza.
+
+────────────────────────────────────────────────────────────────
+38560 — Razonar cuantitativamente frente a situaciones
+susceptibles de ser abordadas de manera matemática
+────────────────────────────────────────────────────────────────
+593256 [APROBADO] — 01 Identificar modelos matemáticos de acuerdo con los requerimientos del problema planteado en contextos sociales y productivo.
+593258 [APROBADO] — 02 Plantear problemas matemáticos a partir de situaciones generadas en el contexto social y productivo.
+593255 [APROBADO] — 03 Resolver problemas matemáticos a partir de situaciones generadas en el contexto social y productivo.
+593257 [APROBADO] — 04 Proponer acciones de mejora frente a los resultados de los procedimientos matemáticos de acuerdo con el problema planteado.
+
+────────────────────────────────────────────────────────────────
+38561 — Gestionar procesos propios de la cultura emprendedora
+y empresarial de acuerdo con el perfil personal y los
+requerimientos de los contextos productivo y social
+────────────────────────────────────────────────────────────────
+593342 [APROBADO] — 01 Integrar elementos de la cultura emprendedora teniendo en cuenta el perfil personal y el contexto de desarrollo social.
+593259 [APROBADO] — 02 Caracterizar la idea de negocio teniendo en cuenta las oportunidades y necesidades del sector productivo y social.
+593340 [APROBADO] — 03 Estructurar el plan de negocio de acuerdo con las características empresariales y tendencias de mercado.
+593341 [APROBADO] — 04 Valorar la propuesta de negocio conforme con su estructura y necesidades del sector productivo y social.
+
+════════════════════════════════════════════════════════════════
+COMPETENCIA DE ETAPA PRODUCTIVA
+════════════════════════════════════════════════════════════════
+
+────────────────────────────────────────────────────────────────
+2 — Resultados de aprendizaje etapa práctica
+────────────────────────────────────────────────────────────────
+590803 [POR EVALUAR] — Aplicar en la resolución de problemas reales del sector productivo, los conocimientos, habilidades y destrezas pertinentes a las competencias del programa de formación asumiendo estrategias y metodologías de autogestión.
+
+════════════════════════════════════════════════════════════════
+RESUMEN
+════════════════════════════════════════════════════════════════
+Total competencias técnicas ADSO:   7 (38392, 38376, 38362, 38367, 38368, 38356, 38369)
+Total competencias transversales:  10 (36180, 36182, 37371, 37714, 37799, 37800, 37801, 37802, 38199, 38558, 38560, 38561)
+Total RAPs técnicos:               27
+Total RAPs transversales:          43
+Competencia etapa productiva:       1 (590803 — POR EVALUAR)
+
+Fuente: Reporte_de_Juicios_Evaluativos_Ficha2995403.xls
+Centro: 9201 — Centro del Diseño y Manufactura del Cuero
+Regional: 5 — Antioquia
+════════════════════════════════════════════════════════════════

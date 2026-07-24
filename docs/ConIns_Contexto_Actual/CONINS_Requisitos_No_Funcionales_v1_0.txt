@@ -1,0 +1,216 @@
+REQUISITOS NO FUNCIONALES — CONINS v1.0
+Centro del Diseño y Manufactura del Cuero — CDMC SENA
+Creado: 21 de Julio 2026
+
+========================================================================================
+
+ORIGEN DE ESTE DOCUMENTO:
+
+En el feedback del 21/07/2026 se observó que varios requisitos
+funcionales contenían detalles técnicos y requisitos no funcionales
+mezclados (mecanismos de sesión, tokens, códigos de respuesta, nombres
+de tecnologías). Este documento consolida todos los RNF del sistema:
+los 16 que ya existían en el ERS v3 y los extraídos de los RF durante
+el rework a v9.0.
+
+Convención: cada RNF indica, cuando aplica, de qué RF fue extraído.
+
+========================================================================================
+
+CATEGORÍA 1 — SEGURIDAD
+
+RNF-01  Almacenamiento de contraseñas
+        Todas las contraseñas se almacenan con hash bcrypt
+        (saltRounds >= 10). Ninguna contraseña se guarda en texto plano.
+
+RNF-02  Sesiones mediante JWT
+        El acceso a rutas protegidas requiere un token JWT válido en el
+        header Authorization: Bearer <token>. El token incluye el
+        identificador del usuario y su rol, con expiración configurable.
+        Peticiones sin token válido reciben HTTP 401.
+        (Extraído de RF-02 v8.0)
+
+RNF-03  Control de acceso basado en roles
+        El sistema aplica RBAC en dos capas: requireRole([]) para roles
+        globales y permisoService para el acceso contextual a registros.
+        Un rol inferior no puede ejecutar acciones de un rol superior.
+        Cuando un usuario tiene varios roles (RF-11), el token refleja
+        únicamente el rol con el que ingresó.
+
+RNF-04  Registro no habilitado
+        El intento de crear contraseña con un correo no habilitado
+        retorna HTTP 403 con mensaje descriptivo, sin revelar
+        información sobre usuarios existentes.
+        (Extraído de RF-01 v8.0)
+
+RNF-05  Token de recuperación de contraseña
+        El enlace de recuperación usa un token de un solo uso con
+        expiración de una hora. Un token usado o vencido es rechazado.
+        (Extraído de RF-04 v8.0)
+
+RNF-06  Cierre de sesión
+        El cierre de sesión descarta el token en el cliente. Todo
+        intento posterior de acceso sin token válido redirige al inicio
+        de sesión.
+        (Extraído de RF-06 v8.0)
+
+RNF-07  Protección de datos personales
+        El tratamiento del tipo y número de documento de identidad
+        cumple la Ley 1581 de 2012 (habeas data): los datos solo son
+        visibles para los administradores y para el propio titular.
+
+========================================================================================
+
+CATEGORÍA 2 — RENDIMIENTO
+
+RNF-08  Tiempo de respuesta
+        Las peticiones de consulta (GET) responden en menos de 2
+        segundos en condiciones normales de uso en red local.
+
+RNF-09  Cálculo de horas en el servidor
+        El cálculo de carga horaria semanal se ejecuta exclusivamente
+        en el backend (horarioService). El frontend nunca calcula ni
+        muestra horas calculadas localmente, garantizando consistencia
+        entre todos los clientes.
+
+========================================================================================
+
+CATEGORÍA 3 — INTEGRIDAD DE LA LÓGICA
+
+RNF-10  Lógica de negocio exclusivamente en el servidor
+        Toda la lógica de negocio, las validaciones de reglas y los
+        cálculos se ejecutan en el servidor. El frontend consume los
+        servicios y presenta las respuestas; no implementa reglas de
+        negocio ni validaciones de fondo de forma independiente.
+        (Era el RF-50 de v8.0, reclasificado como RNF)
+
+RNF-11  Respuestas de conflicto descriptivas
+        Las validaciones que impiden un registro (cruce de horarios,
+        RAP duplicado) retornan HTTP 409 con la descripción del
+        conflicto: qué regla se violó y qué registro lo causa.
+        (Extraído de RF-40 v8.0)
+
+RNF-12  Estados automáticos por fechas
+        Los estados que dependen de fechas (novedades vencidas,
+        bloqueos vencidos) se actualizan automáticamente mediante
+        triggers de base de datos o procesos programados, sin
+        intervención manual. El estado visible siempre corresponde a
+        las fechas vigentes.
+        (Derivado del feedback 21/07/2026 — soporta RN-22)
+
+========================================================================================
+
+CATEGORÍA 4 — DISPONIBILIDAD
+
+RNF-13  Entorno de operación
+        En la etapa de desarrollo académico el sistema opera en entorno
+        local (Laragon). La disponibilidad depende del servidor local
+        del CDMC.
+
+========================================================================================
+
+CATEGORÍA 5 — USABILIDAD
+
+RNF-14  Identidad visual institucional
+        La interfaz usa la paleta y tipografía del Manual de Identidad
+        Visual SENA 2024: Work Sans, verde #39A900, navy #00304D,
+        íconos outline sin relleno.
+
+RNF-15  Mensajes de error
+        Los mensajes de error del backend son descriptivos y se
+        muestran en la interfaz sin modificación. El frontend no
+        reescribe los mensajes de la API.
+
+RNF-16  Terminología configurable — GRUPO
+        El término "grupo" (oficial desde 21/07/2026) se gestiona en el
+        frontend mediante una constante de terminología. El cambio
+        ficha→grupo no requiere modificar la base de datos ni el
+        backend.
+
+RNF-17  Correo condicionado al entorno
+        El envío de correos (recuperación de contraseña, notificaciones
+        al instructor) depende de la configuración SMTP del entorno. Su
+        ausencia no bloquea los flujos internos del sistema: las
+        notificaciones internas se registran siempre.
+
+========================================================================================
+
+CATEGORÍA 6 — MANTENIBILIDAD
+
+RNF-18  Arquitectura por capas
+        El backend sigue la separación estricta Controller (solo HTTP)
+        → Service (lógica de negocio) → DB (queries). Sin lógica de
+        negocio en controllers ni en la capa de datos.
+
+RNF-19  Nada se elimina físicamente
+        Todas las tablas implementan soft delete con el campo activo
+        BOOLEAN NOT NULL DEFAULT TRUE. Nunca se ejecuta DELETE físico.
+
+RNF-20  Listados filtrados
+        Todas las consultas de listado filtran por registros activos
+        por defecto. Los registros inactivos solo aparecen en consultas
+        históricas explícitas.
+
+RNF-21  Registro del último acceso
+        El sistema registra la fecha y hora del último ingreso de cada
+        usuario en el momento del inicio de sesión exitoso.
+        (Extraído de RF-02 v8.0)
+
+========================================================================================
+
+CATEGORÍA 7 — ESCALABILIDAD
+
+RNF-22  Modelo de roles extensible
+        La relación usuario-rol es de muchos a muchos (usuario_roles),
+        lo que soporta usuarios con múltiples roles simultáneos —
+        incluida la herencia del rol instructor para directivos
+        (RF-11) — sin modificar el esquema.
+
+RNF-23  Catálogos editables sin cambios estructurales
+        Los nombres de áreas, tipos de novedad y tipos de actividad son
+        datos de catálogo, editables sin alterar la estructura de la
+        base de datos.
+
+========================================================================================
+
+CATEGORÍA 8 — TRAZABILIDAD
+
+RNF-24  Auditoría inalterable
+        La bitácora de auditoría (RF-53) es de solo lectura: ninguna
+        operación del sistema ni ningún rol puede editar o eliminar sus
+        registros. Cada entrada queda asociada al usuario autenticado y
+        al momento exacto de la operación.
+
+========================================================================================
+
+RESUMEN
+Total de requisitos no funcionales: 24
+
+   Categoría                      RNF              Total
+   Seguridad                      RNF-01 a RNF-07    7
+   Rendimiento                    RNF-08 a RNF-09    2
+   Integridad de la lógica        RNF-10 a RNF-12    3
+   Disponibilidad                 RNF-13             1
+   Usabilidad                     RNF-14 a RNF-17    4
+   Mantenibilidad                 RNF-18 a RNF-21    4
+   Escalabilidad                  RNF-22 a RNF-23    2
+   Trazabilidad                   RNF-24             1
+
+========================================================================================
+
+TRAZABILIDAD RF → RNF (extracciones del rework v9.0):
+
+   RF v8.0 origen    Contenido técnico extraído          RNF destino
+   RF-01             HTTP 403 sin contraseña             RNF-04
+   RF-02             JWT, expiración, último acceso      RNF-02, RNF-21
+   RF-04             Token 1 uso / 1 hora, SMTP          RNF-05, RNF-17
+   RF-06             Descarte del token                  RNF-06
+   RF-40             HTTP 409 descriptivo                RNF-11
+   RF-50             Lógica solo en servidor             RNF-10
+   Feedback 21/07    Triggers de estados                 RNF-12
+   Feedback 21/07    Terminología GRUPO                  RNF-16
+
+========================================================================================
+
+CONINS · SENA CDMC · Requisitos No Funcionales v1.0 · 21 de Julio 2026
+Autores: Jair Enrique González Buelvas · Laura Sofía Posada

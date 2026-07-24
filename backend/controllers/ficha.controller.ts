@@ -13,13 +13,22 @@ export const getById = asyncHandler(async (req: Request, res: Response) => {
   ApiResponse.success(res, ficha);
 });
 
+// RF-44: el "referente de grupo" del frontend se persiste en fichas.lider_id.
+// Se acepta referente_id como alias de lider_id sin duplicar columna.
+function mapReferente(body: any): any {
+  if (body && body.referente_id !== undefined && body.lider_id === undefined) {
+    return { ...body, lider_id: body.referente_id };
+  }
+  return body;
+}
+
 export const create = asyncHandler(async (req: Request, res: Response) => {
-  const ficha = await FichaService.create(req.body);
+  const ficha = await FichaService.create(mapReferente(req.body));
   ApiResponse.created(res, ficha, 'Ficha creada exitosamente');
 });
 
 export const update = asyncHandler(async (req: Request, res: Response) => {
-  const ficha = await FichaService.update(Number(req.params.id), req.body);
+  const ficha = await FichaService.update(Number(req.params.id), mapReferente(req.body));
   ApiResponse.success(res, ficha, 'Ficha actualizada exitosamente');
 });
 

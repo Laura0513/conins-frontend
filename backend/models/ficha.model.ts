@@ -27,7 +27,10 @@ export interface FichaDetail extends RowDataPacket {
   modalidad: string;
   instructores_count: number;
   ambiente: string | null;
+  lider_id: number | null;
+  referente_id: number | null;
   lider_nombre: string | null;
+  referente_nombre: string | null;
   fecha_inicio_lectiva: string | null;
   fecha_fin_lectiva: string | null;
   fecha_inicio_productiva: string | null;
@@ -101,7 +104,8 @@ export const FichaModel = {
              f.etapa, p.modalidad,
              COUNT(DISTINCT a.id) AS instructores_count,
              ab.nombre AS ambiente,
-             lu.nombre AS lider_nombre,
+             f.lider_id, f.lider_id AS referente_id,
+             lu.nombre AS lider_nombre, lu.nombre AS referente_nombre,
              f.fecha_inicio_lectiva, f.fecha_fin_lectiva,
              f.fecha_inicio_productiva, f.fecha_fin_productiva, f.fecha_fin_ficha,
              f.estado, f.activo

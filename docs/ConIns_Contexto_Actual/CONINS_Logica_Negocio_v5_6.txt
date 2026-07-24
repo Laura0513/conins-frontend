@@ -1,0 +1,486 @@
+LÓGICA DE NEGOCIO — CONINS v5.6
+Centro del Diseño y Manufactura del Cuero — CDMC SENA
+Versión: 5.6 · Fecha: 21 de Julio 2026
+Basado en: RF v10.1 · sesiones 23/04, 28/04, 04/05, 11/06, 06/07, 15/07 y 21/07/2026
+
+NOTA DE VIGENCIA (21/07/2026): documento actualizado a v5.6 para alinearlo
+con Requisitos Funcionales v10.1. La versión previa (v5.5) quedó basada en
+RF v9.0 y contenía una RN-15 contradictoria con el modelo adoptado. Cambios
+principales respecto a v5.5:
+  - RN-15 REDEFINIDA: se revierte la herencia automática de RAPs. La
+    asignación es explícita hasta el RAP (instructor → grupo → competencia
+    → RAP), con máximo un instructor por RAP en cada grupo.
+  - RN-25, RN-26, RN-27 NUEVAS: gestión (CRUD) de competencias y RAPs sobre
+    la carga base de Sofía Plus; estado de asignación del RAP; validación de
+    que el RAP pertenezca al programa del grupo.
+  - Sección 5 (modelo de entidades): RAP ya no se hereda.
+  - Sección 8 (schema): tabla nueva asignacion_rap, rap_id en horarios,
+    fecha_fin_productiva en fichas, capacidad en ambientes (pendientes de
+    implementar, ver sección 11).
+  - Sección 9: resumen actualizado a RF v10.1 (62 RF en 12 módulos).
+Los RNF viven en CONINS_Requisitos_No_Funcionales_v1_0.txt.
+
+========================================================================================
+
+1. OBJETIVO DEL SISTEMA
+
+CONINS es un sistema de control de malla de horarios del CDMC. Su pregunta
+central es:
+
+   ¿Qué instructor cubre qué RAP, de qué competencia, en qué grupo, en qué
+   ambiente y en qué jornada?
+
+No es un sistema curricular, no es un gestor de infraestructura, no
+reemplaza a Sofía Plus.
+
+Lo que CONINS NO gestiona:
+
+   Dato                                  Quién lo gestiona
+   Notas y juicios evaluativos           Sofía Plus
+   Creación/edición de programas         Datos oficiales SENA (precarga)
+   Estado académico del curso            Sofía Plus
+   Jornadas                              Datos institucionales (precarga)
+
+NOVEDAD v10.x: las COMPETENCIAS y RAPs conservan la carga base de Sofía
+Plus como precarga, pero ahora tienen gestión administrativa (crear, editar,
+deshabilitar) desde la interfaz (RF-25 a RF-28, RN-25). Los AMBIENTES tienen
+gestión completa desde RF v8.0 (registro, edición, capacidad, bloqueos).
+
+========================================================================================
+
+2. TERMINOLOGÍA OFICIAL — GRUPO
+
+Desde el 21/07/2026, "FICHA" pasa a llamarse "GRUPO" en toda la interfaz
+y la documentación funcional (feedback Coordinación Académica).
+
+   - La interfaz de usuario muestra "Grupo" en todas las pantallas.
+   - La base de datos conserva la tabla fichas y sus columnas por
+     compatibilidad; la traducción es responsabilidad del frontend
+     mediante la constante de terminología (RNF-16).
+   - Los documentos técnicos pueden referirse a "grupo (ficha)" cuando
+     sea necesario desambiguar contra la BD.
+
+========================================================================================
+
+3. ACCESO AL SISTEMA — ONBOARDING EN DOS PASOS
+
+Paso 1 (RF-07) — El administrador habilita la cuenta:
+   Registra al usuario con correo, nombre, rol, tipo y número de
+   documento. La cuenta queda sin contraseña: el usuario aún no puede
+   entrar.
+
+Paso 2 (RF-01) — El usuario crea su contraseña:
+   Con su correo registrado establece su contraseña y puede iniciar
+   sesión. Si el correo no está habilitado, el sistema lo informa.
+
+Paso 3 en adelante: inicio de sesión normal (RF-02).
+
+Recuperación de contraseña (RF-04): mediante enlace temporal de un solo
+uso enviado al correo registrado. Requiere correo configurado en el
+entorno (RNF-17).
+
+Campo de login: correo electrónico registrado. Puede ser @sena.edu.co o
+personal, sin restricción de dominio.
+
+========================================================================================
+
+4. ROLES DEL SISTEMA
+
+Tabla de roles (4 entradas exactas):
+
+   ID  Nombre                    Nivel  Alcance
+   1   Subdirector               1      CDMC completo
+   2   Coordinadora Academica    2      Alcance de gestión completo
+   3   Asistente Coordinacion    3      Mismos permisos que Coordinadora
+   4   Instructor                4      Solo lectura de sus grupos
+
+Datos organizativos SIN impacto en permisos:
+   - Referente de programa (lider_programa): relación instructor-programa.
+   - Referente de grupo (es_lider_ficha): campo booleano en la asignación.
+
+HERENCIA DE ROL INSTRUCTOR (RN-18):
+   Los directivos que fueron o son instructores conservan el rol
+   Instructor disponible en su cuenta. Cuando actúan como instructores,
+   ingresan al sistema bajo ese rol y el sistema los trata exactamente
+   como a cualquier instructor. Los permisos de los roles no se suman ni
+   se mezclan: el alcance depende del rol con el que se ingresó.
+
+========================================================================================
+
+5. MODELO DE ENTIDADES (clarificado 21/07/2026 — modelo RAP directo)
+
+INSTRUCTOR:
+   - Se le asignan: competencias, RAPs específicos, ambientes (vía
+     horarios) y grupos.
+   - Puede pertenecer al área técnica (medular), transversal o ambas.
+   - Su carga horaria semanal debe mantenerse entre 20 y 40 horas.
+
+GRUPO (ficha):
+   - Tiene UN SOLO programa de formación.
+   - Tiene VARIAS competencias (dictadas por sus instructores asignados).
+   - Cada RAP del grupo está a cargo de UN SOLO instructor (RN-06).
+   - Tiene DOS etapas con fechas propias: fecha de inicio y fin de la
+     etapa LECTIVA, y fecha de inicio y fin de la etapa PRODUCTIVA.
+   - Tiene UN instructor referente (líder).
+   - Tiene UN SOLO ambiente asignado por defecto, que puede modificarse
+     únicamente durante la etapa lectiva.
+   - Tiene UNA SOLA jornada.
+
+AMBIENTE:
+   - Tiene: tipo de ambiente (físico o virtual), capacidad máxima de
+     personas, estado (activo o inactivo), y una ocupación derivada de
+     los horarios (jornada y franjas en que está ocupado).
+   - Los grupos se asignan a los ambientes de la misma forma en que se
+     asignan en los horarios: toda ocupación de ambiente pasa por el
+     registro de horarios.
+
+COMPETENCIA / RAP (Resultado de Aprendizaje):
+   - Tienen carga base precargada de Sofía Plus + gestión administrativa
+     posterior: crear, editar, deshabilitar (RF-25 a RF-28, RN-25).
+   - Un RAP puede dictarse en VARIOS grupos.
+   - Dentro de cada grupo, cada RAP está a cargo de UN SOLO instructor
+     (RN-06 reforzada).
+   - Los RAPs se asignan EXPLÍCITAMENTE al instructor dentro de la
+     competencia; NO se heredan (RN-15 redefinida 21/07/2026).
+   - El RAP que se dicta en un bloque de horario debe pertenecer al
+     programa del grupo (RN-27).
+   - Cada RAP en seguimiento tiene fechas de inicio y fin, y un estado:
+     pendiente por evaluar, aprobado o no aprobado (RN-21).
+
+Cadena de asignación (modelo v10.x):
+
+   instructor → grupo → competencia → RAP
+   (asignacion → asignacion_competencia → asignacion_rap)
+
+========================================================================================
+
+6. REGLAS DE NEGOCIO
+
+RN-01 · Onboarding obligatorio
+   Paso 1: el administrador crea la cuenta (correo, nombre, rol,
+   documento) — sin contraseña.
+   Paso 2: el usuario crea su contraseña.
+   Sin el paso 1, el paso 2 es imposible y el sistema informa que la
+   cuenta no está habilitada.
+
+RN-02 · Correo como identificador único
+   Campo de acceso para todos los roles. Puede ser institucional o
+   personal. Solo un administrador puede cambiarlo.
+
+RN-03 · Jornada restringida
+   Horario en jornada nocturna o en sábado/domingo genera un aviso
+   (no impide el registro). Aplica a todos los instructores.
+
+RN-04 · Cruce de horarios del instructor — impedimento
+   Un instructor no puede tener dos horarios activos que se crucen en el
+   mismo día. El sistema impide el registro y explica el conflicto.
+   Es la única validación que bloquea por completo.
+
+RN-05 · Ambiente ocupado — aviso
+   Si el ambiente ya está ocupado en la misma jornada y día por otro
+   grupo, el sistema avisa antes de confirmar pero permite continuar
+   (los talleres pueden albergar varios grupos).
+
+RN-06 · Unicidad de RAP por grupo (reforzada 21/07/2026)
+   Un RAP no puede estar a cargo de dos instructores distintos en el
+   mismo grupo. Sí puede repetirse en grupos diferentes. Con el modelo
+   RAP directo, esta unicidad se valida al asignar el RAP (RF-42) y al
+   registrar el horario que lo dicta (RF-34).
+
+RN-07 · Rango de carga horaria semanal
+   Entre 20 y 40 horas semanales para todos los instructores. Fuera del
+   rango se genera un aviso (no se bloquea). Solo suman carga los bloques
+   aprobados cuyo tipo de actividad así lo determine.
+
+RN-08 · Novedad administrativa del instructor
+   Con novedad vigente (fecha de inicio ≤ hoy ≤ fecha de regreso), el
+   instructor queda excluido de nuevas asignaciones. Al vencer la fecha
+   de regreso se reincorpora automáticamente. Su cuenta sigue activa.
+
+RN-09 · Bloqueo temporal de ambiente
+   Con bloqueo vigente, el ambiente queda excluido de nuevos horarios.
+   Al vencer la fecha de fin se reincorpora automáticamente.
+
+RN-10 · Nada se elimina físicamente
+   Todos los registros se deshabilitan, nunca se borran. Los listados
+   muestran solo lo activo; el historial completo es consultable.
+
+RN-11 · Asignación provisional con trazabilidad
+   Requiere autorizante, fecha de autorización y motivo obligatorios.
+   Sin alguno de ellos, no se registra.
+
+RN-12 · Solo administradores registran provisionales
+   El rol Instructor no puede registrar asignaciones provisionales.
+
+RN-13 · Competencia habilitada como condición
+   Solo se pueden asignar a un instructor las competencias que tiene
+   habilitadas. El sistema filtra y muestra únicamente las disponibles.
+
+RN-14 · Grupos virtuales
+   Los grupos de modalidad virtual no requieren ni validan ambiente
+   físico.
+
+RN-15 · Asignación explícita de RAP (REDEFINIDA 21/07/2026)
+   Se revierte la herencia automática. Al asignar una competencia a un
+   instructor en un grupo, los RAPs NO quedan a su cargo de forma
+   automática. El administrador asigna explícitamente cada RAP que el
+   instructor dictará dentro de esa competencia. Cada RAP solo puede
+   estar a cargo de un instructor por grupo (RN-06).
+
+RN-16 · Trazabilidad del cambio de instructor
+   Al cambiar el instructor de una competencia o RAP activo, queda
+   registrado quién era el anterior y cuándo ocurrió el cambio.
+
+RN-17 · Terminología GRUPO (actualizada 21/07/2026)
+   "Grupo" es el término oficial de la interfaz. La traducción
+   ficha→grupo se resuelve en el frontend mediante configuración, sin
+   tocar la base de datos (RNF-16).
+
+RN-18 · Herencia de rol instructor
+   Un directivo puede tener adicionalmente el rol Instructor. Al
+   ingresar, opera bajo un solo rol a la vez: como directivo ve su
+   alcance de gestión; como instructor ve solo sus grupos, competencias
+   y horarios. Los permisos nunca se suman.
+
+RN-19 · Fechas de las dos etapas del grupo
+   Cada grupo registra fecha de inicio y fin de la etapa lectiva Y de la
+   etapa productiva. El avance de etapa es irreversible y coherente con
+   esas fechas. La consulta del grupo muestra ambas parejas de fechas.
+
+RN-20 · Ambiente y jornada únicos del grupo
+   Cada grupo tiene un solo ambiente por defecto y una sola jornada.
+   El ambiente puede modificarse únicamente mientras el grupo esté en
+   etapa lectiva. El cambio valida disponibilidad del nuevo ambiente.
+
+RN-21 · Estados del RAP en seguimiento
+   Cada RAP en seguimiento tiene uno de tres estados: pendiente por
+   evaluar, aprobado o no aprobado. Todo cambio de estado queda en la
+   bitácora con fecha y usuario. El juicio evaluativo oficial permanece
+   en Sofía Plus.
+
+RN-22 · Estados automáticos por fechas
+   El sistema actualiza automáticamente los estados que dependen de
+   fechas y actúa en consecuencia sin intervención manual:
+   - Novedad de instructor vencida → instructor disponible de nuevo.
+   - Novedad de grupo vencida → grupo disponible de nuevo.
+   - Bloqueo de ambiente vencido → ambiente disponible de nuevo.
+   Los mecanismos (triggers de base de datos o procesos programados)
+   son decisión de implementación; la regla exige que el estado visible
+   siempre corresponda a las fechas vigentes.
+
+RN-23 · Integridad total de horarios
+   Cualquier asignación o interacción que ocupe tiempo de un instructor,
+   un grupo o un ambiente se integra a los registros de horarios. No
+   existen caminos que permitan crear ocupación sin pasar por las
+   validaciones de cruce (RN-04), ambiente (RN-05, RN-09) y novedades
+   (RN-08). Ninguna pantalla ni módulo queda exento.
+
+RN-24 · Flujos multi-camino equivalentes
+   Una misma operación puede iniciarse desde cualquiera de los módulos
+   relacionados (horarios, grupos, instructores, asignaciones o
+   ambientes) y produce exactamente el mismo resultado con las mismas
+   validaciones. El camino elegido por el usuario nunca cambia las
+   reglas que se aplican.
+
+RN-25 · Gestión de competencias y RAPs (NUEVA 21/07/2026)
+   Las competencias y sus RAPs conservan la carga base de Sofía Plus y
+   admiten gestión administrativa: crear, editar y deshabilitar. La
+   deshabilitación es lógica (RN-10). Solo los administradores gestionan
+   estos catálogos; el instructor conserva solo lectura.
+
+RN-26 · Estado de asignación del RAP (NUEVA 21/07/2026)
+   Dentro de un grupo, cada RAP está en uno de dos estados: asignado a un
+   instructor o disponible. La consulta de RAPs muestra ese estado. Un
+   RAP no puede deshabilitarse mientras tenga una asignación activa; hay
+   que desactivar la asignación primero.
+
+RN-27 · RAP dentro del programa del grupo (NUEVA 21/07/2026)
+   El RAP referenciado en un bloque de horario debe pertenecer a una
+   competencia del programa del grupo. Se valida al registrar y al editar
+   el horario (RF-34, RF-35). Un RAP ajeno al programa se rechaza.
+
+========================================================================================
+
+7. STACK TECNOLÓGICO
+
+   Frontend       Next.js 15 (Pages Router) · React 19 · TypeScript ·
+                  Tailwind CSS 4 · Lucide React · Fetch nativo
+   Backend        Node.js · Express 5 · TypeScript · MVC · ESM6
+   Autenticación  JWT + bcrypt
+   Correo         Nodemailer
+   Base de datos  MySQL (conIns) · phpMyAdmin · Laragon
+   IDE / VCS      VS Code · Git + GitHub
+
+Las reglas de arquitectura (capas, validaciones en servidor, mensajes de
+error, cálculo de horas en backend) se formalizaron como RNF en
+CONINS_Requisitos_No_Funcionales_v1_0.txt.
+
+========================================================================================
+
+8. MODELO DE DATOS — schema v5.3 (28 tablas al 15/07/2026)
+
+Jerarquía central (modelo RAP directo v10.x):
+
+   instructor
+     └── asignacion  (instructor_id, ficha_id, es_lider_ficha, es_provisional)
+           └── asignacion_competencia  (asignacion_id, competencia_id)
+                 └── asignacion_rap  (asignacion_competencia_id, rap_id)  ← NUEVA, asignación explícita
+                       └── raps
+
+   La herencia automática de RAPs (modelo v9.x y anteriores) queda
+   reemplazada por la asignación explícita en asignacion_rap. La unicidad
+   de un instructor por RAP en el grupo se garantiza con UNIQUE lógico
+   sobre (ficha_id, rap_id) a través de la cadena.
+
+Catálogos base (precarga + gestión administrativa desde RF v10.x):
+   roles, programas, competencias, raps, ambientes, jornadas, fichas
+   tipos_actividad, tipos_novedad_instructor, tipos_novedad_ambiente,
+   tipos_novedad_ficha
+
+Usuarios y roles:
+   usuarios, usuario_roles, instructores, lider_programa,
+   instructor_competencias_habilitadas, password_reset_tokens
+
+Novedades y bloqueos:
+   instructor_novedades, ficha_novedades, ambiente_bloqueos
+
+Asignaciones:
+   asignacion, asignacion_competencia
+   asignacion_rap  ← NUEVA (pendiente de implementar, P29b)
+
+Horarios, alertas, notificaciones y seguimiento:
+   horarios (con estado, motivo_rechazo, motivo_suspension,
+   tipo_actividad_id, rap_id ← pendiente), alertas, notificaciones,
+   rap_ficha_seguimiento, auditoria
+
+CAMBIOS DE SCHEMA PENDIENTES POR EL REWORK 21/07/2026 (ver sección 11):
+   - asignacion_rap: tabla nueva (instructor_id → rap dentro de la
+     competencia). Lleva el schema de 28 → 29 tablas.
+   - horarios: agregar rap_id FK + validación RN-27.
+   - fichas: agregar fecha_fin_productiva (hoy existen fecha_inicio,
+     fecha_fin, fecha_inicio_productiva).
+   - ambientes: verificar/agregar columna capacidad (máximo de personas).
+   - rap_ficha_seguimiento: verificar que estado soporte los tres valores
+     (pendiente, aprobado, no_aprobado) y registro en bitácora.
+   - auditoria: confirmar bitácora transversal (RF-59, RNF-24 inalterable).
+
+========================================================================================
+
+9. RESUMEN DE RF v10.1 — 62 RF EN 12 MÓDULOS
+
+   Módulo                                  Rango            Total
+   AUTH                                    RF-01 a RF-11    11
+   Instructores                            RF-12 a RF-16     5
+   Grupos                                  RF-17 a RF-22     6
+   Programas                               RF-23 a RF-24     2
+   Competencias y RAPs                     RF-25 a RF-28     4
+   Ambientes                               RF-29 a RF-33     5
+   Horarios                                RF-34 a RF-40     7
+   Asignaciones                            RF-41 a RF-46     6
+   Alertas y Notificaciones                RF-47 a RF-53     7
+   Consulta y Reportes                     RF-54 a RF-57     4
+   Seguridad y Trazabilidad                RF-58 a RF-60     3
+   Seguimiento de RAPs                     RF-61 a RF-62     2
+   Total                                                    62
+
+Ver CONINS_Requisitos_Funcionales_v10_1.txt para el texto completo y el
+mapa de decisiones del feedback del líder técnico.
+
+========================================================================================
+
+10. FLUJOS DE TRABAJO MULTI-CAMINO (feedback 21/07/2026)
+
+El sistema está diseñado para que las operaciones cotidianas de la
+coordinación puedan resolverse desde cualquier módulo relacionado, sin
+rutas obligatorias. Tres escenarios reales ilustran el principio:
+
+ESCENARIO 1 — Instructor libre:
+   La coordinadora quiere organizar el horario del lunes y nota que un
+   instructor está libre. Puede entrar por el módulo de horarios, de
+   instructores o de asignaciones — cualquier camino es válido. Toma al
+   instructor y le asigna un grupo, un RAP de ese grupo que esté dentro
+   de sus competencias habilitadas, y un ambiente. El sistema valida en
+   ese orden: competencia habilitada (RN-13), RAP único en el grupo
+   (RN-06), RAP dentro del programa del grupo (RN-27), disponibilidad del
+   instructor (RN-04, RN-08), y ambiente disponible (RN-05, RN-09).
+
+ESCENARIO 2 — Grupo sin instructor:
+   Un instructor se incapacita y su grupo queda sin cobertura ese día.
+   La coordinadora entra por el módulo de grupos, horarios o
+   asignaciones, toma el grupo y le asigna un instructor disponible, la
+   competencia y el RAP que corresponde ver ese día (o el que el
+   instructor sustituto tenga habilitado), y el ambiente — el que el
+   grupo tiene por defecto u otro disponible. Si el sustituto está fuera
+   de su área, la asignación se registra como provisional con
+   autorizante, fecha y motivo (RN-11).
+
+ESCENARIO 3 — Ambiente liberado:
+   Un grupo salió de excursión y su ambiente quedó libre, pero nadie
+   registró la salida. La administradora registra la novedad del grupo
+   (RF-22) desde el módulo de grupos o de ambientes, lo que libera el
+   ambiente durante el periodo, y luego asigna su reunión en ese
+   ambiente. El sistema refleja la liberación de inmediato (RN-22).
+
+PRINCIPIO GENERAL:
+   Todos los caminos convergen en los mismos registros y las mismas
+   validaciones (RN-23, RN-24). La flexibilidad está en la navegación,
+   nunca en las reglas.
+
+========================================================================================
+
+11. PENDIENTES ACTIVOS (al 21/07/2026)
+
+   #    Pendiente                                          Prioridad
+   P4   Lista oficial de instructores con correo           Media
+   P8   Apellido co-líder Rivera (Técnico Medular)         Baja
+   P9   Apellido Catalina (líder Talento Humano)           Baja
+   P10  Revisar Resolución 1415/2012 y Acuerdo 0003/2017   Baja
+   P16  Infraestructura de pruebas automatizadas           Media
+   P17  Seguridad: xss-clean, CSRF, validación de rutas    Media
+   P26  Expansión línea medular (Calzado/Cuero)            Baja
+   P27  Configurar SMTP para correo                        Media
+   P28  CrearBloqueHorarioModal usa ficha.id en lugar de   Media
+        ficha.programa_id
+   P29  Schema: agregar fecha_fin_productiva a fichas;     Alta
+        verificar capacidad en ambientes
+   P29b Schema: tabla asignacion_rap (modelo RAP directo)  Alta
+        + rap_id en horarios (RN-27)
+   P30  Verificar estados del RAP en                       Alta
+        rap_ficha_seguimiento y registro en bitácora
+   P31  Confirmar/implementar bitácora de auditoría        Alta
+        transversal (RF-59, RNF-24)
+   P32  Frontend: aplicar terminología GRUPO en todas      Alta
+        las pantallas (terminology)
+   P33  Selector de rol activo al iniciar sesión para      Media
+        usuarios con múltiples roles (RF-11)
+   P34  Módulo CRUD Competencias y RAPs (RF-25 a RF-28,    Alta
+        RN-25) — hoy solo seed
+   P35  Asignación explícita de RAP (RF-42, RN-15          Alta
+        redefinida) — hoy herencia automática
+   P36  Horario vinculado a RAP (RF-34, RN-27)             Alta
+
+========================================================================================
+
+12. HISTORIAL DE VERSIONES
+
+   Versión  Fecha        Cambios principales
+   v1–v4.1  Abril 2026   Modelo inicial → flujo /auth, roles depurados
+   v5.0     28/04/2026   RN-08, RN-09, schema 19 tablas
+   v5.1     06/05/2026   Stack Next.js 15. Schema v4, 20 tablas
+   v5.2     11/06/2026   horarios con estados. 27 tablas, 47 RF
+   v5.3     30/06/2026   Schema v5 corregido. Triggers corregidos
+   v5.4     15/07/2026   4 roles vigentes. tipo_contrato eliminado.
+                         28 tablas. RF v8.0 (53 RF)
+   v5.5     21/07/2026   Rework por feedback: terminología GRUPO,
+                         modelo de entidades clarificado, RN-18 a
+                         RN-24, flujos multi-camino, RF v9.0 (56 RF),
+                         RNF separados en documento propio
+   v5.6     21/07/2026   Alineación con RF v10.1: RN-15 redefinida
+                         (RAP directo, sin herencia), RN-25/26/27
+                         nuevas, tabla asignacion_rap, rap_id en
+                         horarios, RF v10.1 (62 RF, 12 módulos)
+
+========================================================================================
+
+CONINS · SENA CDMC · Lógica de Negocio v5.6 · 21 de Julio 2026
+Autores: Jair Enrique González Buelvas · Laura Sofía Posada
