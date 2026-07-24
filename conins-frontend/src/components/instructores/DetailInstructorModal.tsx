@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { X, User, Mail, FileText, Clock, AlertCircle, BookOpen, Calendar, Loader2 } from "lucide-react"
 import { api } from "@/lib/api"
+import { formatJornada } from "@/lib/terminology"
 
 type Instructor = {
   id: number
@@ -153,7 +154,7 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor }: D
                               </span>
                             )}
                           </p>
-                          <p className="text-xs text-gray-500">{asig.programa} - {asig.jornada}</p>
+                          <p className="text-xs text-gray-500">{asig.programa} - {formatJornada(asig.jornada)}</p>
                         </div>
                         <span className="text-sm font-medium text-gray-700">{asig.horas_asignadas}h</span>
                       </div>

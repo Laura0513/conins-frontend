@@ -16,9 +16,13 @@ const HORAS = ["06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "1
 
 const JORNADA_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   "Manana": { bg: "bg-green-50", text: "text-green-800", border: "border-green-200" },
+  "manana": { bg: "bg-green-50", text: "text-green-800", border: "border-green-200" },
   "Mixta": { bg: "bg-blue-50", text: "text-blue-800", border: "border-blue-200" },
+  "mixta": { bg: "bg-blue-50", text: "text-blue-800", border: "border-blue-200" },
   "Noche": { bg: "bg-purple-50", text: "text-purple-800", border: "border-purple-200" },
+  "noche": { bg: "bg-purple-50", text: "text-purple-800", border: "border-purple-200" },
   "Virtual": { bg: "bg-gray-50", text: "text-gray-800", border: "border-gray-200" },
+  "virtual": { bg: "bg-gray-50", text: "text-gray-800", border: "border-gray-200" },
 }
 
 function getHoraInicio(horas: string) {

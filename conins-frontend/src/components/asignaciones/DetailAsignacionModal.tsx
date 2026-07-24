@@ -1,4 +1,5 @@
 import { X, User, BookOpen, MapPin, Clock, Star, FileText, Calendar } from "lucide-react"
+import { formatJornada } from "@/lib/terminology"
 
 type Asignacion = {
   id: number
@@ -63,7 +64,7 @@ export default function DetailAsignacionModal({ isOpen, onClose, asignacion }: D
               <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
               <div>
                 <p className="text-xs text-gray-500">Jornada</p>
-                <p className="text-sm text-gray-900">{asignacion.jornada}</p>
+                <p className="text-sm text-gray-900">{formatJornada(asignacion.jornada)}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">

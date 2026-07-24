@@ -3,6 +3,7 @@ import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
+import { formatJornada } from "@/lib/terminology"
 import { exportarHorariosPDF } from "@/lib/exportPDF"
 import CrearHorarioModal from "@/components/horarios/CrearHorarioModal"
 import CrearBloqueHorarioModal from "@/components/horarios/CrearBloqueHorarioModal"
@@ -328,10 +329,10 @@ export default function HorariosPage() {
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="todas">Jornada: Todas</option>
-              <option value="Mañana">Mañana</option>
-              <option value="Mixta">Mixta</option>
-              <option value="Noche">Noche</option>
-              <option value="Virtual">Virtual</option>
+              <option value="manana">Mañana</option>
+              <option value="mixta">Mixta</option>
+              <option value="noche">Noche</option>
+              <option value="virtual">Virtual</option>
             </select>
 
             <select
@@ -386,9 +387,9 @@ export default function HorariosPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{h.ambiente}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          h.jornada === 'Mañana' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          formatJornada(h.jornada) === 'Mañana' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {h.jornada}
+                          {formatJornada(h.jornada)}
                         </span>
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">

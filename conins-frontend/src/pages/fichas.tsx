@@ -3,6 +3,7 @@ import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
+import { formatJornada } from "@/lib/terminology"
 import CrearFichaModal from "@/components/fichas/CrearFichaModal"
 import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import EditFichaModal from "@/components/fichas/EditFichaModal"
@@ -222,10 +223,10 @@ export default function FichasPage() {
               className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
               <option value="todas">Jornada: Todas</option>
-              <option value="Manana">Manana</option>
-              <option value="Tarde">Tarde</option>
-              <option value="Noche">Noche</option>
-              <option value="Mixta">Mixta</option>
+              <option value="manana">Mañana</option>
+              <option value="mixta">Mixta</option>
+              <option value="noche">Noche</option>
+              <option value="virtual">Virtual</option>
             </select>
 
             <select
@@ -281,7 +282,7 @@ export default function FichasPage() {
                     <tr key={ficha.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{ficha.numero_ficha}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{ficha.programa}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{ficha.jornada}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{formatJornada(ficha.jornada)}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           ficha.etapa === 'lectiva' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'

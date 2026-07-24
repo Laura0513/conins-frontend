@@ -3,6 +3,7 @@ import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
+import { formatJornada } from "@/lib/terminology"
 import CrearAsignacionModal from "@/components/asignaciones/CrearAsignacionModal"
 import RegistrarProvisionalModal from "@/components/asignaciones/RegistrarProvisionalModal"
 import DetailAsignacionModal from "@/components/asignaciones/DetailAsignacionModal"
@@ -302,7 +303,7 @@ export default function AsignacionesPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{asig.ficha_numero}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{asig.competencia}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{asig.ambiente}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{asig.jornada}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{formatJornada(asig.jornada)}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         {asig.es_lider && (
                           <Star className="w-5 h-5 text-sena fill-sena mx-auto" />
