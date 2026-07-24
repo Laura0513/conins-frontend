@@ -40,6 +40,13 @@ type Horario = {
   horas: string
   estado: string
   activo: boolean
+  asignacion_id?: number | null
+  competencia_id?: number | null
+  ambiente_id?: number | null
+  tipo_actividad_id?: number | null
+  rap_id?: number | null
+  rap_codigo?: string | null
+  rap_descripcion?: string | null
 }
 
 

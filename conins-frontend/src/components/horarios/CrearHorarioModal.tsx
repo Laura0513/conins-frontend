@@ -20,6 +20,8 @@ type Asignacion = {
   ambiente_id: number | null
 }
 
+type Rap = { rap_id: number; codigo: string; descripcion: string }
+
 type Ambiente = {
   id: number
   nombre: string
@@ -57,6 +59,8 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
   const [ambientes, setAmbientes] = useState<Ambiente[]>([])
   const [tiposActividad, setTiposActividad] = useState<TipoActividad[]>([])
   const [loading, setLoading] = useState(false)
+  const [rapsDisponibles, setRapsDisponibles] = useState<Rap[]>([])
+  const [loadingRaps, setLoadingRaps] = useState(false)
   const [formData, setFormData] = useState({
     asignacion_id: "",
     dias: [] as number[],
@@ -65,6 +69,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
     jornada_id: "",
     ambiente_id: "",
     tipo_actividad_id: "",
+    rap_id: "",
   })
 
   useEffect(() => {
@@ -77,6 +82,22 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
       ]).finally(() => setLoading(false))
     }
   }, [isOpen])
+
+  useEffect(() => {
+    if (formData.asignacion_id) {
+      const asig = asignaciones.find((a) => a.id === Number(formData.asignacion_id))
+      if (asig) {
+        setLoadingRaps(true)
+        api.assignments.getRapsByCompetencia(asig.id, asig.competencia_id)
+          .then((res) => setRapsDisponibles(res.data || []))
+          .catch(() => setRapsDisponibles([]))
+          .finally(() => setLoadingRaps(false))
+      }
+    } else {
+      setRapsDisponibles([])
+    }
+    setFormData((prev) => ({ ...prev, rap_id: "" }))
+  }, [formData.asignacion_id, asignaciones])
 
   if (!isOpen) return null
 
@@ -112,6 +133,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
         jornada_id: Number(formData.jornada_id),
         ambiente_id: finalAmbienteId,
         tipo_actividad_id: formData.tipo_actividad_id ? Number(formData.tipo_actividad_id) : null,
+        rap_id: formData.rap_id ? Number(formData.rap_id) : null,
       }
       await onSubmit(payload)
       setFormData({
@@ -122,7 +144,9 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
         jornada_id: "",
         ambiente_id: "",
         tipo_actividad_id: "",
+        rap_id: "",
       })
+      setRapsDisponibles([])
     } catch (err: any) {
       showToast(err.message || "Error al registrar horario", "error")
     } finally {
@@ -193,6 +217,31 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
                     <BookOpen className="w-4 h-4 text-gray-400" />
                     <span>{selectedAsignacion.competencia}</span>
                   </div>
+                </div>
+              )}
+
+              {selectedAsignacion && rapsDisponibles.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">RAP a dictar</label>
+                  <select
+                    value={formData.rap_id}
+                    onChange={(e) => handleChange("rap_id", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                  >
+                    <option value="">Sin especificar</option>
+                    {rapsDisponibles.map((r) => (
+                      <option key={r.rap_id} value={r.rap_id}>
+                        {r.codigo} — {r.descripcion}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">RAP que se dictará en este bloque horario.</p>
+                </div>
+              )}
+
+              {selectedAsignacion && loadingRaps && (
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <Loader2 className="w-3 h-3 animate-spin" /> Cargando RAPs...
                 </div>
               )}
 

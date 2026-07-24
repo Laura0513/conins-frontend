@@ -21,7 +21,14 @@ type Horario = {
   jornada_id?: number
   ambiente_id?: number | null
   tipo_actividad_id?: number | null
+  rap_id?: number | null
+  rap_codigo?: string | null
+  rap_descripcion?: string | null
+  asignacion_id?: number | null
+  competencia_id?: number | null
 }
+
+type Rap = { rap_id: number; codigo: string; descripcion: string }
 
 type Ambiente = {
   id: number
@@ -66,11 +73,9 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
   const [ambientes, setAmbientes] = useState<Ambiente[]>([])
   const [tiposActividad, setTiposActividad] = useState<TipoActividad[]>([])
   const [loading, setLoading] = useState(false)
-  
-  // El backend devuelve días como ["Lun", "Mar"], necesitamos mapear a IDs para el formulario
-  // Pero para edición simple, asumimos que el horario tiene un solo bloque o tomamos el primero.
-  // Para simplificar, permitimos cambiar el día y la hora.
-  
+  const [rapsDisponibles, setRapsDisponibles] = useState<Rap[]>([])
+  const [loadingRaps, setLoadingRaps] = useState(false)
+
   const [formData, setFormData] = useState({
     dia_ids: [] as number[],
     hora_inicio: "",
@@ -78,6 +83,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
     jornada_id: "",
     ambiente_id: "",
     tipo_actividad_id: "",
+    rap_id: "",
   })
 
   useEffect(() => {
@@ -118,7 +124,19 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
         jornada_id: jornadaId,
         ambiente_id: horario.ambiente_id ? String(horario.ambiente_id) : "",
         tipo_actividad_id: horario.tipo_actividad_id ? String(horario.tipo_actividad_id) : "",
+        rap_id: horario.rap_id ? String(horario.rap_id) : "",
       })
+
+      // Cargar RAPs disponibles si hay asignación y competencia
+      if (horario.asignacion_id && horario.competencia_id) {
+        setLoadingRaps(true)
+        api.assignments.getRapsByCompetencia(horario.asignacion_id, horario.competencia_id)
+          .then((res) => setRapsDisponibles(res.data || []))
+          .catch(() => setRapsDisponibles([]))
+          .finally(() => setLoadingRaps(false))
+      } else {
+        setRapsDisponibles([])
+      }
     }
   }, [isOpen, horario])
 
@@ -139,6 +157,7 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
         jornada_id: Number(formData.jornada_id),
         ambiente_id: formData.ambiente_id ? Number(formData.ambiente_id) : null,
         tipo_actividad_id: formData.tipo_actividad_id ? Number(formData.tipo_actividad_id) : null,
+        rap_id: formData.rap_id ? Number(formData.rap_id) : null,
       }
       await onSubmit(payload)
     } finally {
@@ -185,6 +204,31 @@ export default function EditarHorarioModal({ isOpen, onClose, horario, onSubmit 
               <span>{horario.competencia}</span>
             </div>
           </div>
+
+          {rapsDisponibles.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">RAP a dictar</label>
+              <select
+                value={formData.rap_id}
+                onChange={(e) => handleChange("rap_id", e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              >
+                <option value="">Sin especificar</option>
+                {rapsDisponibles.map((r) => (
+                  <option key={r.rap_id} value={r.rap_id}>
+                    {r.codigo} — {r.descripcion}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">RAP que se dictará en este bloque horario.</p>
+            </div>
+          )}
+
+          {loadingRaps && (
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+              <Loader2 className="w-3 h-3 animate-spin" /> Cargando RAPs...
+            </div>
+          )}
 
           {loading ? (
             <div className="flex items-center justify-center py-4 text-gray-500">

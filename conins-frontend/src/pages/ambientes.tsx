@@ -230,7 +230,7 @@ export default function AmbientesPage() {
                     <tr key={amb.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{amb.nombre}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{amb.tipo}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-700">{amb.capacidad} pax</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-700">{amb.capacidad ? `${amb.capacidad} pax` : "—"}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           !amb.activo ? 'bg-red-100 text-red-800' :

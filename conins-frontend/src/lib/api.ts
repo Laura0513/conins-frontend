@@ -218,6 +218,18 @@ export const api = {
                 body: JSON.stringify(data),
             })
         },
+        getRaps(asignacionId: number) {
+            return apiFetch(`/asignaciones/${asignacionId}/raps`)
+        },
+        getRapsByCompetencia(asignacionId: number, competenciaId: number) {
+            return apiFetch(`/asignaciones/${asignacionId}/competencia/${competenciaId}/raps`)
+        },
+        setRaps(asignacionId: number, competenciaId: number, rapIds: number[]) {
+            return apiFetch(`/asignaciones/${asignacionId}/competencia/${competenciaId}/raps`, {
+                method: 'PUT',
+                body: JSON.stringify({ rap_ids: rapIds }),
+            })
+        },
     },
 
     horarios: {

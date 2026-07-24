@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { X, Loader2 } from "lucide-react"
+import { X, Loader2, ChevronDown, ChevronUp } from "lucide-react"
 import { api } from "@/lib/api"
 
 type CrearAsignacionModalProps = {
@@ -10,7 +10,8 @@ type CrearAsignacionModalProps = {
 
 type Instructor = { id: number; nombre: string }
 type Ficha = { id: number; numero_ficha: string; programa: string; programa_id?: number }
-type Competencia = { id: number; nombre: string }
+type Competencia = { id: number; nombre: string; codigo?: string }
+type Rap = { rap_id?: number; id?: number; codigo: string; descripcion: string; activo: boolean }
 
 export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: CrearAsignacionModalProps) {
   const [submitting, setSubmitting] = useState(false)
@@ -19,6 +20,13 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
   const [competencias, setCompetencias] = useState<Competencia[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedFicha, setSelectedFicha] = useState<Ficha | null>(null)
+
+  // RAPs por competencia: { competenciaId: Rap[] }
+  const [rapsDisponibles, setRapsDisponibles] = useState<Record<number, Rap[]>>({})
+  const [rapsSeleccionados, setRapsSeleccionados] = useState<Record<number, number[]>>({})
+  const [loadingRaps, setLoadingRaps] = useState<Record<number, boolean>>({})
+  const [expandedComps, setExpandedComps] = useState<Record<number, boolean>>({})
+
   const [formData, setFormData] = useState({
     instructor_id: "",
     ficha_id: "",
@@ -44,7 +52,10 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
         api.catalogo.getCompetenciasByPrograma(ficha.programa_id)
           .then((res) => {
             setCompetencias(res.data || [])
-            setFormData({ ...formData, competencia_ids: [] })
+            setFormData((prev) => ({ ...prev, competencia_ids: [] }))
+            setRapsDisponibles({})
+            setRapsSeleccionados({})
+            setExpandedComps({})
           })
           .catch(() => setCompetencias([]))
       } else if (ficha && !ficha.programa_id) {
@@ -54,8 +65,64 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
     } else {
       setSelectedFicha(null)
       setCompetencias([])
+      setRapsDisponibles({})
+      setRapsSeleccionados({})
     }
   }, [formData.ficha_id, fichas])
+
+  const cargarRaps = async (competenciaId: number) => {
+    if (rapsDisponibles[competenciaId]) return
+    setLoadingRaps((prev) => ({ ...prev, [competenciaId]: true }))
+    try {
+      const res = await api.competencias.getRaps(competenciaId)
+      const raps = (res.data || []).filter((r: Rap) => r.activo)
+      setRapsDisponibles((prev) => ({ ...prev, [competenciaId]: raps }))
+    } catch {
+      setRapsDisponibles((prev) => ({ ...prev, [competenciaId]: [] }))
+    } finally {
+      setLoadingRaps((prev) => ({ ...prev, [competenciaId]: false }))
+    }
+  }
+
+  const toggleCompetencia = (id: number) => {
+    const yaIncluida = formData.competencia_ids.includes(id)
+    if (yaIncluida) {
+      setFormData((prev) => ({
+        ...prev,
+        competencia_ids: prev.competencia_ids.filter((c) => c !== id),
+      }))
+      setRapsSeleccionados((prev) => {
+        const nuevo = { ...prev }
+        delete nuevo[id]
+        return nuevo
+      })
+      setExpandedComps((prev) => ({ ...prev, [id]: false }))
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        competencia_ids: [...prev.competencia_ids, id],
+      }))
+      cargarRaps(id)
+      setExpandedComps((prev) => ({ ...prev, [id]: true }))
+    }
+  }
+
+  const toggleRap = (competenciaId: number, rapId: number) => {
+    setRapsSeleccionados((prev) => {
+      const actuales = prev[competenciaId] || []
+      const nuevos = actuales.includes(rapId)
+        ? actuales.filter((r) => r !== rapId)
+        : [...actuales, rapId]
+      return { ...prev, [competenciaId]: nuevos }
+    })
+  }
+
+  const toggleExpandComp = (compId: number) => {
+    setExpandedComps((prev) => ({ ...prev, [compId]: !prev[compId] }))
+    if (!rapsDisponibles[compId]) {
+      cargarRaps(compId)
+    }
+  }
 
   if (!isOpen) return null
 
@@ -68,6 +135,7 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
         ficha_id: Number(formData.ficha_id),
         competencia_ids: formData.competencia_ids,
         es_lider_ficha: formData.es_lider_ficha,
+        rapsSeleccionados,
       }
       await onSubmit(payload)
       setFormData({
@@ -76,6 +144,9 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
         competencia_ids: [],
         es_lider_ficha: false,
       })
+      setRapsDisponibles({})
+      setRapsSeleccionados({})
+      setExpandedComps({})
     } finally {
       setSubmitting(false)
     }
@@ -83,13 +154,6 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
 
   const handleChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value })
-  }
-
-  const toggleCompetencia = (id: number) => {
-    const nuevos = formData.competencia_ids.includes(id)
-      ? formData.competencia_ids.filter((c) => c !== id)
-      : [...formData.competencia_ids, id]
-    setFormData({ ...formData, competencia_ids: nuevos })
   }
 
   return (
@@ -142,27 +206,83 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
 
               {selectedFicha && competencias.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Competencias <span className="text-red-500">*</span></label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
-                    {competencias.map((c) => (
-                      <label key={c.id} className="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-50">
-                        <input
-                          type="checkbox"
-                          checked={formData.competencia_ids.includes(c.id)}
-                          onChange={() => toggleCompetencia(c.id)}
-                          className="w-4 h-4 text-sena border-gray-300 rounded focus:ring-sena"
-                        />
-                        <span className="text-sm text-gray-700">{c.nombre}</span>
-                      </label>
-                    ))}
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Competencias y RAPs <span className="text-red-500">*</span></label>
+                  <div className="space-y-1 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                    {competencias.map((c) => {
+                      const isSelected = formData.competencia_ids.includes(c.id)
+                      const isExpanded = expandedComps[c.id]
+                      const raps = rapsDisponibles[c.id] || []
+                      const isLoadingRaps = loadingRaps[c.id]
+                      const selectedRapCount = (rapsSeleccionados[c.id] || []).length
+
+                      return (
+                        <div key={c.id} className="rounded-lg border border-gray-100">
+                          <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleCompetencia(c.id)}
+                              className="w-4 h-4 text-sena border-gray-300 rounded focus:ring-sena"
+                            />
+                            <span className="text-sm text-gray-700 flex-1">{c.nombre}</span>
+                            {isSelected && (
+                              <div className="flex items-center gap-2">
+                                {selectedRapCount > 0 && (
+                                  <span className="text-xs bg-sena/10 text-sena px-2 py-0.5 rounded-full">
+                                    {selectedRapCount} RAP{selectedRapCount > 1 ? "s" : ""}
+                                  </span>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => toggleExpandComp(c.id)}
+                                  className="p-1 text-gray-400 hover:text-gray-600"
+                                >
+                                  {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          {isSelected && isExpanded && (
+                            <div className="pl-9 pr-3 pb-3 space-y-1">
+                              {isLoadingRaps ? (
+                                <div className="flex items-center gap-2 text-gray-400 text-xs py-1">
+                                  <Loader2 className="w-3 h-3 animate-spin" /> Cargando RAPs...
+                                </div>
+                              ) : raps.length > 0 ? (
+                                raps.map((rap) => {
+                                  const rapId = rap.rap_id || rap.id || 0
+                                  return (
+                                    <label key={rapId} className="flex items-start gap-2 cursor-pointer p-1.5 rounded hover:bg-blue-50/50">
+                                      <input
+                                        type="checkbox"
+                                        checked={(rapsSeleccionados[c.id] || []).includes(rapId)}
+                                        onChange={() => toggleRap(c.id, rapId)}
+                                        className="w-3.5 h-3.5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mt-0.5"
+                                      />
+                                      <div>
+                                        <span className="text-xs font-mono text-gray-500">{rap.codigo}</span>
+                                        <p className="text-xs text-gray-600">{rap.descripcion}</p>
+                                      </div>
+                                    </label>
+                                  )
+                                })
+                              ) : (
+                                <p className="text-xs text-gray-400 py-1">Sin RAPs disponibles</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Selecciona una o más competencias del programa.</p>
+                  <p className="text-xs text-gray-500 mt-1">Selecciona competencias y opcionalmente sus RAPs.</p>
                 </div>
               )}
 
               {selectedFicha && competencias.length === 0 && (
                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-                  El programa "{selectedFicha.programa}" no tiene competencias registradas aún.
+                  El programa &ldquo;{selectedFicha.programa}&rdquo; no tiene competencias registradas aún.
                 </div>
               )}
 

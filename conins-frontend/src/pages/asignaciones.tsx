@@ -108,7 +108,23 @@ export default function AsignacionesPage() {
 
   const handleCreate = async (data: any) => {
     try {
-      await api.assignments.create(data)
+      const { rapsSeleccionados, ...asignacionData } = data
+      const res = await api.assignments.create(asignacionData)
+      const asignacionId = res.data?.id
+
+      // Guardar RAPs seleccionados por competencia
+      if (asignacionId && rapsSeleccionados) {
+        for (const [competenciaId, rapIds] of Object.entries(rapsSeleccionados)) {
+          if ((rapIds as number[]).length > 0) {
+            try {
+              await api.assignments.setRaps(asignacionId, Number(competenciaId), rapIds as number[])
+            } catch (rapErr: any) {
+              showToast(rapErr.message || "Error al asignar RAPs", "error")
+            }
+          }
+        }
+      }
+
       showToast("Asignación registrada exitosamente", "success")
       setIsCreateModalOpen(false)
       cargarAsignaciones()
