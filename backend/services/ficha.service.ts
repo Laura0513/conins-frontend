@@ -17,7 +17,9 @@ export const FichaService = {
   async getById(id: number) {
     const ficha = await FichaModel.findById(id);
     if (!ficha) throw new NotFoundError('Ficha no encontrada');
-    return ficha;
+    // RF-44 / feedback Laura 28/07: adjuntar instructores asignados
+    const instructores = await FichaModel.findInstructoresByFicha(id);
+    return { ...ficha, instructores };
   },
 
   async create(data: {

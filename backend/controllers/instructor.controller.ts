@@ -4,10 +4,43 @@ import { ApiResponse } from '../utils/response.js';
 import { InstructorService } from '../services/instructor.service.js';
 import { NotificacionService } from '../services/notificacion.service.js';
 import { InstructorModel } from '../models/instructor.model.js';
+import { InstructorHistoricoModel } from '../models/instructor-historico.model.js';
+import { NotFoundError, ValidationError } from '../utils/errors.js';
 
 export const getAll = asyncHandler(async (_req: Request, res: Response) => {
   const instructors = await InstructorService.getAll();
   ApiResponse.success(res, instructors);
+});
+
+// ============================================================
+// Histórico de instructores (24/07/2026)
+// ============================================================
+
+// GET /api/instructores/historico — instructores que salieron del CDMC
+export const getHistorico = asyncHandler(async (_req: Request, res: Response) => {
+  const historico = await InstructorHistoricoModel.findAll();
+  ApiResponse.success(res, historico);
+});
+
+// POST /api/instructores/:id/baja — registra la baja + soft-delete
+// Body: { fecha_salida, motivo?, fecha_ingreso? }
+export const registrarBaja = asyncHandler(async (req: Request, res: Response) => {
+  const instructorId = Number(req.params.id);
+  const { fecha_salida, motivo, fecha_ingreso } = req.body ?? {};
+
+  if (!fecha_salida) throw new ValidationError('fecha_salida es obligatoria');
+
+  const snapshot = await InstructorHistoricoModel.getSnapshot(instructorId);
+  if (!snapshot) throw new NotFoundError('Instructor no encontrado');
+
+  const id = await InstructorHistoricoModel.registrarBaja(
+    instructorId,
+    { nombre: (snapshot as any).nombre, documento: (snapshot as any).documento, tipo_area: (snapshot as any).tipo_area },
+    { fecha_salida, motivo, fecha_ingreso },
+    req.user?.id ?? null,
+  );
+
+  ApiResponse.created(res, { id, instructor_id: instructorId }, 'Baja de instructor registrada en el histórico');
 });
 
 export const getById = asyncHandler(async (req: Request, res: Response) => {

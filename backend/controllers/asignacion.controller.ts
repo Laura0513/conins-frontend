@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { AsignacionService } from '../services/asignacion.service.js';
+import { AsignacionRapService } from '../services/asignacion-rap.service.js';
 import { NotificacionService } from '../services/notificacion.service.js';
 import { InstructorModel } from '../models/instructor.model.js';
 
@@ -61,4 +62,34 @@ export const registrarProvisional = asyncHandler(async (req: Request, res: Respo
 export const getHistoricas = asyncHandler(async (_req: Request, res: Response) => {
   const historicas = await AsignacionService.getHistoricas();
   ApiResponse.success(res, historicas);
+});
+
+// ============================================================
+// RF-42 — Asignacion explicita de RAP (modelo RAP directo)
+// ============================================================
+
+// GET /api/asignaciones/:id/raps — RAPs asignados agrupados por competencia
+export const getRapsByAsignacion = asyncHandler(async (req: Request, res: Response) => {
+  const raps = await AsignacionRapService.getRapsByAsignacion(Number(req.params.id));
+  ApiResponse.success(res, raps);
+});
+
+// GET /api/asignaciones/:id/competencia/:competenciaId/raps — RAPs de esa competencia
+export const getRapsDeCompetencia = asyncHandler(async (req: Request, res: Response) => {
+  const raps = await AsignacionRapService.getRaps(
+    Number(req.params.id),
+    Number(req.params.competenciaId),
+  );
+  ApiResponse.success(res, raps);
+});
+
+// PUT /api/asignaciones/:id/competencia/:competenciaId/raps — define los RAPs
+// Body: { rap_ids: number[] }
+export const setRapsDeCompetencia = asyncHandler(async (req: Request, res: Response) => {
+  const raps = await AsignacionRapService.setRaps(
+    Number(req.params.id),
+    Number(req.params.competenciaId),
+    req.body?.rap_ids ?? [],
+  );
+  ApiResponse.success(res, raps, 'RAPs del instructor actualizados');
 });

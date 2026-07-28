@@ -103,6 +103,7 @@ export const AsignacionModel = {
   async create(data: {
     instructor_id: number;
     ficha_id: number;
+    jornada_id?: number | null;
     es_lider_ficha?: boolean;
     es_provisional?: boolean;
     autorizado_por_id?: number | null;
@@ -111,12 +112,13 @@ export const AsignacionModel = {
   }): Promise<number> {
     try {
       const [result] = await pool.query(
-        `INSERT INTO asignacion (instructor_id, ficha_id, es_lider_ficha, es_provisional,
+        `INSERT INTO asignacion (instructor_id, ficha_id, jornada_id, es_lider_ficha, es_provisional,
           autorizado_por_id, motivo_provisional, fecha_asignacion)
-         VALUES (?, ?, ?, ?, ?, ?, CURDATE())`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE())`,
         [
           data.instructor_id,
           data.ficha_id,
+          data.jornada_id ?? null,
           data.es_lider_ficha ?? false,
           data.es_provisional ?? false,
           data.autorizado_por_id ?? null,

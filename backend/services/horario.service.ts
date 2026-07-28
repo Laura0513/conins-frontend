@@ -28,6 +28,7 @@ export const HorarioService = {
     ficha_id: number;
     instructor_id: number;
     competencia_id: number;
+    rap_id?: number | null;
     ambiente_id?: number | null;
     dia_semana: number;
     hora_inicio: string;
@@ -41,6 +42,14 @@ export const HorarioService = {
 
     const ficha = await FichaModel.findById(data.ficha_id);
     if (!ficha) throw new NotFoundError('Ficha no encontrada');
+
+    // RN-27: el RAP debe pertenecer al programa del grupo
+    if (data.rap_id) {
+      const rapOk = await HorarioModel.rapPerteneceAlProgramaDeFicha(data.rap_id, data.ficha_id);
+      if (!rapOk) {
+        throw new ValidationError('El RAP no pertenece al programa del grupo (RN-27)');
+      }
+    }
 
     if (new Date(`2000-01-01T${data.hora_fin}`).getTime() <= new Date(`2000-01-01T${data.hora_inicio}`).getTime()) {
       throw new ValidationError('La hora de fin debe ser posterior a la hora de inicio');
@@ -110,6 +119,7 @@ export const HorarioService = {
     hora_inicio?: string;
     hora_fin?: string;
     competencia_id?: number;
+    rap_id?: number | null;
     ambiente_id?: number | null;
     tipo_actividad_id?: number | null;
   }) {
@@ -120,6 +130,14 @@ export const HorarioService = {
     );
     const existing = (rawRows as any[])[0];
     if (!existing) throw new NotFoundError('Horario no encontrado');
+
+    // RN-27: si se cambia el RAP, debe pertenecer al programa del grupo
+    if (data.rap_id !== undefined && data.rap_id !== null) {
+      const rapOk = await HorarioModel.rapPerteneceAlProgramaDeFicha(data.rap_id, existing.ficha_id);
+      if (!rapOk) {
+        throw new ValidationError('El RAP no pertenece al programa del grupo (RN-27)');
+      }
+    }
 
     // Valores finales (merge datos nuevos + existentes)
     const finalDia = data.dia_semana ?? existing.dia_semana;

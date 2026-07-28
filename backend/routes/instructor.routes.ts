@@ -20,6 +20,10 @@ router.post(
 
 router.get('/perfil', instructorController.getOwnProfile);
 
+// Histórico de instructores (ruta literal antes de /:id)
+router.get('/historico', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.getHistorico);
+router.post('/:id/baja', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.registrarBaja);
+
 router.get('/:id', instructorController.getById);
 router.get('/:id/detalle', instructorController.getDetalle);
 

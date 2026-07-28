@@ -27,6 +27,8 @@ export interface FichaDetail extends RowDataPacket {
   modalidad: string;
   instructores_count: number;
   ambiente: string | null;
+  sede_id: number | null;
+  sede_nombre: string | null;
   lider_id: number | null;
   referente_id: number | null;
   lider_nombre: string | null;
@@ -57,7 +59,7 @@ export const FichaModel = {
     const [rows] = await pool.query<FichaDetail[]>(`
       SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
              f.etapa, p.modalidad,
-             COUNT(DISTINCT a.id) AS instructores_count,
+             (SELECT COUNT(*) FROM asignacion a WHERE a.ficha_id = f.id AND a.activo = TRUE) AS instructores_count,
              ab.nombre AS ambiente,
              lu.nombre AS lider_nombre,
              f.fecha_inicio_lectiva, f.fecha_fin_lectiva,
@@ -68,8 +70,6 @@ export const FichaModel = {
       JOIN jornadas j ON f.jornada_id = j.id
       LEFT JOIN ambientes ab ON f.ambiente_id = ab.id
       LEFT JOIN usuarios lu ON f.lider_id = lu.id
-      LEFT JOIN asignacion a ON a.ficha_id = f.id AND a.activo = TRUE
-      GROUP BY f.id
       ORDER BY f.numero_ficha
     `);
     return rows;
@@ -79,7 +79,7 @@ export const FichaModel = {
     const [rows] = await pool.query<FichaDetail[]>(`
       SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
              f.etapa, p.modalidad,
-             COUNT(DISTINCT a_all.id) AS instructores_count,
+             (SELECT COUNT(*) FROM asignacion a_all WHERE a_all.ficha_id = f.id AND a_all.activo = TRUE) AS instructores_count,
              ab.nombre AS ambiente,
              lu.nombre AS lider_nombre,
              f.fecha_inicio_lectiva, f.fecha_fin_lectiva,
@@ -91,7 +91,6 @@ export const FichaModel = {
       LEFT JOIN ambientes ab ON f.ambiente_id = ab.id
       LEFT JOIN usuarios lu ON f.lider_id = lu.id
       JOIN asignacion a ON a.ficha_id = f.id AND a.activo = TRUE AND a.instructor_id = ?
-      LEFT JOIN asignacion a_all ON a_all.ficha_id = f.id AND a_all.activo = TRUE
       GROUP BY f.id
       ORDER BY f.numero_ficha
     `, [instructorId]);
@@ -102,8 +101,9 @@ export const FichaModel = {
     const [rows] = await pool.query<FichaDetail[]>(`
       SELECT f.id, f.numero_ficha, f.programa_id, p.nombre AS programa, j.nombre AS jornada,
              f.etapa, p.modalidad,
-             COUNT(DISTINCT a.id) AS instructores_count,
+             (SELECT COUNT(*) FROM asignacion a WHERE a.ficha_id = f.id AND a.activo = TRUE) AS instructores_count,
              ab.nombre AS ambiente,
+             f.sede_id, s.nombre AS sede_nombre,
              f.lider_id, f.lider_id AS referente_id,
              lu.nombre AS lider_nombre, lu.nombre AS referente_nombre,
              f.fecha_inicio_lectiva, f.fecha_fin_lectiva,
@@ -113,12 +113,30 @@ export const FichaModel = {
       JOIN programas p ON f.programa_id = p.id
       JOIN jornadas j ON f.jornada_id = j.id
       LEFT JOIN ambientes ab ON f.ambiente_id = ab.id
+      LEFT JOIN sedes s ON f.sede_id = s.id
       LEFT JOIN usuarios lu ON f.lider_id = lu.id
-      LEFT JOIN asignacion a ON a.ficha_id = f.id AND a.activo = TRUE
       WHERE f.id = ?
-      GROUP BY f.id
     `, [id]);
     return rows[0] ?? null;
+  },
+
+  // Instructores asignados (activos) de una ficha, con sus competencias.
+  async findInstructoresByFicha(fichaId: number): Promise<RowDataPacket[]> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT a.id AS asignacion_id, a.instructor_id, u.nombre AS instructor_nombre,
+              a.es_lider_ficha AS es_lider, a.es_provisional,
+              GROUP_CONCAT(DISTINCT c.nombre ORDER BY c.nombre SEPARATOR ', ') AS competencias
+       FROM asignacion a
+       JOIN instructores i ON a.instructor_id = i.id
+       JOIN usuarios u ON i.usuario_id = u.id
+       LEFT JOIN asignacion_competencia ac ON ac.asignacion_id = a.id AND ac.activo = TRUE
+       LEFT JOIN competencias c ON ac.competencia_id = c.id
+       WHERE a.ficha_id = ? AND a.activo = TRUE
+       GROUP BY a.id
+       ORDER BY u.nombre`,
+      [fichaId],
+    );
+    return rows;
   },
 
   async findByNumero(numeroFicha: string): Promise<FichaRecord | null> {
@@ -134,6 +152,7 @@ export const FichaModel = {
     programa_id: number;
     jornada_id: number;
     ambiente_id?: number | null;
+    sede_id?: number | null;
     lider_id?: number | null;
     etapa?: string;
     fecha_inicio_lectiva?: string;
@@ -143,14 +162,15 @@ export const FichaModel = {
     fecha_fin_ficha?: string;
   }): Promise<number> {
     const [result] = await pool.query(
-      `INSERT INTO fichas (numero_ficha, programa_id, jornada_id, ambiente_id, lider_id, etapa,
+      `INSERT INTO fichas (numero_ficha, programa_id, jornada_id, ambiente_id, sede_id, lider_id, etapa,
         fecha_inicio_lectiva, fecha_fin_lectiva, fecha_inicio_productiva, fecha_fin_productiva, fecha_fin_ficha)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         data.numero_ficha,
         data.programa_id,
         data.jornada_id,
         data.ambiente_id ?? null,
+        data.sede_id ?? null,
         data.lider_id ?? null,
         data.etapa ?? 'lectiva',
         data.fecha_inicio_lectiva ?? null,
@@ -168,6 +188,7 @@ export const FichaModel = {
     programa_id?: number;
     jornada_id?: number;
     ambiente_id?: number | null;
+    sede_id?: number | null;
     lider_id?: number | null;
     etapa?: string;
     fecha_inicio_lectiva?: string;
@@ -183,6 +204,7 @@ export const FichaModel = {
     if (data.programa_id !== undefined) { updates.push('programa_id = ?'); values.push(data.programa_id); }
     if (data.jornada_id !== undefined) { updates.push('jornada_id = ?'); values.push(data.jornada_id); }
     if (data.ambiente_id !== undefined) { updates.push('ambiente_id = ?'); values.push(data.ambiente_id); }
+    if (data.sede_id !== undefined) { updates.push('sede_id = ?'); values.push(data.sede_id); }
     if (data.lider_id !== undefined) { updates.push('lider_id = ?'); values.push(data.lider_id); }
     if (data.etapa !== undefined) { updates.push('etapa = ?'); values.push(data.etapa); }
     if (data.fecha_inicio_lectiva !== undefined) { updates.push('fecha_inicio_lectiva = ?'); values.push(data.fecha_inicio_lectiva); }

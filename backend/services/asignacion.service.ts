@@ -27,6 +27,7 @@ export const AsignacionService = {
   async create(data: {
     instructor_id: number;
     ficha_id: number;
+    jornada_id?: number | null;
     es_lider_ficha?: boolean;
     es_provisional?: boolean;
     autorizado_por_id?: number | null;

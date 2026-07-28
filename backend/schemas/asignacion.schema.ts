@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const crearAsignacionSchema = z.object({
   instructor_id: z.number().int().positive(),
   ficha_id: z.number().int().positive(),
+  jornada_id: z.number().int().positive().nullable().optional(), // 28/07: jornada preferente
   es_lider_ficha: z.boolean().default(false),
   es_provisional: z.boolean().default(false),
   competencia_ids: z.array(z.number().int().positive()).min(1),

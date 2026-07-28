@@ -4639,3 +4639,89 @@ Error: Cuenta sin activar. Cree su contrasena primero.
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
     at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
 ---
+[2026-07-24T19:57:14.288Z] Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:111:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:61:18)
+---
+[2026-07-24T19:57:38.782Z] Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:111:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:61:18)
+---
+[2026-07-24T19:57:39.695Z] Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:111:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:61:18)
+---
+[2026-07-24T19:57:40.116Z] Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:111:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:61:18)
+---
+[2026-07-24T19:57:40.297Z] Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:111:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:61:18)
+---
+[2026-07-24T19:57:40.423Z] Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:111:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:61:18)
+---
+[2026-07-24T19:57:57.262Z] Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+Error: Cannot add or update a child row: a foreign key constraint fails (`conins`.`usuario_roles`, CONSTRAINT `usuario_roles_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`))
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:111:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:61:18)
+---
+[2026-07-24T20:08:40.887Z] Error: El instructor no tiene habilitada esta competencia segun su contrato (RN-13)
+Error: El instructor no tiene habilitada esta competencia segun su contrato (RN-13)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:60:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:19:22)
+---
+[2026-07-28T18:51:45.672Z] Error: El instructor no tiene habilitada esta competencia segun su contrato (RN-13)
+Error: El instructor no tiene habilitada esta competencia segun su contrato (RN-13)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:60:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:19:22)
+---
+[2026-07-28T18:54:14.301Z] Error: El instructor no tiene habilitada esta competencia segun su contrato (RN-13)
+Error: El instructor no tiene habilitada esta competencia segun su contrato (RN-13)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:60:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:19:22)
+---
+[2026-07-28T20:47:18.787Z] Error: Ya existe una asignacion para este instructor en esta ficha
+Error: Ya existe una asignacion para este instructor en esta ficha
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:138:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:68:16)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:19:22)
+---
+[2026-07-28T20:47:30.042Z] Error: Asignacion no encontrada
+Error: Asignacion no encontrada
+    at Object.desactivar (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:107:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:38:18)
+---
+[2026-07-28T20:47:34.026Z] Error: Asignacion no encontrada
+Error: Asignacion no encontrada
+    at Object.desactivar (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:107:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:38:18)
+---
+[2026-07-28T21:02:41.814Z] Error: Ya existe una asignacion para este instructor en esta ficha
+Error: Ya existe una asignacion para este instructor en esta ficha
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:138:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:68:16)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:19:22)
+---

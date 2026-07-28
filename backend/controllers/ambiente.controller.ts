@@ -5,12 +5,12 @@ import { NotFoundError, ValidationError } from '../utils/errors.js';
 import pool from '../config/db.js';
 
 export const getAll = asyncHandler(async (_req: Request, res: Response) => {
-  const [rows] = await pool.query('SELECT id, nombre, tipo, capacidad, area_id, activo FROM ambientes WHERE activo = TRUE ORDER BY nombre');
+  const [rows] = await pool.query('SELECT id, nombre, tipo, capacidad, area_id, sede_id, activo FROM ambientes WHERE activo = TRUE ORDER BY nombre');
   ApiResponse.success(res, rows);
 });
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
-  const { nombre, tipo, capacidad, area_id } = req.body;
+  const { nombre, tipo, capacidad, area_id, sede_id } = req.body;
 
   if (!nombre || !tipo) {
     throw new ValidationError('nombre y tipo son obligatorios');
@@ -22,17 +22,17 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const [result] = await pool.query(
-    'INSERT INTO ambientes (nombre, tipo, capacidad, area_id) VALUES (?, ?, ?, ?)',
-    [nombre, tipo, capacidad ?? null, area_id ?? null],
+    'INSERT INTO ambientes (nombre, tipo, capacidad, area_id, sede_id) VALUES (?, ?, ?, ?, ?)',
+    [nombre, tipo, capacidad ?? null, area_id ?? null, sede_id ?? null],
   );
 
   const id = (result as any).insertId;
-  const [row] = await pool.query('SELECT id, nombre, tipo, capacidad, area_id, activo FROM ambientes WHERE id = ?', [id]);
+  const [row] = await pool.query('SELECT id, nombre, tipo, capacidad, area_id, sede_id, activo FROM ambientes WHERE id = ?', [id]);
   ApiResponse.created(res, (row as any[])[0], 'Ambiente creado exitosamente');
 });
 
 export const update = asyncHandler(async (req: Request, res: Response) => {
-  const { nombre, tipo, capacidad, area_id, activo } = req.body;
+  const { nombre, tipo, capacidad, area_id, sede_id, activo } = req.body;
   const id = Number(req.params.id);
 
   const [existing] = await pool.query('SELECT id FROM ambientes WHERE id = ?', [id]);
@@ -54,6 +54,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   if (tipo !== undefined) { updates.push('tipo = ?'); values.push(tipo); }
   if (capacidad !== undefined) { updates.push('capacidad = ?'); values.push(capacidad); }
   if (area_id !== undefined) { updates.push('area_id = ?'); values.push(area_id); }
+  if (sede_id !== undefined) { updates.push('sede_id = ?'); values.push(sede_id); }
   if (activo !== undefined) { updates.push('activo = ?'); values.push(activo); }
 
   if (updates.length === 0) {
@@ -63,7 +64,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   values.push(id);
   await pool.query(`UPDATE ambientes SET ${updates.join(', ')} WHERE id = ?`, values);
 
-  const [row] = await pool.query('SELECT id, nombre, tipo, capacidad, area_id, activo FROM ambientes WHERE id = ?', [id]);
+  const [row] = await pool.query('SELECT id, nombre, tipo, capacidad, area_id, sede_id, activo FROM ambientes WHERE id = ?', [id]);
   ApiResponse.success(res, (row as any[])[0], 'Ambiente actualizado exitosamente');
 });
 

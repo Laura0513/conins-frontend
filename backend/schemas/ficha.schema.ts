@@ -5,6 +5,7 @@ export const crearFichaSchema = z.object({
   programa_id:  z.number().int().positive(),
   jornada_id:   z.number().int().positive(),
   ambiente_id:  z.number().int().positive().nullable().optional(),
+  sede_id:      z.number().int().positive().nullable().optional(),
   lider_id:     z.number().int().positive().nullable().optional(),
   referente_id: z.number().int().positive().nullable().optional(), // RF-44: alias de lider_id
   etapa:        z.enum(['lectiva', 'productiva']).default('lectiva'),
@@ -20,6 +21,7 @@ export const actualizarFichaSchema = z.object({
   programa_id:  z.number().int().positive().optional(),
   jornada_id:   z.number().int().positive().optional(),
   ambiente_id:  z.number().int().positive().nullable().optional(),
+  sede_id:      z.number().int().positive().nullable().optional(),
   lider_id:     z.number().int().positive().nullable().optional(),
   referente_id: z.number().int().positive().nullable().optional(), // RF-44: alias de lider_id
   etapa:        z.enum(['lectiva', 'productiva']).optional(),

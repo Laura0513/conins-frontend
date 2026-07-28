@@ -6,6 +6,7 @@ export interface HorarioRecord extends RowDataPacket {
   ficha_id: number;
   instructor_id: number;
   competencia_id: number;
+  rap_id: number | null;
   ambiente_id: number | null;
   dia_semana: number;
   hora_inicio: string;
@@ -24,6 +25,9 @@ export interface HorarioDetail extends RowDataPacket {
   ficha_numero: string;
   instructor_nombre: string;
   competencia: string;
+  rap_id: number | null;
+  rap_codigo: string | null;
+  rap_descripcion: string | null;
   ambiente: string;
   jornada: string;
   tipo_actividad: string | null;
@@ -120,6 +124,7 @@ export const HorarioModel = {
     const [rows] = await pool.query<HorarioDetail[]>(`
       SELECT h.id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
              c.nombre AS competencia,
+             h.rap_id, r.codigo AS rap_codigo, r.nombre AS rap_descripcion,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
              j.nombre AS jornada,
              ta.nombre AS tipo_actividad,
@@ -138,6 +143,7 @@ export const HorarioModel = {
       JOIN instructores i ON h.instructor_id = i.id
       JOIN usuarios u ON i.usuario_id = u.id
       JOIN competencias c ON h.competencia_id = c.id
+      LEFT JOIN raps r ON h.rap_id = r.id
       LEFT JOIN ambientes ab ON h.ambiente_id = ab.id
       JOIN jornadas j ON h.jornada_id = j.id
       LEFT JOIN tipos_actividad ta ON h.tipo_actividad_id = ta.id
@@ -152,6 +158,7 @@ export const HorarioModel = {
     ficha_id: number;
     instructor_id: number;
     competencia_id: number;
+    rap_id?: number | null;
     ambiente_id?: number | null;
     dia_semana: number;
     hora_inicio: string;
@@ -161,13 +168,14 @@ export const HorarioModel = {
     semana: string;
   }): Promise<number> {
     const [result] = await pool.query(
-      `INSERT INTO horarios (ficha_id, instructor_id, competencia_id, ambiente_id,
+      `INSERT INTO horarios (ficha_id, instructor_id, competencia_id, rap_id, ambiente_id,
         dia_semana, hora_inicio, hora_fin, tipo_actividad_id, jornada_id, semana)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         data.ficha_id,
         data.instructor_id,
         data.competencia_id,
+        data.rap_id ?? null,
         data.ambiente_id ?? null,
         data.dia_semana,
         data.hora_inicio,
@@ -185,6 +193,7 @@ export const HorarioModel = {
     hora_inicio?: string;
     hora_fin?: string;
     competencia_id?: number;
+    rap_id?: number | null;
     ambiente_id?: number | null;
     tipo_actividad_id?: number | null;
   }): Promise<void> {
@@ -195,6 +204,7 @@ export const HorarioModel = {
     if (data.hora_inicio !== undefined) { updates.push('hora_inicio = ?'); values.push(data.hora_inicio); }
     if (data.hora_fin !== undefined) { updates.push('hora_fin = ?'); values.push(data.hora_fin); }
     if (data.competencia_id !== undefined) { updates.push('competencia_id = ?'); values.push(data.competencia_id); }
+    if (data.rap_id !== undefined) { updates.push('rap_id = ?'); values.push(data.rap_id); }
     if (data.ambiente_id !== undefined) { updates.push('ambiente_id = ?'); values.push(data.ambiente_id); }
     if (data.tipo_actividad_id !== undefined) { updates.push('tipo_actividad_id = ?'); values.push(data.tipo_actividad_id); }
 
@@ -202,6 +212,20 @@ export const HorarioModel = {
 
     values.push(id);
     await pool.query(`UPDATE horarios SET ${updates.join(', ')} WHERE id = ?`, values);
+  },
+
+  // RN-27: el RAP debe pertenecer a una competencia del programa del grupo.
+  async rapPerteneceAlProgramaDeFicha(rapId: number, fichaId: number): Promise<boolean> {
+    const [rows] = await pool.query(
+      `SELECT 1
+       FROM raps r
+       JOIN competencias c ON r.competencia_id = c.id
+       JOIN fichas f ON f.programa_id = c.programa_id
+       WHERE r.id = ? AND f.id = ? AND r.activo = TRUE
+       LIMIT 1`,
+      [rapId, fichaId],
+    );
+    return (rows as any[]).length > 0;
   },
 
   async toggleActivo(id: number, motivo?: string): Promise<boolean> {

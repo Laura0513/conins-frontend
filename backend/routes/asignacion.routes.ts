@@ -11,6 +11,16 @@ router.use(verifyToken);
 
 router.get('/', asignacionController.getAll);
 router.get('/historicas', asignacionController.getHistoricas);
+
+// RF-42 — RAPs asignados (rutas literales antes de /:id para evitar ambiguedad)
+router.get('/:id/raps', asignacionController.getRapsByAsignacion);
+router.get('/:id/competencia/:competenciaId/raps', asignacionController.getRapsDeCompetencia);
+router.put(
+  '/:id/competencia/:competenciaId/raps',
+  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
+  asignacionController.setRapsDeCompetencia,
+);
+
 router.get('/:id', asignacionController.getById);
 
 router.post(
