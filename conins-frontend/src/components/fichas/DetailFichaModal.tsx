@@ -25,6 +25,7 @@ type Ficha = {
 
 type InstructorAsignado = {
   id: number
+  instructor_id?: number
   instructor_nombre: string
   competencia: string
   horas: number
@@ -35,9 +36,10 @@ type DetailFichaModalProps = {
   isOpen: boolean
   onClose: () => void
   ficha: Ficha | null
+  onInstructorClick?: (instructorId: number, nombre: string) => void
 }
 
-export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFichaModalProps) {
+export default function DetailFichaModal({ isOpen, onClose, ficha, onInstructorClick }: DetailFichaModalProps) {
   const [detalle, setDetalle] = useState<Ficha | null>(null)
   const [instructores, setInstructores] = useState<InstructorAsignado[]>([])
   const [loading, setLoading] = useState(false)
@@ -52,9 +54,25 @@ export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFicha
     if (!ficha) return
     setLoading(true)
     try {
-      const res = await api.fichas.getById(ficha.id)
-      setDetalle(res.data || ficha)
-      setInstructores(res.data?.instructores || [])
+      const [fichaRes, asigRes] = await Promise.all([
+        api.fichas.getById(ficha.id),
+        api.assignments.getAll(),
+      ])
+      setDetalle(fichaRes.data || ficha)
+
+      // Filtrar asignaciones de esta ficha
+      const asignacionesFicha = (asigRes.data || []).filter(
+        (a: any) => a.ficha_id === ficha.id && a.activo
+      )
+      const mapped: InstructorAsignado[] = asignacionesFicha.map((a: any) => ({
+        id: a.id,
+        instructor_id: a.instructor_id,
+        instructor_nombre: a.instructor_nombre || "—",
+        competencia: a.competencia || "",
+        horas: a.horas_asignadas || 0,
+        es_lider: a.es_lider || false,
+      }))
+      setInstructores(mapped)
     } catch {
       setDetalle(ficha)
       setInstructores([])
@@ -199,7 +217,17 @@ export default function DetailFichaModal({ isOpen, onClose, ficha }: DetailFicha
                   <div key={asig.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {asig.instructor_nombre}
+                        {onInstructorClick && asig.instructor_id ? (
+                          <button
+                            onClick={() => onInstructorClick(asig.instructor_id!, asig.instructor_nombre)}
+                            className="text-left hover:text-sena hover:underline transition-colors"
+                            title="Ver detalle del instructor"
+                          >
+                            {asig.instructor_nombre}
+                          </button>
+                        ) : (
+                          asig.instructor_nombre
+                        )}
                         {asig.es_lider && (
                           <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sena/10 text-sena">
                             Lider

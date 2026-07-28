@@ -375,6 +375,7 @@ export default function InstructoresPage() {
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         instructor={selectedInstructor}
+        puedeEditar={puedeEditar}
       />
 
       <EditInstructorModal

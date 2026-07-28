@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useRouter } from "next/router"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -8,6 +9,9 @@ import CrearAsignacionModal from "@/components/asignaciones/CrearAsignacionModal
 import RegistrarProvisionalModal from "@/components/asignaciones/RegistrarProvisionalModal"
 import DetailAsignacionModal from "@/components/asignaciones/DetailAsignacionModal"
 import EditAsignacionModal from "@/components/asignaciones/EditAsignacionModal"
+import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
+import DetailFichaModal from "@/components/fichas/DetailFichaModal"
+import VerAgendaAmbienteModal from "@/components/ambientes/VerAgendaAmbienteModal"
 import {
   Search,
   Plus,
@@ -39,6 +43,7 @@ type Asignacion = {
 
 
 export default function AsignacionesPage() {
+  const router = useRouter()
   const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [asignaciones, setAsignaciones] = useState<Asignacion[]>([])
@@ -49,6 +54,12 @@ export default function AsignacionesPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedAsignacion, setSelectedAsignacion] = useState<Asignacion | null>(null)
   const [activeTab, setActiveTab] = useState<"activa" | "provisional" | "historica">("activa")
+  const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false)
+  const [selectedInstructor, setSelectedInstructor] = useState<{ id: number; nombre: string; email: string; tipo_area: string; activo: boolean; roles: string } | null>(null)
+  const [isFichaModalOpen, setIsFichaModalOpen] = useState(false)
+  const [selectedFicha, setSelectedFicha] = useState<any>(null)
+  const [isAmbienteModalOpen, setIsAmbienteModalOpen] = useState(false)
+  const [selectedAmbiente, setSelectedAmbiente] = useState<any>(null)
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
@@ -141,6 +152,57 @@ export default function AsignacionesPage() {
       cargarAsignaciones()
     } catch (err: any) {
       showToast(err.message || "Error al registrar provisional", "error")
+    }
+  }
+
+  const openInstructorDetail = async (asig: Asignacion) => {
+    try {
+      const res = await api.instructors.getById(asig.instructor_id)
+      const inst = res.data
+      setSelectedInstructor({
+        id: inst.id,
+        nombre: inst.nombre || asig.instructor_nombre,
+        email: inst.email || "",
+        tipo_area: inst.tipo_area || "",
+        activo: inst.activo ?? true,
+        roles: inst.roles || "Instructor",
+      })
+      setIsInstructorModalOpen(true)
+    } catch {
+      // Fallback with minimal data
+      setSelectedInstructor({
+        id: asig.instructor_id,
+        nombre: asig.instructor_nombre,
+        email: "",
+        tipo_area: "",
+        activo: true,
+        roles: "Instructor",
+      })
+      setIsInstructorModalOpen(true)
+    }
+  }
+
+  const openFichaDetail = async (asig: Asignacion) => {
+    try {
+      const res = await api.fichas.getById(asig.ficha_id)
+      setSelectedFicha(res.data)
+    } catch {
+      setSelectedFicha({ id: asig.ficha_id, numero_ficha: asig.ficha_numero, programa: "", jornada: asig.jornada, etapa: "", modalidad: "", instructores_count: 0, estado: "", activo: true })
+    }
+    setIsFichaModalOpen(true)
+  }
+
+  const openAmbienteDetail = async (asig: Asignacion) => {
+    if (!asig.ambiente) return
+    try {
+      const res = await api.ambientes.getAll()
+      const amb = (res.data || []).find((a: any) => a.nombre === asig.ambiente)
+      if (amb) {
+        setSelectedAmbiente(amb)
+        setIsAmbienteModalOpen(true)
+      }
+    } catch {
+      // silently fail
     }
   }
 
@@ -315,10 +377,46 @@ export default function AsignacionesPage() {
                 <tbody className="divide-y divide-gray-100">
                   {listaPaginada.map((asig) => (
                     <tr key={asig.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{asig.instructor_nombre}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{asig.ficha_numero}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{asig.competencia}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{asig.ambiente}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">
+                        <button
+                          onClick={() => openInstructorDetail(asig)}
+                          className="text-left hover:text-sena hover:underline transition-colors"
+                          title="Ver detalle del instructor"
+                        >
+                          {asig.instructor_nombre}
+                        </button>
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">
+                        <button
+                          onClick={() => openFichaDetail(asig)}
+                          className="text-left hover:text-sena hover:underline transition-colors"
+                          title="Ver detalle del grupo"
+                        >
+                          {asig.ficha_numero}
+                        </button>
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
+                        <button
+                          onClick={() => router.push("/gestion-competencias")}
+                          className="text-left hover:text-sena hover:underline transition-colors"
+                          title="Ir a gestión de competencias"
+                        >
+                          {asig.competencia}
+                        </button>
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
+                        {asig.ambiente ? (
+                          <button
+                            onClick={() => openAmbienteDetail(asig)}
+                            className="text-left hover:text-sena hover:underline transition-colors"
+                            title="Ver agenda del ambiente"
+                          >
+                            {asig.ambiente}
+                          </button>
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{formatJornada(asig.jornada)}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         {asig.es_lider && (
@@ -425,6 +523,34 @@ export default function AsignacionesPage() {
         onClose={() => setIsEditModalOpen(false)}
         asignacion={selectedAsignacion}
         onSubmit={handleEditAsignacion}
+      />
+
+      <DetailInstructorModal
+        isOpen={isInstructorModalOpen}
+        onClose={() => setIsInstructorModalOpen(false)}
+        instructor={selectedInstructor}
+        puedeEditar={puedeEditar}
+      />
+
+      <DetailFichaModal
+        isOpen={isFichaModalOpen}
+        onClose={() => setIsFichaModalOpen(false)}
+        ficha={selectedFicha}
+        onInstructorClick={async (instructorId, nombre) => {
+          try {
+            const res = await api.instructors.getById(instructorId)
+            setSelectedInstructor(res.data)
+          } catch {
+            setSelectedInstructor({ id: instructorId, nombre, email: "", tipo_area: "", activo: true, roles: "Instructor" })
+          }
+          setIsInstructorModalOpen(true)
+        }}
+      />
+
+      <VerAgendaAmbienteModal
+        isOpen={isAmbienteModalOpen}
+        onClose={() => setIsAmbienteModalOpen(false)}
+        ambiente={selectedAmbiente}
       />
 
       {confirmDialog.isOpen && (

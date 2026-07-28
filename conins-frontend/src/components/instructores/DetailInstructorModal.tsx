@@ -1,7 +1,21 @@
 import { useState, useEffect } from "react"
-import { X, User, Mail, FileText, Clock, AlertCircle, BookOpen, Calendar, Loader2 } from "lucide-react"
+import {
+  X,
+  User,
+  Mail,
+  FileText,
+  Clock,
+  AlertCircle,
+  BookOpen,
+  Calendar,
+  Loader2,
+  Layers,
+  Plus,
+  Trash2,
+} from "lucide-react"
 import { api } from "@/lib/api"
 import { formatJornada } from "@/lib/terminology"
+import { useToast } from "@/lib/ToastContext"
 
 type Instructor = {
   id: number
@@ -29,20 +43,44 @@ type Novedad = {
   observacion: string
 }
 
+type CompetenciaInst = {
+  id?: number
+  competencia_id: number
+  nombre: string
+  codigo?: string
+}
+
+type CompetenciaAll = {
+  id: number
+  nombre: string
+  codigo?: string
+}
+
 type DetailInstructorModalProps = {
   isOpen: boolean
   onClose: () => void
   instructor: Instructor | null
+  puedeEditar?: boolean
 }
 
-export default function DetailInstructorModal({ isOpen, onClose, instructor }: DetailInstructorModalProps) {
+export default function DetailInstructorModal({ isOpen, onClose, instructor, puedeEditar = false }: DetailInstructorModalProps) {
+  const { showToast } = useToast()
   const [asignaciones, setAsignaciones] = useState<Asignacion[]>([])
   const [novedades, setNovedades] = useState<Novedad[]>([])
   const [loading, setLoading] = useState(false)
 
+  // Competencias
+  const [competenciasInstructor, setCompetenciasInstructor] = useState<CompetenciaInst[]>([])
+  const [todasCompetencias, setTodasCompetencias] = useState<CompetenciaAll[]>([])
+  const [loadingComps, setLoadingComps] = useState(false)
+  const [showAddComp, setShowAddComp] = useState(false)
+  const [addingCompId, setAddingCompId] = useState<number | null>(null)
+  const [removingCompId, setRemovingCompId] = useState<number | null>(null)
+
   useEffect(() => {
     if (isOpen && instructor) {
       cargarDetalle()
+      cargarCompetencias()
     }
   }, [isOpen, instructor])
 
@@ -61,7 +99,60 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor }: D
     }
   }
 
+  const cargarCompetencias = async () => {
+    if (!instructor) return
+    setLoadingComps(true)
+    try {
+      const [instRes, allRes] = await Promise.all([
+        api.instructors.getCompetencias(instructor.id),
+        api.competencias.getAll(),
+      ])
+      setCompetenciasInstructor(instRes.data || [])
+      setTodasCompetencias(allRes.data || [])
+    } catch {
+      setCompetenciasInstructor([])
+      setTodasCompetencias([])
+    } finally {
+      setLoadingComps(false)
+    }
+  }
+
+  const handleAddCompetencia = async (competenciaId: number) => {
+    if (!instructor) return
+    setAddingCompId(competenciaId)
+    try {
+      await api.instructors.addCompetencia(instructor.id, { competencia_id: competenciaId })
+      showToast("Competencia agregada", "success")
+      await cargarCompetencias()
+      setShowAddComp(false)
+    } catch (err: any) {
+      showToast(err.message || "Error al agregar competencia", "error")
+    } finally {
+      setAddingCompId(null)
+    }
+  }
+
+  const handleRemoveCompetencia = async (competenciaId: number) => {
+    if (!instructor) return
+    setRemovingCompId(competenciaId)
+    try {
+      await api.instructors.removeCompetencia(instructor.id, competenciaId)
+      showToast("Competencia removida", "success")
+      await cargarCompetencias()
+    } catch (err: any) {
+      showToast(err.message || "Error al remover competencia", "error")
+    } finally {
+      setRemovingCompId(null)
+    }
+  }
+
   if (!isOpen || !instructor) return null
+
+  // Competencias disponibles para agregar (que no tiene ya)
+  const idsYaAsignadas = competenciasInstructor.map((c) => c.competencia_id || c.id || 0)
+  const competenciasDisponibles = todasCompetencias.filter(
+    (c) => !idsYaAsignadas.includes(c.id)
+  )
 
   const horas = instructor.horas_semana ?? 0
   const limite = 40
@@ -111,7 +202,7 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor }: D
             <div className="flex items-start gap-3">
               <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
               <div>
-                <p className="text-xs text-gray-500">Area</p>
+                <p className="text-xs text-gray-500">Área</p>
                 <p className="text-sm text-gray-900 capitalize">{instructor.tipo_area}</p>
               </div>
             </div>
@@ -129,13 +220,106 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor }: D
             </div>
           </div>
 
-          {loading ? (
+          {loading || loadingComps ? (
             <div className="py-6 flex items-center justify-center text-gray-400">
               <Loader2 className="w-5 h-5 animate-spin" />
             </div>
           ) : (
             <>
-              {/* Asignaciones */}
+              {/* ─── Competencias habilitadas ─── */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-sena" />
+                    Competencias habilitadas ({competenciasInstructor.length})
+                  </h4>
+                  {puedeEditar && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddComp(!showAddComp)}
+                      className="text-xs font-medium text-sena hover:text-sena/80 flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Agregar
+                    </button>
+                  )}
+                </div>
+
+                {/* Selector para agregar */}
+                {showAddComp && puedeEditar && (
+                  <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    {competenciasDisponibles.length > 0 ? (
+                      <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                        {competenciasDisponibles.map((c) => (
+                          <div key={c.id} className="flex items-center justify-between p-2 hover:bg-white rounded-lg">
+                            <div className="flex-1 min-w-0">
+                              {c.codigo && <span className="text-xs font-mono text-gray-400 mr-2">{c.codigo}</span>}
+                              <span className="text-sm text-gray-700">{c.nombre}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleAddCompetencia(c.id)}
+                              disabled={addingCompId === c.id}
+                              className="ml-2 shrink-0 px-2.5 py-1 bg-sena text-white text-xs font-medium rounded-lg hover:bg-sena/90 disabled:opacity-50 flex items-center gap-1"
+                            >
+                              {addingCompId === c.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <Plus className="w-3 h-3" />
+                              )}
+                              Agregar
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-500">Todas las competencias ya están asignadas.</p>
+                    )}
+                  </div>
+                )}
+
+                {competenciasInstructor.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {competenciasInstructor.map((comp) => {
+                      const compId = comp.competencia_id || comp.id || 0
+                      return (
+                        <div key={compId} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
+                          <div className="flex-1 min-w-0">
+                            {comp.codigo && (
+                              <span className="text-xs font-mono text-gray-400 mr-2">{comp.codigo}</span>
+                            )}
+                            <span className="text-sm text-gray-700">{comp.nombre}</span>
+                          </div>
+                          {puedeEditar && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveCompetencia(compId)}
+                              disabled={removingCompId === compId}
+                              className="ml-2 shrink-0 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50"
+                              title="Quitar competencia"
+                            >
+                              {removingCompId === compId ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-sm text-amber-800">Este instructor no tiene competencias habilitadas.</p>
+                    <p className="text-xs text-amber-700 mt-1">
+                      Agrega las competencias que puede dictar para poder crear asignaciones.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* ─── Asignaciones ─── */}
               <div>
                 <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-sena" />
@@ -150,7 +334,7 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor }: D
                             Grupo {asig.ficha_numero}
                             {asig.es_lider && (
                               <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sena/10 text-sena">
-                                Lider
+                                Líder
                               </span>
                             )}
                           </p>
@@ -165,7 +349,7 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor }: D
                 )}
               </div>
 
-              {/* Novedades */}
+              {/* ─── Novedades ─── */}
               <div>
                 <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-orange-500" />

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useRouter } from "next/router"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -9,6 +10,7 @@ import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import EditFichaModal from "@/components/fichas/EditFichaModal"
 import RapSeguimientoModal from "@/components/fichas/RapSeguimientoModal"
 import NovedadFichaModal from "@/components/fichas/NovedadFichaModal"
+import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
 import {
   Search,
   Plus,
@@ -38,6 +40,7 @@ type Ficha = {
 
 
 export default function FichasPage() {
+  const router = useRouter()
   const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [fichas, setFichas] = useState<Ficha[]>([])
@@ -48,6 +51,9 @@ export default function FichasPage() {
   const [isRapModalOpen, setIsRapModalOpen] = useState(false)
   const [isNovedadModalOpen, setIsNovedadModalOpen] = useState(false)
   const [selectedFicha, setSelectedFicha] = useState<Ficha | null>(null)
+  const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false)
+  const [selectedInstructor, setSelectedInstructor] = useState<any>(null)
+  const [asignacionesPorFicha, setAsignacionesPorFicha] = useState<Record<number, { instructor_id: number; instructor_nombre: string }[]>>({})
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
@@ -85,8 +91,23 @@ export default function FichasPage() {
   const cargarFichas = async () => {
     setLoading(true)
     try {
-      const res = await api.fichas.getAll()
-      setFichas(res.data || [])
+      const [fichaRes, asigRes] = await Promise.all([
+        api.fichas.getAll(),
+        api.assignments.getAll(),
+      ])
+      setFichas(fichaRes.data || [])
+
+      // Agrupar instructores por ficha (solo activas, sin duplicar nombre)
+      const mapa: Record<number, { instructor_id: number; instructor_nombre: string }[]> = {}
+      for (const a of (asigRes.data || [])) {
+        if (!a.activo) continue
+        if (!mapa[a.ficha_id]) mapa[a.ficha_id] = []
+        const yaExiste = mapa[a.ficha_id].some((i: any) => i.instructor_id === a.instructor_id)
+        if (!yaExiste) {
+          mapa[a.ficha_id].push({ instructor_id: a.instructor_id, instructor_nombre: a.instructor_nombre })
+        }
+      }
+      setAsignacionesPorFicha(mapa)
     } catch (err) {
       console.warn("Error cargando fichas:", err)
       setFichas([])
@@ -280,8 +301,24 @@ export default function FichasPage() {
                 <tbody className="divide-y divide-gray-100">
                   {listaPaginada.map((ficha) => (
                     <tr key={ficha.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{ficha.numero_ficha}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{ficha.programa}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">
+                        <button
+                          onClick={() => openDetailModal(ficha)}
+                          className="text-left hover:text-sena hover:underline transition-colors"
+                          title="Ver detalle del grupo"
+                        >
+                          {ficha.numero_ficha}
+                        </button>
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">
+                        <button
+                          onClick={() => router.push("/gestion-competencias")}
+                          className="text-left hover:text-sena hover:underline transition-colors"
+                          title="Ver competencias del programa"
+                        >
+                          {ficha.programa}
+                        </button>
+                      </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{formatJornada(ficha.jornada)}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -297,7 +334,32 @@ export default function FichasPage() {
                           {ficha.modalidad}
                         </span>
                       </td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-700">{ficha.instructores_count}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">
+                        {(asignacionesPorFicha[ficha.id] || []).length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {(asignacionesPorFicha[ficha.id] || []).map((inst) => (
+                              <button
+                                key={inst.instructor_id}
+                                onClick={async () => {
+                                  try {
+                                    const res = await api.instructors.getById(inst.instructor_id)
+                                    setSelectedInstructor(res.data)
+                                  } catch {
+                                    setSelectedInstructor({ id: inst.instructor_id, nombre: inst.instructor_nombre, email: "", tipo_area: "", activo: true, roles: "Instructor" })
+                                  }
+                                  setIsInstructorModalOpen(true)
+                                }}
+                                className="text-xs px-2 py-1 bg-sena/10 text-sena rounded-full hover:bg-sena/20 hover:underline transition-colors"
+                                title="Ver detalle del instructor"
+                              >
+                                {inst.instructor_nombre.split(" ").slice(0, 2).join(" ")}
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 text-sm">—</span>
+                        )}
+                      </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           ficha.estado === 'Activa' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -422,6 +484,15 @@ export default function FichasPage() {
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         ficha={selectedFicha}
+        onInstructorClick={async (instructorId, nombre) => {
+          try {
+            const res = await api.instructors.getById(instructorId)
+            setSelectedInstructor(res.data)
+          } catch {
+            setSelectedInstructor({ id: instructorId, nombre, email: "", tipo_area: "", activo: true, roles: "Instructor" })
+          }
+          setIsInstructorModalOpen(true)
+        }}
       />
 
       <EditFichaModal
@@ -444,6 +515,13 @@ export default function FichasPage() {
         isOpen={isNovedadModalOpen}
         onClose={() => setIsNovedadModalOpen(false)}
         ficha={selectedFicha}
+        puedeEditar={puedeEditar}
+      />
+
+      <DetailInstructorModal
+        isOpen={isInstructorModalOpen}
+        onClose={() => setIsInstructorModalOpen(false)}
+        instructor={selectedInstructor}
         puedeEditar={puedeEditar}
       />
 

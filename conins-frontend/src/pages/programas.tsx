@@ -16,6 +16,7 @@ type Programa = {
   id: number
   nombre: string
   tipo_linea?: string
+  tipo_formacion?: string
   area?: string
   modalidad?: string
   referente_id?: number | null
@@ -159,6 +160,7 @@ export default function ProgramasPage() {
                 <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
                   <tr>
                     <th className="px-3 py-3 md:px-6 md:py-4">Programa</th>
+                    <th className="px-3 py-3 md:px-6 md:py-4">Tipo</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Línea</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Modalidad</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">
@@ -177,6 +179,17 @@ export default function ProgramasPage() {
                         {prog.area && (
                           <p className="text-xs text-gray-400 mt-0.5">{prog.area}</p>
                         )}
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4">
+                        {prog.tipo_formacion ? (
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                            prog.tipo_formacion === "titulada" ? "bg-blue-100 text-blue-800" :
+                            prog.tipo_formacion === "complementaria" ? "bg-purple-100 text-purple-800" :
+                            "bg-gray-100 text-gray-800"
+                          }`}>
+                            {prog.tipo_formacion.charAt(0).toUpperCase() + prog.tipo_formacion.slice(1)}
+                          </span>
+                        ) : "—"}
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
                         {prog.tipo_linea || "—"}

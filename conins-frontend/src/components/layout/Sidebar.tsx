@@ -14,6 +14,9 @@ import {
   User,
   Layers,
   GraduationCap,
+  ChevronDown,
+  FileText,
+  Shield,
 } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
 import { api } from "@/lib/api"
@@ -25,36 +28,61 @@ type MenuItem = {
   showBadge?: boolean
 }
 
-const MENU_ADMIN: MenuItem[] = [
+type MenuGroup = {
+  label: string
+  icon: any
+  items: MenuItem[]
+}
+
+type SidebarEntry = MenuItem | MenuGroup
+
+function isGroup(entry: SidebarEntry): entry is MenuGroup {
+  return "items" in entry
+}
+
+// ─── Menú Admin / Coordinadora / Asistente ───
+const MENU_ADMIN: SidebarEntry[] = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
-  { name: "Instructores", href: "/instructores", icon: Users },
-  { name: "Ambientes", href: "/ambientes", icon: Building2 },
-  { name: "Programas", href: "/programas", icon: GraduationCap },
-  { name: "Grupos", href: "/fichas", icon: BookOpen },
-  { name: "Competencias", href: "/gestion-competencias", icon: Layers },
-  { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
-  { name: "Horarios", href: "/horarios", icon: Calendar },
+  {
+    label: "Asignaciones",
+    icon: ClipboardList,
+    items: [
+      { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
+      { name: "Horarios", href: "/horarios", icon: Calendar },
+      { name: "Instructores", href: "/instructores", icon: Users },
+      { name: "Grupos", href: "/fichas", icon: BookOpen },
+      { name: "Competencias y RAPs", href: "/gestion-competencias", icon: Layers },
+      { name: "Ambientes", href: "/ambientes", icon: Building2 },
+    ],
+  },
   { name: "Alertas", href: "/alertas", icon: Bell, showBadge: true },
   { name: "Reportes", href: "/consultas", icon: Search },
   { name: "Usuarios", href: "/usuarios", icon: UserCog },
   { name: "Mi Perfil", href: "/perfil", icon: User },
 ]
 
-const MENU_SUBDIRECTOR: MenuItem[] = [
+// ─── Menú Subdirector (sin Usuarios) ───
+const MENU_SUBDIRECTOR: SidebarEntry[] = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
-  { name: "Instructores", href: "/instructores", icon: Users },
-  { name: "Ambientes", href: "/ambientes", icon: Building2 },
-  { name: "Programas", href: "/programas", icon: GraduationCap },
-  { name: "Grupos", href: "/fichas", icon: BookOpen },
-  { name: "Competencias", href: "/gestion-competencias", icon: Layers },
-  { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
-  { name: "Horarios", href: "/horarios", icon: Calendar },
+  {
+    label: "Asignaciones",
+    icon: ClipboardList,
+    items: [
+      { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
+      { name: "Horarios", href: "/horarios", icon: Calendar },
+      { name: "Instructores", href: "/instructores", icon: Users },
+      { name: "Grupos", href: "/fichas", icon: BookOpen },
+      { name: "Competencias y RAPs", href: "/gestion-competencias", icon: Layers },
+      { name: "Ambientes", href: "/ambientes", icon: Building2 },
+    ],
+  },
   { name: "Alertas", href: "/alertas", icon: Bell, showBadge: true },
   { name: "Reportes", href: "/consultas", icon: Search },
   { name: "Mi Perfil", href: "/perfil", icon: User },
 ]
 
-const MENU_INSTRUCTOR: MenuItem[] = [
+// ─── Menú Instructor (sin acordeón) ───
+const MENU_INSTRUCTOR: SidebarEntry[] = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   { name: "Mis Horarios", href: "/horarios", icon: Calendar },
   { name: "Mis Asignaciones", href: "/asignaciones", icon: ClipboardList },
@@ -64,7 +92,7 @@ const MENU_INSTRUCTOR: MenuItem[] = [
   { name: "Mi Perfil", href: "/perfil", icon: User },
 ]
 
-function getMenuItems(rol: string) {
+function getMenuEntries(rol: string): SidebarEntry[] {
   const r = rol?.trim() || ""
   switch (r) {
     case "Instructor":
@@ -86,8 +114,9 @@ type SidebarProps = {
 export default function Sidebar({ alertasViewed, isOpen, onClose, rol }: SidebarProps) {
   const router = useRouter()
   const { user } = useAuth()
-  const menuItems = getMenuItems(rol)
+  const entries = getMenuEntries(rol)
   const [alertasPendientes, setAlertasPendientes] = useState(0)
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({})
 
   const cargarAlertasPendientes = useCallback(async () => {
     try {
@@ -106,6 +135,48 @@ export default function Sidebar({ alertasViewed, isOpen, onClose, rol }: Sidebar
       return () => clearInterval(interval)
     }
   }, [user, cargarAlertasPendientes])
+
+  // Auto-abrir el grupo si la ruta actual está dentro de él
+  useEffect(() => {
+    entries.forEach((entry) => {
+      if (isGroup(entry)) {
+        const isChildActive = entry.items.some((item) => router.pathname === item.href)
+        if (isChildActive) {
+          setOpenGroups((prev) => ({ ...prev, [entry.label]: true }))
+        }
+      }
+    })
+  }, [router.pathname, entries])
+
+  const toggleGroup = (label: string) => {
+    setOpenGroups((prev) => ({ ...prev, [label]: !prev[label] }))
+  }
+
+  const renderItem = (item: MenuItem, nested = false) => {
+    const isActive = router.pathname === item.href
+    const Icon = item.icon
+
+    return (
+      <Link
+        key={item.name}
+        href={item.href}
+        onClick={onClose}
+        className={`flex items-center gap-3 ${nested ? "px-3 py-2 ml-3 pl-6 border-l border-gray-200" : "px-4 py-3"} rounded-xl text-sm font-medium transition-all ${
+          isActive
+            ? "bg-sena/10 text-sena shadow-sm"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+        }`}
+      >
+        <Icon className={`${nested ? "w-4 h-4" : "w-5 h-5"}`} />
+        <span>{item.name}</span>
+        {item.showBadge && alertasPendientes > 0 && !alertasViewed && (
+          <span className="ml-auto bg-sena text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            {alertasPendientes > 99 ? "99+" : alertasPendientes}
+          </span>
+        )}
+      </Link>
+    )
+  }
 
   return (
     <aside className={`
@@ -127,30 +198,45 @@ export default function Sidebar({ alertasViewed, isOpen, onClose, rol }: Sidebar
 
       {/* Menu de navegacion */}
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => {
-          const isActive = router.pathname === item.href
-          const Icon = item.icon
+        {entries.map((entry) => {
+          if (isGroup(entry)) {
+            const expanded = openGroups[entry.label] ?? false
+            const GroupIcon = entry.icon
+            const hasActiveChild = entry.items.some((item) => router.pathname === item.href)
 
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                isActive
-                  ? "bg-sena/10 text-sena shadow-sm"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{item.name}</span>
-              {item.showBadge && alertasPendientes > 0 && !alertasViewed && (
-                <span className="ml-auto bg-sena text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                  {alertasPendientes > 99 ? "99+" : alertasPendientes}
-                </span>
-              )}
-            </Link>
-          )
+            return (
+              <div key={entry.label}>
+                <button
+                  onClick={() => toggleGroup(entry.label)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                    hasActiveChild
+                      ? "bg-sena/5 text-sena"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <GroupIcon className="w-5 h-5" />
+                  <span>{entry.label}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 ml-auto transition-transform duration-200 ${
+                      expanded ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                <div
+                  className={`overflow-hidden transition-all duration-200 ${
+                    expanded ? "max-h-[500px] opacity-100 mt-1" : "max-h-0 opacity-0"
+                  }`}
+                >
+                  <div className="space-y-0.5 pb-1">
+                    {entry.items.map((item) => renderItem(item, true))}
+                  </div>
+                </div>
+              </div>
+            )
+          }
+
+          return renderItem(entry as MenuItem)
         })}
       </nav>
     </aside>
