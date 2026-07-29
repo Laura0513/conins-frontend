@@ -12,6 +12,9 @@ import EditAsignacionModal from "@/components/asignaciones/EditAsignacionModal"
 import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
 import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import VerAgendaAmbienteModal from "@/components/ambientes/VerAgendaAmbienteModal"
+import { exportarAsignacionesPDF } from "@/lib/exportPDF"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
 import {
   Search,
   Plus,
@@ -23,6 +26,8 @@ import {
   ChevronRight,
   Loader2,
   AlertTriangle,
+  ClipboardList,
+  FileDown,
 } from "lucide-react"
 
 type Asignacion = {
@@ -119,7 +124,7 @@ export default function AsignacionesPage() {
 
   const handleCreate = async (data: any) => {
     try {
-      const { rapsSeleccionados, ...asignacionData } = data
+      const { rapsSeleccionados, horario, ...asignacionData } = data
       const res = await api.assignments.create(asignacionData)
       const asignacionId = res.data?.id
 
@@ -136,7 +141,60 @@ export default function AsignacionesPage() {
         }
       }
 
-      showToast("Asignación registrada exitosamente", "success")
+      // Crear horario si se proporcionó
+      let horarioCreado = false
+      if (horario && horario.dias && horario.dias.length > 0) {
+        try {
+          const now = new Date()
+          const day = now.getDay()
+          const diff = day === 0 ? -6 : 1 - day
+          const lunes = new Date(now)
+          lunes.setDate(now.getDate() + diff)
+          const semana = lunes.toISOString().split("T")[0]
+
+          const compId = Number(asignacionData.competencia_ids?.[0])
+          if (!compId || isNaN(compId)) {
+            console.error("competencia_id inválido:", asignacionData.competencia_ids)
+            showToast("No se pudo crear horario: competencia no válida", "error")
+          } else {
+            let todosOk = true
+            for (const dia of horario.dias) {
+              const horarioPayload = {
+                ficha_id: Number(asignacionData.ficha_id),
+                instructor_id: Number(asignacionData.instructor_id),
+                competencia_id: compId,
+                dia_semana: Number(dia),
+                hora_inicio: horario.hora_inicio,
+                hora_fin: horario.hora_fin,
+                jornada_id: Number(horario.jornada_id),
+                ambiente_id: horario.ambiente_id ? Number(horario.ambiente_id) : null,
+                tipo_actividad_id: horario.tipo_actividad_id ? Number(horario.tipo_actividad_id) : null,
+                rap_id: null,
+                semana,
+              }
+              console.log("Enviando horario:", JSON.stringify(horarioPayload))
+              try {
+                await api.horarios.create(horarioPayload)
+                console.log("Horario creado OK para día", dia)
+              } catch (horErr: any) {
+                todosOk = false
+                console.error("Error creando horario día", dia, ":", horErr.message)
+                showToast(`Error horario: ${horErr.message}`, "error")
+              }
+            }
+            if (todosOk) horarioCreado = true
+          }
+        } catch (e: any) {
+          console.error("Error general horarios:", e)
+        }
+      }
+
+      showToast(
+        horarioCreado
+          ? "Asignación y horario registrados exitosamente"
+          : "Asignación registrada" + (horario ? " (horario pendiente — puede agregarlo desde el detalle)" : ""),
+        horarioCreado ? "success" : (horario ? "info" : "success")
+      )
       setIsCreateModalOpen(false)
       cargarAsignaciones()
     } catch (err: any) {
@@ -252,16 +310,7 @@ export default function AsignacionesPage() {
     { id: "historica", label: "Históricas", count: asignaciones.filter(a => a.tipo === "historica").length },
   ]
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -328,6 +377,14 @@ export default function AsignacionesPage() {
           </div>
 
           <div className="flex justify-end gap-3">
+            <button
+              onClick={() => exportarAsignacionesPDF(listaFiltrada, activeTab)}
+              disabled={listaFiltrada.length === 0}
+              className="border border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-40"
+            >
+              <FileDown className="w-4 h-4" />
+              PDF
+            </button>
             {puedeEditar && (
               <>
                 <button
@@ -352,14 +409,9 @@ export default function AsignacionesPage() {
         {/* Tabla */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 flex flex-col items-center justify-center text-gray-500">
-              <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando asignaciones...</p>
-            </div>
+            <TableSkeleton rows={5} columns={7} />
           ) : listaPaginada.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              No se encontraron asignaciones con los filtros seleccionados.
-            </div>
+            <EmptyState icon={ClipboardList} title="Sin asignaciones" description="No se encontraron asignaciones con los filtros seleccionados." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
@@ -424,7 +476,7 @@ export default function AsignacionesPage() {
                         )}
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
-                        {puedeEditar ? (
+                        {puedeEditar && asig.tipo !== "historica" ? (
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => openDetailModal(asig)}
@@ -448,7 +500,7 @@ export default function AsignacionesPage() {
                               <Power className="w-4 h-4" />
                             </button>
                           </div>
-                        ) : rol === "Subdirector" ? (
+                        ) : puedeEditar || rol === "Subdirector" ? (
                           <button
                             onClick={() => openDetailModal(asig)}
                             className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"

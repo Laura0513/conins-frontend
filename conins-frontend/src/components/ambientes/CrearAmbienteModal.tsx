@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { X, Loader2 } from "lucide-react"
 import { api } from "@/lib/api"
+import FormField, { inputClass, selectClass } from "@/components/ui/FormField"
 
 type CrearAmbienteModalProps = {
   isOpen: boolean
@@ -12,6 +13,7 @@ type Area = { id: number; nombre: string }
 
 export default function CrearAmbienteModal({ isOpen, onClose, onSubmit }: CrearAmbienteModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [areas, setAreas] = useState<Area[]>([])
   const [formData, setFormData] = useState({
     nombre: "",
@@ -30,8 +32,19 @@ export default function CrearAmbienteModal({ isOpen, onClose, onSubmit }: CrearA
 
   if (!isOpen) return null
 
+  // Validaciones
+  const errors: Record<string, string> = {}
+  if (!formData.nombre.trim()) errors.nombre = "El nombre es obligatorio"
+  else if (formData.nombre.trim().length < 2) errors.nombre = "Mínimo 2 caracteres"
+  if (!formData.capacidad) errors.capacidad = "La capacidad es obligatoria"
+  else if (Number(formData.capacidad) < 1 || Number(formData.capacidad) > 500) errors.capacidad = "Entre 1 y 500"
+
+  const isValid = Object.keys(errors).length === 0
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setTouched({ nombre: true, capacidad: true })
+    if (!isValid) return
     setSubmitting(true)
     try {
       const payload = {
@@ -42,6 +55,7 @@ export default function CrearAmbienteModal({ isOpen, onClose, onSubmit }: CrearA
       }
       await onSubmit(payload)
       setFormData({ nombre: "", tipo: "aula", capacidad: "", area_id: "" })
+      setTouched({})
     } finally {
       setSubmitting(false)
     }
@@ -49,6 +63,10 @@ export default function CrearAmbienteModal({ isOpen, onClose, onSubmit }: CrearA
 
   const handleChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value })
+  }
+
+  const handleBlur = (field: string) => {
+    setTouched({ ...touched, [field]: true })
   }
 
   return (
@@ -62,57 +80,55 @@ export default function CrearAmbienteModal({ isOpen, onClose, onSubmit }: CrearA
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre <span className="text-red-500">*</span></label>
+          <FormField label="Nombre" required error={touched.nombre ? errors.nombre : undefined}>
             <input
               type="text"
-              required
               value={formData.nombre}
               onChange={(e) => handleChange("nombre", e.target.value)}
+              onBlur={() => handleBlur("nombre")}
               placeholder="Ej: Aula 301"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
+              className={inputClass(touched.nombre && !!errors.nombre)}
             />
-          </div>
+          </FormField>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <FormField label="Tipo">
               <select
                 value={formData.tipo}
                 onChange={(e) => handleChange("tipo", e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                className={selectClass()}
               >
                 <option value="aula">Aula</option>
                 <option value="taller">Taller</option>
                 <option value="laboratorio">Laboratorio</option>
               </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad</label>
+            </FormField>
+            <FormField label="Capacidad" required error={touched.capacidad ? errors.capacidad : undefined}>
               <input
                 type="number"
-                required
                 value={formData.capacidad}
                 onChange={(e) => handleChange("capacidad", e.target.value)}
+                onBlur={() => handleBlur("capacidad")}
                 placeholder="30"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                min={1}
+                max={500}
+                className={inputClass(touched.capacidad && !!errors.capacidad)}
               />
-            </div>
+            </FormField>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Área (Opcional)</label>
+          <FormField label="Área" hint="Opcional">
             <select
               value={formData.area_id}
               onChange={(e) => handleChange("area_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              className={selectClass()}
             >
               <option value="">Sin área específica</option>
               {areas.map((a) => (
                 <option key={a.id} value={a.id}>{a.nombre}</option>
               ))}
             </select>
-          </div>
+          </FormField>
 
           <div className="pt-4 flex items-center justify-end gap-3">
             <button
@@ -124,7 +140,7 @@ export default function CrearAmbienteModal({ isOpen, onClose, onSubmit }: CrearA
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !isValid}
               className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}

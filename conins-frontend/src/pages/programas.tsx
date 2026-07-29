@@ -3,6 +3,8 @@ import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
 import {
   Search,
   ChevronLeft,
@@ -109,16 +111,7 @@ export default function ProgramasPage() {
     setPaginaActual(1)
   }, [search])
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -145,15 +138,9 @@ export default function ProgramasPage() {
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 flex flex-col items-center justify-center text-gray-500">
-              <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando programas...</p>
-            </div>
+            <TableSkeleton rows={5} columns={5} />
           ) : listaPaginada.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              <GraduationCap className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-              <p>No se encontraron programas.</p>
-            </div>
+            <EmptyState icon={GraduationCap} title="Sin programas" description="No se encontraron programas con los filtros seleccionados." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">

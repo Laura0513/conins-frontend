@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useRouter } from "next/router"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -10,6 +11,8 @@ import CrearBloqueHorarioModal from "@/components/horarios/CrearBloqueHorarioMod
 import EditarHorarioModal from "@/components/horarios/EditarHorarioModal"
 import GrillaHorarios from "@/components/horarios/GrillaHorarios"
 import ConfirmDialog from "@/components/ui/ConfirmDialog"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
 import {
   Search,
   Plus,
@@ -26,6 +29,7 @@ import {
   FileDown,
   LayoutGrid,
   List,
+  Calendar,
 } from "lucide-react"
 
 type Horario = {
@@ -51,6 +55,7 @@ type Horario = {
 
 
 export default function HorariosPage() {
+  const router = useRouter()
   const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [horarios, setHorarios] = useState<Horario[]>([])
@@ -248,16 +253,7 @@ export default function HorariosPage() {
     })
   }
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -285,11 +281,11 @@ export default function HorariosPage() {
             </button>
             {puedeEditar && (
               <button
-                onClick={() => setIsCreateModalOpen(true)}
+                onClick={() => router.push("/asignaciones")}
                 className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
               >
                 <Plus className="w-4 h-4" />
-                Registrar horario
+                Crear desde asignación
               </button>
             )}
           </div>
@@ -360,14 +356,9 @@ export default function HorariosPage() {
         ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 flex flex-col items-center justify-center text-gray-500">
-              <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando horarios...</p>
-            </div>
+            <TableSkeleton rows={5} columns={10} />
           ) : listaPaginada.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              No se encontraron horarios con los filtros seleccionados.
-            </div>
+            <EmptyState icon={Calendar} title="Sin horarios" description="No se encontraron horarios con los filtros seleccionados." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">

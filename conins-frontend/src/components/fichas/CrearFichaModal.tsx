@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { X, Loader2 } from "lucide-react"
 import { api } from "@/lib/api"
+import FormField, { inputClass, selectClass } from "@/components/ui/FormField"
 
 type CrearFichaModalProps = {
   isOpen: boolean
@@ -20,6 +21,7 @@ const JORNADAS = [
 
 export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFichaModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [programas, setProgramas] = useState<Programa[]>([])
   const [lideres, setLideres] = useState<Lider[]>([])
   const [formData, setFormData] = useState({
@@ -57,8 +59,23 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
 
   if (!isOpen) return null
 
+  // Validaciones
+  const errors: Record<string, string> = {}
+  if (!formData.numero_ficha.trim()) errors.numero_ficha = "El número de grupo es obligatorio"
+  else if (!/^\d{4,10}$/.test(formData.numero_ficha.trim())) errors.numero_ficha = "Solo números, entre 4 y 10 dígitos"
+  if (!formData.programa_id) errors.programa_id = "Seleccione un programa"
+  if (!formData.jornada_id) errors.jornada_id = "Seleccione una jornada"
+  if (formData.fecha_inicio_lectiva && formData.fecha_fin_lectiva && formData.fecha_fin_lectiva < formData.fecha_inicio_lectiva)
+    errors.fecha_fin_lectiva = "La fecha fin debe ser posterior al inicio"
+  if (formData.fecha_inicio_productiva && formData.fecha_fin_productiva && formData.fecha_fin_productiva < formData.fecha_inicio_productiva)
+    errors.fecha_fin_productiva = "La fecha fin debe ser posterior al inicio"
+
+  const isValid = Object.keys(errors).length === 0
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setTouched({ numero_ficha: true, programa_id: true, jornada_id: true })
+    if (!isValid) return
     setSubmitting(true)
     try {
       const payload = {
@@ -75,17 +92,11 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
       }
       await onSubmit(payload)
       setFormData({
-        numero_ficha: "",
-        programa_id: "",
-        jornada_id: "",
-        etapa: "lectiva",
-        lider_id: "",
-        fecha_inicio_lectiva: "",
-        fecha_fin_lectiva: "",
-        fecha_inicio_productiva: "",
-        fecha_fin_productiva: "",
-        fecha_fin_ficha: "",
+        numero_ficha: "", programa_id: "", jornada_id: "", etapa: "lectiva", lider_id: "",
+        fecha_inicio_lectiva: "", fecha_fin_lectiva: "", fecha_inicio_productiva: "",
+        fecha_fin_productiva: "", fecha_fin_ficha: "",
       })
+      setTouched({})
     } finally {
       setSubmitting(false)
     }
@@ -93,6 +104,10 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
 
   const handleChange = (field: string, value: any) => {
     setFormData({ ...formData, [field]: value })
+  }
+
+  const handleBlur = (field: string) => {
+    setTouched({ ...touched, [field]: true })
   }
 
   return (
@@ -106,50 +121,46 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-5 max-h-[70vh] overflow-y-auto">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Número de grupo</label>
+          <FormField label="Número de grupo" required error={touched.numero_ficha ? errors.numero_ficha : undefined}>
             <input
               type="text"
-              required
               value={formData.numero_ficha}
               onChange={(e) => handleChange("numero_ficha", e.target.value)}
+              onBlur={() => handleBlur("numero_ficha")}
               placeholder="2995403"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
+              className={inputClass(touched.numero_ficha && !!errors.numero_ficha)}
             />
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Programa</label>
+          <FormField label="Programa" required error={touched.programa_id ? errors.programa_id : undefined}>
             <select
-              required
               value={formData.programa_id}
               onChange={(e) => handleChange("programa_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              onBlur={() => handleBlur("programa_id")}
+              className={selectClass(touched.programa_id && !!errors.programa_id)}
             >
               <option value="">Seleccionar programa</option>
               {programas.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre}</option>
               ))}
             </select>
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Lider de programa</label>
+          <FormField label="Líder de programa">
             <select
               value={formData.lider_id}
               onChange={(e) => handleChange("lider_id", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+              className={selectClass()}
             >
               <option value="">Sin asignar</option>
               {lideres.map((l) => (
                 <option key={l.id} value={l.id}>{l.nombre}</option>
               ))}
             </select>
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Jornada</label>
-            <div className="flex flex-wrap gap-4">
+          <FormField label="Jornada" required error={touched.jornada_id ? errors.jornada_id : undefined}>
+            <div className="flex flex-wrap gap-4 pt-1">
               {JORNADAS.map((j) => (
                 <label key={j.id} className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -157,23 +168,20 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
                     name="jornada"
                     value={j.id}
                     checked={Number(formData.jornada_id) === j.id}
-                    onChange={(e) => handleChange("jornada_id", e.target.value)}
+                    onChange={(e) => { handleChange("jornada_id", e.target.value); setTouched({ ...touched, jornada_id: true }) }}
                     className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
                   />
                   <span className="text-sm text-gray-700">{j.nombre}</span>
                 </label>
               ))}
             </div>
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Etapa</label>
-            <div className="flex gap-4">
+          <FormField label="Etapa">
+            <div className="flex gap-4 pt-1">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="radio"
-                  name="etapa"
-                  value="lectiva"
+                  type="radio" name="etapa" value="lectiva"
                   checked={formData.etapa === "lectiva"}
                   onChange={(e) => handleChange("etapa", e.target.value)}
                   className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
@@ -182,9 +190,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  type="radio"
-                  name="etapa"
-                  value="productiva"
+                  type="radio" name="etapa" value="productiva"
                   checked={formData.etapa === "productiva"}
                   onChange={(e) => handleChange("etapa", e.target.value)}
                   className="w-4 h-4 text-sena border-gray-300 focus:ring-sena"
@@ -192,30 +198,28 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
                 <span className="text-sm text-gray-700">Productiva</span>
               </label>
             </div>
-          </div>
+          </FormField>
 
           {/* Fechas lectiva */}
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Etapa lectiva</p>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Fecha inicio</label>
+              <FormField label="Fecha inicio">
                 <input
                   type="date"
                   value={formData.fecha_inicio_lectiva}
                   onChange={(e) => handleChange("fecha_inicio_lectiva", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  className={inputClass()}
                 />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Fecha fin</label>
+              </FormField>
+              <FormField label="Fecha fin" error={errors.fecha_fin_lectiva}>
                 <input
                   type="date"
                   value={formData.fecha_fin_lectiva}
                   onChange={(e) => handleChange("fecha_fin_lectiva", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  className={inputClass(!!errors.fecha_fin_lectiva)}
                 />
-              </div>
+              </FormField>
             </div>
           </div>
 
@@ -223,36 +227,33 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">Etapa productiva</p>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Fecha inicio</label>
+              <FormField label="Fecha inicio">
                 <input
                   type="date"
                   value={formData.fecha_inicio_productiva}
                   onChange={(e) => handleChange("fecha_inicio_productiva", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  className={inputClass()}
                 />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Fecha fin</label>
+              </FormField>
+              <FormField label="Fecha fin" error={errors.fecha_fin_productiva}>
                 <input
                   type="date"
                   value={formData.fecha_fin_productiva}
                   onChange={(e) => handleChange("fecha_fin_productiva", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                  className={inputClass(!!errors.fecha_fin_productiva)}
                 />
-              </div>
+              </FormField>
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Fecha fin grupo</label>
+          <FormField label="Fecha fin grupo">
             <input
               type="date"
               value={formData.fecha_fin_ficha}
               onChange={(e) => handleChange("fecha_fin_ficha", e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+              className={inputClass()}
             />
-          </div>
+          </FormField>
 
           <div className="pt-2 flex items-center justify-end gap-3">
             <button
@@ -264,7 +265,7 @@ export default function CrearFichaModal({ isOpen, onClose, onSubmit }: CrearFich
             </button>
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !isValid}
               className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}

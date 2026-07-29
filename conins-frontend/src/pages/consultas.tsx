@@ -4,6 +4,8 @@ import { api } from "@/lib/api"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import { useToast } from "@/lib/ToastContext"
 import { exportarCargaHorariaPDF, exportarHorarioFichaPDF, exportarOcupacionPDF } from "@/lib/exportPDF"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
 import {
   Search,
   FileDown,
@@ -14,6 +16,7 @@ import {
   Users,
   Building2,
   Calendar,
+  BarChart3,
 } from "lucide-react"
 
 // --- Types ---
@@ -118,16 +121,7 @@ export default function ConsultasPage() {
       ? Math.round(ocupacion.reduce((sum, o) => sum + Number(o.porcentaje), 0) / ocupacion.length)
       : 0
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -214,10 +208,7 @@ export default function ConsultasPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="p-12 flex flex-col items-center justify-center text-gray-500 bg-white rounded-xl border border-gray-200">
-            <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-            <p>Cargando reporte...</p>
-          </div>
+          <TableSkeleton rows={6} columns={6} />
         ) : (
           <>
             {/* Tab: Carga Horaria */}
@@ -248,9 +239,7 @@ export default function ConsultasPage() {
 
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   {cargaFiltrada.length === 0 ? (
-                    <div className="p-12 text-center text-gray-500">
-                      No se encontraron resultados.
-                    </div>
+                    <EmptyState icon={BarChart3} title="Sin resultados" description="No se encontraron resultados con los filtros seleccionados." />
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm text-left">
@@ -356,9 +345,7 @@ export default function ConsultasPage() {
 
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   {fichasFiltradas.length === 0 ? (
-                    <div className="p-12 text-center text-gray-500">
-                      No se encontraron grupos con horarios activos.
-                    </div>
+                    <EmptyState icon={Calendar} title="Sin horarios" description="No se encontraron grupos con horarios activos." />
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm text-left">
@@ -413,9 +400,7 @@ export default function ConsultasPage() {
               <div className="space-y-4">
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   {ocupacion.length === 0 ? (
-                    <div className="p-12 text-center text-gray-500">
-                      No hay datos de ocupacion disponibles.
-                    </div>
+                    <EmptyState icon={Building2} title="Sin datos" description="No hay datos de ocupacion disponibles." />
                   ) : (
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm text-left">

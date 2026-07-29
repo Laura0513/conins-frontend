@@ -2,7 +2,9 @@ import { useState, useEffect } from "react"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
-import { Loader2 } from "lucide-react"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
+import { Loader2, Layers } from "lucide-react"
 
 type Competencia = {
   id: number
@@ -35,16 +37,7 @@ export default function CompetenciasPage() {
     }
   }
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -56,14 +49,9 @@ export default function CompetenciasPage() {
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 flex flex-col items-center justify-center text-gray-500">
-              <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando competencias...</p>
-            </div>
+            <TableSkeleton rows={5} columns={5} />
           ) : competencias.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              No tienes competencias registradas.
-            </div>
+            <EmptyState icon={Layers} title="Sin competencias" description="No tienes competencias registradas." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">

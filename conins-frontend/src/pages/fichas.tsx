@@ -23,7 +23,12 @@ import {
   AlertTriangle,
   ClipboardList,
   FileWarning,
+  BookOpen,
+  FileDown,
 } from "lucide-react"
+import { exportarGruposPDF } from "@/lib/exportPDF"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
 
 type Ficha = {
   id: number
@@ -183,16 +188,7 @@ export default function FichasPage() {
     }
   }
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -203,15 +199,25 @@ export default function FichasPage() {
             <h1 className="text-2xl font-bold text-gray-900">Grupos</h1>
             <p className="text-gray-500 text-sm">{puedeEditar ? "Gestión de grupos de formación" : "Mis grupos asignados"}</p>
           </div>
-          {puedeEditar && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+              onClick={() => exportarGruposPDF(listaFiltrada)}
+              disabled={listaFiltrada.length === 0}
+              className="border border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-40"
             >
-              <Plus className="w-4 h-4" />
-              Registrar grupo
+              <FileDown className="w-4 h-4" />
+              PDF
             </button>
-          )}
+            {puedeEditar && (
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Registrar grupo
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -275,14 +281,13 @@ export default function FichasPage() {
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 flex flex-col items-center justify-center text-gray-500">
-              <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando grupos...</p>
-            </div>
+            <TableSkeleton rows={6} columns={7} />
           ) : listaPaginada.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              No se encontraron grupos con los filtros seleccionados.
-            </div>
+            <EmptyState
+              icon={BookOpen}
+              title="Sin grupos"
+              description="No se encontraron grupos con los filtros seleccionados."
+            />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { X, Loader2, Clock, User, BookOpen, Hash } from "lucide-react"
+import { useState, useEffect, useMemo } from "react"
+import { X, Loader2, User, BookOpen, Hash, Info, Building2, Sun, ChevronDown, ChevronUp } from "lucide-react"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 
@@ -9,15 +9,37 @@ type CrearHorarioModalProps = {
   onSubmit: (data: any) => Promise<void>
 }
 
-type Asignacion = {
+type AsignacionRaw = {
   id: number
   instructor_nombre: string
   ficha_numero: string
   competencia: string
+  competencia_id: number
   instructor_id: number
   ficha_id: number
-  competencia_id: number
   ambiente_id: number | null
+  ambiente?: string
+  jornada_id: number | null
+  jornada?: string
+  activo: boolean
+  tipo?: string
+}
+
+type AsignacionAgrupada = {
+  key: string
+  instructor_id: number
+  instructor_nombre: string
+  ficha_id: number
+  ficha_numero: string
+  ambiente_id: number | null
+  ambiente_nombre: string
+  jornada_id: number | null
+  jornada_nombre: string
+  competencias: {
+    asignacion_id: number
+    competencia_id: number
+    nombre: string
+  }[]
 }
 
 type Rap = { rap_id: number; codigo: string; descripcion: string }
@@ -55,14 +77,16 @@ const DIAS_SEMANA = [
 export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHorarioModalProps) {
   const { showToast } = useToast()
   const [submitting, setSubmitting] = useState(false)
-  const [asignaciones, setAsignaciones] = useState<Asignacion[]>([])
+  const [asignacionesRaw, setAsignacionesRaw] = useState<AsignacionRaw[]>([])
   const [ambientes, setAmbientes] = useState<Ambiente[]>([])
   const [tiposActividad, setTiposActividad] = useState<TipoActividad[]>([])
   const [loading, setLoading] = useState(false)
   const [rapsDisponibles, setRapsDisponibles] = useState<Rap[]>([])
   const [loadingRaps, setLoadingRaps] = useState(false)
+  const [showCompetencias, setShowCompetencias] = useState(false)
   const [formData, setFormData] = useState({
-    asignacion_id: "",
+    grupo_key: "",
+    competencia_id: "",
     dias: [] as number[],
     hora_inicio: "",
     hora_fin: "",
@@ -72,23 +96,91 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
     rap_id: "",
   })
 
+  // Agrupar asignaciones por instructor+grupo (solo activas)
+  const asignacionesAgrupadas = useMemo(() => {
+    const activas = asignacionesRaw.filter((a) => a.activo === true || a.activo === 1 as any)
+    const grupos: Record<string, AsignacionAgrupada> = {}
+
+    for (const a of activas) {
+      const key = `${a.instructor_id}-${a.ficha_id}`
+      if (!grupos[key]) {
+        const jornadaNombre = a.jornada || JORNADAS.find((j) => j.id === a.jornada_id)?.nombre || ""
+        grupos[key] = {
+          key,
+          instructor_id: a.instructor_id,
+          instructor_nombre: a.instructor_nombre,
+          ficha_id: a.ficha_id,
+          ficha_numero: a.ficha_numero,
+          ambiente_id: a.ambiente_id,
+          ambiente_nombre: a.ambiente || "",
+          jornada_id: a.jornada_id,
+          jornada_nombre: jornadaNombre,
+          competencias: [],
+        }
+      }
+      // Evitar duplicados de competencia
+      if (!grupos[key].competencias.some((c) => c.competencia_id === a.competencia_id)) {
+        grupos[key].competencias.push({
+          asignacion_id: a.id,
+          competencia_id: a.competencia_id,
+          nombre: a.competencia,
+        })
+      }
+    }
+
+    return Object.values(grupos)
+  }, [asignacionesRaw])
+
+  const selectedGrupo = asignacionesAgrupadas.find((g) => g.key === formData.grupo_key) || null
+
   useEffect(() => {
     if (isOpen) {
       setLoading(true)
       Promise.all([
-        api.assignments.getAll().then((res) => setAsignaciones(res.data || [])).catch(() => setAsignaciones([])),
+        api.assignments.getAll().then((res) => setAsignacionesRaw(res.data || [])).catch(() => setAsignacionesRaw([])),
         api.ambientes.getAll().then((res) => setAmbientes(res.data || [])).catch(() => setAmbientes([])),
         api.catalogo.getTiposActividad().then((res) => setTiposActividad(res.data || [])).catch(() => setTiposActividad([])),
       ]).finally(() => setLoading(false))
+
+      // Reset
+      setFormData({
+        grupo_key: "",
+        competencia_id: "",
+        dias: [],
+        hora_inicio: "",
+        hora_fin: "",
+        jornada_id: "",
+        ambiente_id: "",
+        tipo_actividad_id: "",
+        rap_id: "",
+      })
+      setRapsDisponibles([])
+      setShowCompetencias(false)
     }
   }, [isOpen])
 
+  // Auto-llenar jornada y ambiente cuando se selecciona un grupo
   useEffect(() => {
-    if (formData.asignacion_id) {
-      const asig = asignaciones.find((a) => a.id === Number(formData.asignacion_id))
-      if (asig) {
+    if (formData.grupo_key && selectedGrupo) {
+      setFormData((prev) => ({
+        ...prev,
+        jornada_id: selectedGrupo.jornada_id ? String(selectedGrupo.jornada_id) : prev.jornada_id,
+        ambiente_id: selectedGrupo.ambiente_id ? String(selectedGrupo.ambiente_id) : prev.ambiente_id,
+        competencia_id: "",
+        rap_id: "",
+      }))
+      setRapsDisponibles([])
+      setShowCompetencias(true)
+    }
+  }, [formData.grupo_key])
+
+  // Cargar RAPs cuando se selecciona una competencia
+  useEffect(() => {
+    if (formData.competencia_id && selectedGrupo) {
+      const comp = selectedGrupo.competencias.find((c) => c.competencia_id === Number(formData.competencia_id))
+      if (comp) {
         setLoadingRaps(true)
-        api.assignments.getRapsByCompetencia(asig.id, asig.competencia_id)
+        api.assignments.getRapsByCompetencia(comp.asignacion_id, comp.competencia_id)
           .then((res) => setRapsDisponibles(res.data || []))
           .catch(() => setRapsDisponibles([]))
           .finally(() => setLoadingRaps(false))
@@ -97,18 +189,16 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
       setRapsDisponibles([])
     }
     setFormData((prev) => ({ ...prev, rap_id: "" }))
-  }, [formData.asignacion_id, asignaciones])
+  }, [formData.competencia_id])
 
   if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!selectedGrupo) return
     setSubmitting(true)
     try {
-      const selected = asignaciones.find((a) => a.id === Number(formData.asignacion_id))
-      if (!selected) return
-
-      const finalAmbienteId = formData.ambiente_id ? Number(formData.ambiente_id) : selected.ambiente_id
+      const finalAmbienteId = formData.ambiente_id ? Number(formData.ambiente_id) : selectedGrupo.ambiente_id
 
       if (!finalAmbienteId) {
         showToast("Este grupo no tiene un ambiente asignado. Por favor selecciona uno manualmente.", "error")
@@ -116,17 +206,15 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
         return
       }
 
-      const now = new Date()
-      const day = now.getDay()
-      const diff = day === 0 ? -6 : 1 - day
-      const lunes = new Date(now)
-      lunes.setDate(now.getDate() + diff)
-      const semana = lunes.toISOString().split('T')[0]
+      // Buscar el asignacion_id correspondiente a la competencia seleccionada (o la primera)
+      const compSeleccionada = formData.competencia_id
+        ? selectedGrupo.competencias.find((c) => c.competencia_id === Number(formData.competencia_id))
+        : selectedGrupo.competencias[0]
 
       const payload = {
-        ficha_id: selected.ficha_id,
-        instructor_id: selected.instructor_id,
-        competencia_id: selected.competencia_id,
+        ficha_id: selectedGrupo.ficha_id,
+        instructor_id: selectedGrupo.instructor_id,
+        competencia_id: compSeleccionada?.competencia_id || selectedGrupo.competencias[0].competencia_id,
         dias: formData.dias,
         hora_inicio: formData.hora_inicio,
         hora_fin: formData.hora_fin,
@@ -137,7 +225,8 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
       }
       await onSubmit(payload)
       setFormData({
-        asignacion_id: "",
+        grupo_key: "",
+        competencia_id: "",
         dias: [],
         hora_inicio: "",
         hora_fin: "",
@@ -165,8 +254,6 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
     setFormData({ ...formData, dias: nuevosDias })
   }
 
-  const selectedAsignacion = asignaciones.find((a) => a.id === Number(formData.asignacion_id))
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
@@ -183,159 +270,238 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
               <Loader2 className="w-5 h-5 animate-spin mr-2" />
               Cargando asignaciones...
             </div>
+          ) : asignacionesAgrupadas.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p className="text-sm">No hay asignaciones activas disponibles.</p>
+              <p className="text-xs mt-1">Crea una asignación primero para poder registrar horarios.</p>
+            </div>
           ) : (
             <>
+              {/* Selector de asignación agrupada */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Asignación activa <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Asignación <span className="text-red-500">*</span></label>
                 <select
                   required
-                  value={formData.asignacion_id}
-                  onChange={(e) => handleChange("asignacion_id", e.target.value)}
+                  value={formData.grupo_key}
+                  onChange={(e) => handleChange("grupo_key", e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
                 >
                   <option value="">Seleccionar asignación</option>
-                  {asignaciones.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.instructor_nombre} — Grupo {a.ficha_numero} — {a.competencia}
+                  {asignacionesAgrupadas.map((g) => (
+                    <option key={g.key} value={g.key}>
+                      {g.instructor_nombre} — Grupo {g.ficha_numero} ({g.competencias.length} comp.)
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">Selecciona una asignación vigente para crear el horario.</p>
               </div>
 
-              {selectedAsignacion && (
-                <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
+              {/* Resumen completo de la asignación */}
+              {selectedGrupo && (
+                <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
                   <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <User className="w-4 h-4 text-gray-400" />
-                    <span className="font-medium">{selectedAsignacion.instructor_nombre}</span>
+                    <User className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span className="font-medium">{selectedGrupo.instructor_nombre}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <Hash className="w-4 h-4 text-gray-400" />
-                    <span>Grupo {selectedAsignacion.ficha_numero}</span>
+                    <Hash className="w-4 h-4 text-gray-400 shrink-0" />
+                    <span>Grupo {selectedGrupo.ficha_numero}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <BookOpen className="w-4 h-4 text-gray-400" />
-                    <span>{selectedAsignacion.competencia}</span>
-                  </div>
-                </div>
-              )}
+                  {selectedGrupo.jornada_nombre && (
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Sun className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span>{selectedGrupo.jornada_nombre}</span>
+                    </div>
+                  )}
+                  {selectedGrupo.ambiente_nombre && (
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Building2 className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span>{selectedGrupo.ambiente_nombre}</span>
+                    </div>
+                  )}
 
-              {selectedAsignacion && rapsDisponibles.length > 0 && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">RAP a dictar</label>
-                  <select
-                    value={formData.rap_id}
-                    onChange={(e) => handleChange("rap_id", e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-                  >
-                    <option value="">Sin especificar</option>
-                    {rapsDisponibles.map((r) => (
-                      <option key={r.rap_id} value={r.rap_id}>
-                        {r.codigo} — {r.descripcion}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">RAP que se dictará en este bloque horario.</p>
-                </div>
-              )}
-
-              {selectedAsignacion && loadingRaps && (
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <Loader2 className="w-3 h-3 animate-spin" /> Cargando RAPs...
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Días de la semana <span className="text-red-500">*</span></label>
-                <div className="flex flex-wrap gap-2">
-                  {DIAS_SEMANA.map((d) => (
+                  {/* Competencias de esta asignación */}
+                  <div className="pt-2 border-t border-gray-200">
                     <button
-                      key={d.id}
                       type="button"
-                      onClick={() => toggleDia(d.id)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
-                        formData.dias.includes(d.id)
-                          ? "bg-gray-800 text-white border-gray-800"
-                          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-                      }`}
+                      onClick={() => setShowCompetencias(!showCompetencias)}
+                      className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-sena transition-colors w-full"
                     >
-                      {d.nombre}
+                      <BookOpen className="w-4 h-4 text-gray-400" />
+                      <span>{selectedGrupo.competencias.length} competencia{selectedGrupo.competencias.length > 1 ? "s" : ""} asignada{selectedGrupo.competencias.length > 1 ? "s" : ""}</span>
+                      {showCompetencias ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
                     </button>
-                  ))}
-                </div>
-              </div>
+                    {showCompetencias && (
+                      <ul className="mt-2 space-y-1.5">
+                        {selectedGrupo.competencias.map((c) => (
+                          <li key={c.competencia_id} className="text-xs text-gray-600 pl-6 py-1 bg-white rounded border border-gray-100">
+                            {c.nombre}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Jornada <span className="text-red-500">*</span></label>
-                <div className="flex flex-wrap gap-2">
-                  {JORNADAS.map((j) => (
-                    <button
-                      key={j.id}
-                      type="button"
-                      onClick={() => handleChange("jornada_id", String(j.id))}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-                        Number(formData.jornada_id) === j.id
-                          ? "bg-sena text-white border-sena"
-                          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-                      }`}
-                    >
-                      {j.nombre}
-                    </button>
-                  ))}
+                  <div className="flex items-start gap-2 pt-2 border-t border-gray-200">
+                    <Info className="w-3.5 h-3.5 text-sena mt-0.5 shrink-0" />
+                    <span className="text-xs text-sena">Datos pre-llenados desde la asignación. Solo completa el horario abajo.</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Hora inicio <span className="text-red-500">*</span></label>
-                  <input
-                    type="time"
-                    required
-                    value={formData.hora_inicio}
-                    onChange={(e) => handleChange("hora_inicio", e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Hora fin <span className="text-red-500">*</span></label>
-                  <input
-                    type="time"
-                    required
-                    value={formData.hora_fin}
-                    onChange={(e) => handleChange("hora_fin", e.target.value)}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                  />
-                </div>
-              </div>
+              {selectedGrupo && (
+                <>
+                  {/* Competencia específica para este bloque */}
+                  {selectedGrupo.competencias.length > 1 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Competencia para este bloque</label>
+                      <select
+                        value={formData.competencia_id}
+                        onChange={(e) => handleChange("competencia_id", e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                      >
+                        <option value="">Todas las competencias</option>
+                        {selectedGrupo.competencias.map((c) => (
+                          <option key={c.competencia_id} value={c.competencia_id}>{c.nombre}</option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">Si este bloque es para una competencia específica, selecciónala.</p>
+                    </div>
+                  )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente</label>
-                <select
-                  value={formData.ambiente_id}
-                  onChange={(e) => handleChange("ambiente_id", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-                >
-                  <option value="">Sin asignar (usa el del grupo)</option>
-                  {ambientes.map((a) => (
-                    <option key={a.id} value={a.id}>{a.nombre}</option>
-                  ))}
-                </select>
-              </div>
+                  {/* RAP (solo si hay competencia seleccionada y tiene RAPs) */}
+                  {formData.competencia_id && rapsDisponibles.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">RAP a dictar</label>
+                      <select
+                        value={formData.rap_id}
+                        onChange={(e) => handleChange("rap_id", e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                      >
+                        <option value="">Sin especificar</option>
+                        {rapsDisponibles.map((r) => (
+                          <option key={r.rap_id} value={r.rap_id}>
+                            {r.codigo} — {r.descripcion}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de actividad</label>
-                <select
-                  value={formData.tipo_actividad_id}
-                  onChange={(e) => handleChange("tipo_actividad_id", e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-                >
-                  <option value="">Sin clasificar</option>
-                  {tiposActividad.map((t) => (
-                    <option key={t.id} value={t.id}>{t.nombre}</option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">Clasifica el tipo de actividad para el cálculo de carga horaria.</p>
-              </div>
+                  {loadingRaps && (
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <Loader2 className="w-3 h-3 animate-spin" /> Cargando RAPs...
+                    </div>
+                  )}
+
+                  {/* --- DATOS DEL HORARIO (lo nuevo) --- */}
+                  <div className="pt-2 border-t border-gray-200">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Datos del horario</p>
+
+                    {/* Días */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Días de la semana <span className="text-red-500">*</span></label>
+                      <div className="flex flex-wrap gap-2">
+                        {DIAS_SEMANA.map((d) => (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onClick={() => toggleDia(d.id)}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
+                              formData.dias.includes(d.id)
+                                ? "bg-gray-800 text-white border-gray-800"
+                                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                            }`}
+                          >
+                            {d.nombre}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Jornada */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Jornada <span className="text-red-500">*</span>
+                        {selectedGrupo.jornada_id && <span className="text-xs text-sena ml-2">(de la asignación)</span>}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {JORNADAS.map((j) => (
+                          <button
+                            key={j.id}
+                            type="button"
+                            onClick={() => handleChange("jornada_id", String(j.id))}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                              Number(formData.jornada_id) === j.id
+                                ? "bg-sena text-white border-sena"
+                                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                            }`}
+                          >
+                            {j.nombre}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Horas */}
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Hora inicio <span className="text-red-500">*</span></label>
+                        <input
+                          type="time"
+                          required
+                          value={formData.hora_inicio}
+                          onChange={(e) => handleChange("hora_inicio", e.target.value)}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Hora fin <span className="text-red-500">*</span></label>
+                        <input
+                          type="time"
+                          required
+                          value={formData.hora_fin}
+                          onChange={(e) => handleChange("hora_fin", e.target.value)}
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Ambiente */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Ambiente
+                        {selectedGrupo.ambiente_id && <span className="text-xs text-sena ml-2">(de la asignación)</span>}
+                      </label>
+                      <select
+                        value={formData.ambiente_id}
+                        onChange={(e) => handleChange("ambiente_id", e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                      >
+                        <option value="">Sin asignar (usa el del grupo)</option>
+                        {ambientes.map((a) => (
+                          <option key={a.id} value={a.id}>{a.nombre}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Tipo de actividad */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de actividad</label>
+                      <select
+                        value={formData.tipo_actividad_id}
+                        onChange={(e) => handleChange("tipo_actividad_id", e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                      >
+                        <option value="">Sin clasificar</option>
+                        {tiposActividad.map((t) => (
+                          <option key={t.id} value={t.id}>{t.nombre}</option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">Clasifica el tipo de actividad para el cálculo de carga horaria.</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
 
@@ -349,7 +515,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onSubmit }: CrearHo
             </button>
             <button
               type="submit"
-              disabled={submitting || loading}
+              disabled={submitting || loading || !selectedGrupo}
               className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}

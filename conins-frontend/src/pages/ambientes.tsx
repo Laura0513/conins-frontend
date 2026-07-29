@@ -7,6 +7,11 @@ import CrearAmbienteModal from "@/components/ambientes/CrearAmbienteModal"
 import EditarAmbienteModal from "@/components/ambientes/EditarAmbienteModal"
 import VerAgendaAmbienteModal from "@/components/ambientes/VerAgendaAmbienteModal"
 import BloquearAmbienteModal from "@/components/ambientes/BloquearAmbienteModal"
+import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
+import DetailFichaModal from "@/components/fichas/DetailFichaModal"
+import { exportarAmbientesPDF } from "@/lib/exportPDF"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
 import {
   Search,
   Plus,
@@ -17,6 +22,8 @@ import {
   ChevronRight,
   Loader2,
   AlertTriangle,
+  Building2,
+  FileDown,
 } from "lucide-react"
 
 type Ambiente = {
@@ -44,6 +51,10 @@ export default function AmbientesPage() {
   const [isAgendaModalOpen, setIsAgendaModalOpen] = useState(false)
   const [isBloqueoModalOpen, setIsBloqueoModalOpen] = useState(false)
   const [selectedAmbiente, setSelectedAmbiente] = useState<Ambiente | null>(null)
+  const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false)
+  const [selectedInstructor, setSelectedInstructor] = useState<any>(null)
+  const [isFichaModalOpen, setIsFichaModalOpen] = useState(false)
+  const [selectedFicha, setSelectedFicha] = useState<any>(null)
 
   const [search, setSearch] = useState("")
   const [paginaActual, setPaginaActual] = useState(1)
@@ -95,6 +106,28 @@ export default function AmbientesPage() {
     }
   }
 
+  const openInstructorByName = async (nombre: string) => {
+    try {
+      const res = await api.instructors.getAll()
+      const inst = (res.data || []).find((i: any) => i.nombre === nombre)
+      if (inst) {
+        setSelectedInstructor(inst)
+        setIsInstructorModalOpen(true)
+      }
+    } catch { /* silently fail */ }
+  }
+
+  const openFichaByNumero = async (numero: string) => {
+    try {
+      const res = await api.fichas.getAll()
+      const ficha = (res.data || []).find((f: any) => f.numero_ficha === numero)
+      if (ficha) {
+        setSelectedFicha(ficha)
+        setIsFichaModalOpen(true)
+      }
+    } catch { /* silently fail */ }
+  }
+
   const openAgendaModal = (amb: Ambiente) => {
     setSelectedAmbiente(amb)
     setIsAgendaModalOpen(true)
@@ -134,16 +167,7 @@ export default function AmbientesPage() {
     }
   }
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -154,15 +178,25 @@ export default function AmbientesPage() {
             <h1 className="text-2xl font-bold text-gray-900">Ambientes</h1>
             <p className="text-gray-500 text-sm">{puedeEditar ? "Aulas y talleres del CDMC" : "Mis ambientes asignados"}</p>
           </div>
-          {puedeEditar && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+              onClick={() => exportarAmbientesPDF(listaFiltrada)}
+              disabled={listaFiltrada.length === 0}
+              className="border border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-40"
             >
-              <Plus className="w-4 h-4" />
-              Registrar ambiente
+              <FileDown className="w-4 h-4" />
+              PDF
             </button>
-          )}
+            {puedeEditar && (
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Registrar ambiente
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -204,14 +238,9 @@ export default function AmbientesPage() {
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 flex flex-col items-center justify-center text-gray-500">
-              <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando ambientes...</p>
-            </div>
+            <TableSkeleton rows={5} columns={6} />
           ) : listaPaginada.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              No se encontraron ambientes con los filtros seleccionados.
-            </div>
+            <EmptyState icon={Building2} title="Sin ambientes" description="No se encontraron ambientes con los filtros seleccionados." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
@@ -228,7 +257,15 @@ export default function AmbientesPage() {
                 <tbody className="divide-y divide-gray-100">
                   {listaPaginada.map((amb) => (
                     <tr key={amb.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{amb.nombre}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">
+                        <button
+                          onClick={() => openAgendaModal(amb)}
+                          className="text-left hover:text-sena hover:underline transition-colors"
+                          title="Ver agenda del ambiente"
+                        >
+                          {amb.nombre}
+                        </button>
+                      </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{amb.tipo}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center text-gray-700">{amb.capacidad ? `${amb.capacidad} pax` : "—"}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
@@ -243,8 +280,23 @@ export default function AmbientesPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         {amb.ocupante_actual ? (
                           <div className="text-sm">
-                            <p className="font-medium text-gray-900">{amb.ocupante_actual.instructor}</p>
-                            <p className="text-xs text-gray-500">Grupo {amb.ocupante_actual.ficha} · {amb.ocupante_actual.competencia}</p>
+                            <button
+                              onClick={() => openInstructorByName(amb.ocupante_actual!.instructor)}
+                              className="font-medium text-gray-900 hover:text-sena hover:underline transition-colors text-left"
+                              title="Ver detalle del instructor"
+                            >
+                              {amb.ocupante_actual.instructor}
+                            </button>
+                            <p className="text-xs text-gray-500">
+                              <button
+                                onClick={() => openFichaByNumero(amb.ocupante_actual!.ficha)}
+                                className="hover:text-sena hover:underline transition-colors"
+                                title="Ver detalle del grupo"
+                              >
+                                Grupo {amb.ocupante_actual.ficha}
+                              </button>
+                              {" · "}{amb.ocupante_actual.competencia}
+                            </p>
                           </div>
                         ) : (
                           <span className="text-xs text-gray-400">-</span>
@@ -351,6 +403,28 @@ export default function AmbientesPage() {
         onClose={() => setIsBloqueoModalOpen(false)}
         ambiente={selectedAmbiente}
         onSubmit={handleBloqueo}
+      />
+
+      <DetailInstructorModal
+        isOpen={isInstructorModalOpen}
+        onClose={() => setIsInstructorModalOpen(false)}
+        instructor={selectedInstructor}
+        puedeEditar={puedeEditar}
+      />
+
+      <DetailFichaModal
+        isOpen={isFichaModalOpen}
+        onClose={() => setIsFichaModalOpen(false)}
+        ficha={selectedFicha}
+        onInstructorClick={async (instructorId, nombre) => {
+          try {
+            const res = await api.instructors.getById(instructorId)
+            setSelectedInstructor(res.data)
+          } catch {
+            setSelectedInstructor({ id: instructorId, nombre, email: "", tipo_area: "", activo: true, roles: "Instructor" })
+          }
+          setIsInstructorModalOpen(true)
+        }}
       />
 
     </DashboardLayout>

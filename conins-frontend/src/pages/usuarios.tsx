@@ -6,6 +6,9 @@ import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import CrearUsuarioModal from "@/components/usuarios/CrearUsuarioModal"
 import EditarUsuarioModal from "@/components/usuarios/EditarUsuarioModal"
 import AsignarProgramasLiderModal from "@/components/usuarios/AsignarProgramasLiderModal"
+import { exportarUsuariosPDF } from "@/lib/exportPDF"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
 import {
   Search,
   Plus,
@@ -15,6 +18,8 @@ import {
   ChevronRight,
   Loader2,
   BookOpen,
+  Users,
+  FileDown,
 } from "lucide-react"
 
 type Usuario = {
@@ -128,16 +133,7 @@ export default function UsuariosPage() {
     }
   }
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -148,13 +144,23 @@ export default function UsuariosPage() {
             <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
             <p className="text-gray-500 text-sm">Gestión de cuentas de acceso al sistema</p>
           </div>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Nuevo usuario
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => exportarUsuariosPDF(listaFiltrada)}
+              disabled={listaFiltrada.length === 0}
+              className="border border-gray-300 text-gray-700 hover:bg-gray-50 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-40"
+            >
+              <FileDown className="w-4 h-4" />
+              PDF
+            </button>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Nuevo usuario
+            </button>
+          </div>
         </div>
 
         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -197,14 +203,9 @@ export default function UsuariosPage() {
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 flex flex-col items-center justify-center text-gray-500">
-              <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando usuarios...</p>
-            </div>
+            <TableSkeleton rows={5} columns={7} />
           ) : listaPaginada.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              No se encontraron usuarios con los filtros seleccionados.
-            </div>
+            <EmptyState icon={Users} title="Sin usuarios" description="No se encontraron usuarios con los filtros seleccionados." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">

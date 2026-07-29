@@ -12,6 +12,8 @@ import {
   Sun,
   Layers,
   Check,
+  Clock,
+  Calendar,
 } from "lucide-react"
 import { api } from "@/lib/api"
 import { formatJornada } from "@/lib/terminology"
@@ -36,6 +38,16 @@ type Ficha = {
 type Ambiente = { id: number; nombre: string }
 type Competencia = { id: number; nombre: string; codigo?: string }
 type Rap = { rap_id?: number; id?: number; codigo: string; descripcion: string; activo: boolean }
+type TipoActividad = { id: number; nombre: string }
+
+const DIAS_SEMANA = [
+  { id: 1, nombre: "Lun" },
+  { id: 2, nombre: "Mar" },
+  { id: 3, nombre: "Mié" },
+  { id: 4, nombre: "Jue" },
+  { id: 5, nombre: "Vie" },
+  { id: 6, nombre: "Sáb" },
+]
 
 const STEPS = [
   { label: "Instructor y Grupo", icon: User },
@@ -57,6 +69,7 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
   const [competenciasInstructor, setCompetenciasInstructor] = useState<number[]>([])
   const [loadingComps, setLoadingComps] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [tiposActividad, setTiposActividad] = useState<TipoActividad[]>([])
 
   // Competencias que el instructor puede dictar Y pertenecen al programa
   const competencias = competenciasPrograma.filter(
@@ -80,6 +93,11 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
     jornada_id: "",
     competencia_ids: [] as number[],
     es_lider_ficha: false,
+    // Horario
+    horario_dias: [] as number[],
+    horario_inicio: "",
+    horario_fin: "",
+    horario_tipo_actividad_id: "",
   })
 
   // Derived
@@ -103,10 +121,11 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
         api.instructors.getAll().then((res) => setInstructores(res.data || [])).catch(() => setInstructores([])),
         api.fichas.getAll().then((res) => setFichas(res.data || [])).catch(() => setFichas([])),
         api.ambientes.getAll().then((res) => setAmbientes(res.data || [])).catch(() => setAmbientes([])),
+        api.catalogo.getTiposActividad().then((res) => setTiposActividad(res.data || [])).catch(() => setTiposActividad([])),
       ]).finally(() => setLoading(false))
 
       // Reset form
-      setFormData({ instructor_id: "", ficha_id: "", ambiente_id: "", jornada_id: "", competencia_ids: [], es_lider_ficha: false })
+      setFormData({ instructor_id: "", ficha_id: "", ambiente_id: "", jornada_id: "", competencia_ids: [], es_lider_ficha: false, horario_dias: [], horario_inicio: "", horario_fin: "", horario_tipo_actividad_id: "" })
       setCompetenciasPrograma([])
       setCompetenciasInstructor([])
       setRapsDisponibles({})
@@ -245,12 +264,24 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
   const handleSubmit = async () => {
     setSubmitting(true)
     try {
+      const tieneHorario = formData.horario_dias.length > 0 && formData.horario_inicio && formData.horario_fin
       const payload = {
         instructor_id: Number(formData.instructor_id),
         ficha_id: Number(formData.ficha_id),
         competencia_ids: formData.competencia_ids,
         es_lider_ficha: formData.es_lider_ficha,
         rapsSeleccionados,
+        // Datos de horario (opcionales)
+        ...(tieneHorario ? {
+          horario: {
+            dias: formData.horario_dias,
+            hora_inicio: formData.horario_inicio,
+            hora_fin: formData.horario_fin,
+            jornada_id: Number(formData.jornada_id),
+            ambiente_id: formData.ambiente_id ? Number(formData.ambiente_id) : null,
+            tipo_actividad_id: formData.horario_tipo_actividad_id ? Number(formData.horario_tipo_actividad_id) : null,
+          },
+        } : {}),
       }
       await onSubmit(payload)
       onClose()
@@ -387,6 +418,82 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                           </button>
                         ))}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Horario — aparece al elegir jornada */}
+                  {formData.jornada_id && selectedFicha && (
+                    <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-200/50 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-sena" />
+                        <span className="text-sm font-semibold text-gray-700">Horario</span>
+                        <span className="text-xs text-gray-400">(opcional)</span>
+                      </div>
+
+                      {/* Días */}
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1.5">Días de la semana</label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {DIAS_SEMANA.map((d) => (
+                            <button
+                              key={d.id}
+                              type="button"
+                              onClick={() => {
+                                const nuevosDias = formData.horario_dias.includes(d.id)
+                                  ? formData.horario_dias.filter((x) => x !== d.id)
+                                  : [...formData.horario_dias, d.id]
+                                handleChange("horario_dias", nuevosDias)
+                              }}
+                              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors border ${
+                                formData.horario_dias.includes(d.id)
+                                  ? "bg-gray-800 text-white border-gray-800"
+                                  : "bg-white text-gray-500 border-gray-300 hover:bg-gray-50"
+                              }`}
+                            >
+                              {d.nombre}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Horas */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Hora inicio</label>
+                          <input
+                            type="time"
+                            value={formData.horario_inicio}
+                            onChange={(e) => handleChange("horario_inicio", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Hora fin</label>
+                          <input
+                            type="time"
+                            value={formData.horario_fin}
+                            onChange={(e) => handleChange("horario_fin", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Tipo actividad */}
+                      {tiposActividad.length > 0 && (
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de actividad</label>
+                          <select
+                            value={formData.horario_tipo_actividad_id}
+                            onChange={(e) => handleChange("horario_tipo_actividad_id", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                          >
+                            <option value="">Sin clasificar</option>
+                            {tiposActividad.map((t) => (
+                              <option key={t.id} value={t.id}>{t.nombre}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -646,6 +753,24 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                         })}
                       </div>
                     </div>
+
+                    {/* Horario */}
+                    {formData.horario_dias.length > 0 && formData.horario_inicio && formData.horario_fin ? (
+                      <div className="flex items-center gap-3 p-3 bg-white">
+                        <Clock className="w-5 h-5 text-sena shrink-0" />
+                        <div>
+                          <p className="text-xs text-gray-500">Horario</p>
+                          <p className="text-sm font-medium text-gray-900">
+                            {formData.horario_dias.map((d) => DIAS_SEMANA.find((ds) => ds.id === d)?.nombre).join(", ")} · {formData.horario_inicio} - {formData.horario_fin}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3 p-3 bg-gray-50">
+                        <Clock className="w-5 h-5 text-gray-300 shrink-0" />
+                        <p className="text-sm text-gray-400">Sin horario — se puede asignar después</p>
+                      </div>
+                    )}
 
                     {/* Líder */}
                     {formData.es_lider_ficha && (

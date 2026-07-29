@@ -6,6 +6,8 @@ import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import CrearCompetenciaModal from "@/components/competencias/CrearCompetenciaModal"
 import EditarCompetenciaModal from "@/components/competencias/EditarCompetenciaModal"
 import VerRapsModal from "@/components/competencias/VerRapsModal"
+import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
+import EmptyState from "@/components/ui/EmptyState"
 import {
   Search,
   Plus,
@@ -160,16 +162,7 @@ export default function GestionCompetenciasPage() {
     setPaginaActual(1)
   }, [search, filtroPrograma, filtroEstado])
 
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-gray-500">
-          <Loader2 className="w-8 h-8 animate-spin text-sena" />
-          <p>Cargando...</p>
-        </div>
-      </div>
-    )
-  }
+  if (authLoading || !user) return <PageSkeleton />
 
   return (
     <DashboardLayout>
@@ -234,15 +227,9 @@ export default function GestionCompetenciasPage() {
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-12 flex flex-col items-center justify-center text-gray-500">
-              <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
-              <p>Cargando competencias...</p>
-            </div>
+            <TableSkeleton rows={5} columns={6} />
           ) : listaPaginada.length === 0 ? (
-            <div className="p-12 text-center text-gray-500">
-              <Layers className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-              <p>No se encontraron competencias con los filtros seleccionados.</p>
-            </div>
+            <EmptyState icon={Layers} title="Sin competencias" description="No se encontraron competencias con los filtros seleccionados." />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
