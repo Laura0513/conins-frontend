@@ -22,7 +22,7 @@ import {
 } from "lucide-react"
 import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
-import { exportarInstructoresPDF } from "@/lib/exportPDF"
+import { exportarInstructoresPDF, exportarInstructorIndividualPDF } from "@/lib/exportPDF"
 
 type Instructor = {
   id: number
@@ -136,6 +136,37 @@ export default function InstructoresPage() {
       cargarInstructores()
     } catch (err) {
       showToast("Error al actualizar instructor.", "error")
+    }
+  }
+
+  const handleDescargarPDFIndividual = async (inst: Instructor) => {
+    try {
+      const [asigRes, horRes] = await Promise.all([
+        api.assignments.getAll(),
+        api.horarios.getAll(),
+      ])
+      const asignaciones = (asigRes.data || [])
+        .filter((a: any) => a.instructor_id === inst.id && a.activo)
+        .map((a: any) => ({
+          ficha_numero: a.ficha_numero,
+          competencia: a.competencia,
+          jornada: a.jornada || "—",
+          ambiente: a.ambiente || "",
+          es_lider: a.es_lider,
+        }))
+      const horarios = (horRes.data || [])
+        .filter((h: any) => h.instructor_nombre === inst.nombre)
+        .map((h: any) => ({
+          ficha_numero: h.ficha_numero,
+          competencia: h.competencia,
+          dias: h.dias || [],
+          horas: h.horas,
+          ambiente: h.ambiente,
+          estado: h.estado,
+        }))
+      exportarInstructorIndividualPDF(inst, asignaciones, horarios)
+    } catch {
+      showToast("Error al generar el PDF", "error")
     }
   }
 
@@ -302,6 +333,13 @@ export default function InstructoresPage() {
                             title="Ver detalle"
                           >
                             <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDescargarPDFIndividual(inst)}
+                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            title="Descargar PDF"
+                          >
+                            <FileDown className="w-4 h-4" />
                           </button>
                           {puedeEditar && (
                             <>

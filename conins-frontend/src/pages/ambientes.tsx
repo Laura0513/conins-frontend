@@ -9,7 +9,7 @@ import VerAgendaAmbienteModal from "@/components/ambientes/VerAgendaAmbienteModa
 import BloquearAmbienteModal from "@/components/ambientes/BloquearAmbienteModal"
 import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
 import DetailFichaModal from "@/components/fichas/DetailFichaModal"
-import { exportarAmbientesPDF } from "@/lib/exportPDF"
+import { exportarAmbientesPDF, exportarAmbienteIndividualPDF } from "@/lib/exportPDF"
 import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
 import {
@@ -126,6 +126,25 @@ export default function AmbientesPage() {
         setIsFichaModalOpen(true)
       }
     } catch { /* silently fail */ }
+  }
+
+  const handleDescargarPDFIndividual = async (amb: Ambiente) => {
+    try {
+      const horRes = await api.horarios.getAll()
+      const horarios = (horRes.data || [])
+        .filter((h: any) => h.ambiente === amb.nombre)
+        .map((h: any) => ({
+          instructor_nombre: h.instructor_nombre,
+          ficha_numero: h.ficha_numero,
+          competencia: h.competencia,
+          dias: h.dias || [],
+          horas: h.horas,
+          estado: h.estado,
+        }))
+      exportarAmbienteIndividualPDF(amb, horarios)
+    } catch {
+      showToast("Error al generar el PDF", "error")
+    }
   }
 
   const openAgendaModal = (amb: Ambiente) => {
@@ -313,6 +332,13 @@ export default function AmbientesPage() {
                               <Eye className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() => handleDescargarPDFIndividual(amb)}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                              title="Descargar PDF"
+                            >
+                              <FileDown className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => openBloqueoModal(amb)}
                               className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
                               title="Registrar bloqueo"
@@ -328,13 +354,22 @@ export default function AmbientesPage() {
                             </button>
                           </div>
                         ) : rol === "Subdirector" ? (
-                          <button
-                            onClick={() => openAgendaModal(amb)}
-                            className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
-                            title="Ver agenda"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => openAgendaModal(amb)}
+                              className="p-1.5 text-gray-400 hover:text-sena hover:bg-sena/10 rounded transition-colors"
+                              title="Ver agenda"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDescargarPDFIndividual(amb)}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                              title="Descargar PDF"
+                            >
+                              <FileDown className="w-4 h-4" />
+                            </button>
+                          </div>
                         ) : (
                           <span className="text-xs text-gray-400">-</span>
                         )}

@@ -26,7 +26,7 @@ import {
   BookOpen,
   FileDown,
 } from "lucide-react"
-import { exportarGruposPDF } from "@/lib/exportPDF"
+import { exportarGruposPDF, exportarFichaIndividualPDF } from "@/lib/exportPDF"
 import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
 
@@ -137,6 +137,35 @@ export default function FichasPage() {
   const listaPaginada = listaFiltrada.slice((paginaActual - 1) * porPagina, paginaActual * porPagina)
 
   useEffect(() => { setPaginaActual(1) }, [search, filtroPrograma, filtroJornada, filtroEtapa, filtroModalidad])
+
+  const handleDescargarPDFIndividual = async (ficha: Ficha) => {
+    try {
+      const [asigRes, horRes] = await Promise.all([
+        api.assignments.getAll(),
+        api.horarios.getAll(),
+      ])
+      const instructores = (asigRes.data || [])
+        .filter((a: any) => a.ficha_id === ficha.id && a.activo)
+        .map((a: any) => ({
+          instructor_nombre: a.instructor_nombre,
+          competencia: a.competencia,
+          es_lider: a.es_lider,
+        }))
+      const horarios = (horRes.data || [])
+        .filter((h: any) => h.ficha_numero === ficha.numero_ficha)
+        .map((h: any) => ({
+          ficha_numero: h.instructor_nombre,
+          competencia: h.competencia,
+          dias: h.dias || [],
+          horas: h.horas,
+          ambiente: h.ambiente,
+          estado: h.estado,
+        }))
+      exportarFichaIndividualPDF(ficha, instructores, horarios)
+    } catch {
+      showToast("Error al generar el PDF", "error")
+    }
+  }
 
   const openDetailModal = (ficha: Ficha) => {
     setSelectedFicha(ficha)
@@ -383,6 +412,13 @@ export default function FichasPage() {
                               <Eye className="w-4 h-4" />
                             </button>
                             <button
+                              onClick={() => handleDescargarPDFIndividual(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                              title="Descargar PDF"
+                            >
+                              <FileDown className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => openRapModal(ficha)}
                               className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
                               title="Seguimiento RAPs"
@@ -419,6 +455,13 @@ export default function FichasPage() {
                               title="Ver detalle"
                             >
                               <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDescargarPDFIndividual(ficha)}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                              title="Descargar PDF"
+                            >
+                              <FileDown className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => openRapModal(ficha)}

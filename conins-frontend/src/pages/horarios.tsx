@@ -5,7 +5,7 @@ import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
 import { formatJornada } from "@/lib/terminology"
-import { exportarHorariosPDF } from "@/lib/exportPDF"
+import { exportarHorariosPDF, exportarHorarioIndividualPDF } from "@/lib/exportPDF"
 import CrearHorarioModal from "@/components/horarios/CrearHorarioModal"
 import CrearBloqueHorarioModal from "@/components/horarios/CrearBloqueHorarioModal"
 import EditarHorarioModal from "@/components/horarios/EditarHorarioModal"
@@ -22,8 +22,6 @@ import {
   ChevronRight,
   Loader2,
   AlertTriangle,
-  CheckCircle,
-  XCircle,
   Clock,
   Ban,
   FileDown,
@@ -178,43 +176,6 @@ export default function HorariosPage() {
     }
   }
 
-  const handleAprobar = async (horario: Horario) => {
-    setConfirmDialog({
-      isOpen: true,
-      title: "Aprobar horario",
-      message: `¿Estas seguro de aprobar el horario de ${horario.instructor_nombre}? Quedará activo oficialmente.`,
-      onConfirm: async () => {
-        setConfirmDialog({ ...confirmDialog, isOpen: false })
-        try {
-          await api.horarios.aprobar(horario.id)
-          showToast("Horario aprobado exitosamente", "success")
-          cargarHorarios()
-        } catch (err: any) {
-          showToast(err.message || "Error al aprobar horario", "error")
-        }
-      },
-    })
-  }
-
-  const handleRechazar = (horario: Horario) => {
-    setConfirmDialog({
-      isOpen: true,
-      title: "Rechazar horario",
-      message: `¿Estas seguro de rechazar el horario de ${horario.instructor_nombre}?`,
-      showMotivo: true,
-      onConfirm: async (motivo?: string) => {
-        setConfirmDialog({ ...confirmDialog, isOpen: false })
-        try {
-          await api.horarios.rechazar(horario.id, motivo || "Sin motivo especificado")
-          showToast("Horario rechazado", "success")
-          cargarHorarios()
-        } catch (err: any) {
-          showToast(err.message || "Error al rechazar horario", "error")
-        }
-      },
-    })
-  }
-
   const handleDesactivar = (horario: Horario) => {
     setConfirmDialog({
       isOpen: true,
@@ -270,7 +231,7 @@ export default function HorariosPage() {
               className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
             >
               {vistaGrilla ? <List className="w-4 h-4" /> : <LayoutGrid className="w-4 h-4" />}
-              {vistaGrilla ? "Ver tabla" : "Ver grilla"}
+              {vistaGrilla ? "Ver tabla" : "Ver horario"}
             </button>
             <button
               onClick={() => exportarHorariosPDF(listaFiltrada)}
@@ -373,7 +334,7 @@ export default function HorariosPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4">Días</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Horas</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
-                    {puedeEditar && <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>}
+                    <th className="px-3 py-3 md:px-6 md:py-4 text-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -416,51 +377,43 @@ export default function HorariosPage() {
                       <td className="px-3 py-3 md:px-6 md:py-4 text-center">
                         {puedeEditar ? (
                           <div className="flex items-center justify-center gap-2">
-                            {h.estado === 'Pendiente' ? (
-                              <>
-                                <button
-                                  onClick={() => handleAprobar(h)}
-                                  className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors"
-                                  title="Aprobar"
-                                >
-                                  <CheckCircle className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleRechazar(h)}
-                                  className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
-                                  title="Rechazar"
-                                >
-                                  <XCircle className="w-4 h-4" />
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <button
-                                  onClick={() => openEditModal(h)}
-                                  className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                                  title="Editar"
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleSuspender(h)}
-                                  className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
-                                  title="Suspender"
-                                >
-                                  <Ban className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDesactivar(h)}
-                                  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                  title={h.activo ? "Deshabilitar" : "Habilitar"}
-                                >
-                                  <Power className="w-4 h-4" />
-                                </button>
-                              </>
-                            )}
+                            <button
+                              onClick={() => exportarHorarioIndividualPDF(h)}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                              title="Descargar PDF"
+                            >
+                              <FileDown className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => openEditModal(h)}
+                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                              title="Editar"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleSuspender(h)}
+                              className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
+                              title="Suspender"
+                            >
+                              <Ban className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDesactivar(h)}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                              title={h.activo ? "Deshabilitar" : "Habilitar"}
+                            >
+                              <Power className="w-4 h-4" />
+                            </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-400">-</span>
+                          <button
+                            onClick={() => exportarHorarioIndividualPDF(h)}
+                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            title="Descargar PDF"
+                          >
+                            <FileDown className="w-4 h-4" />
+                          </button>
                         )}
                       </td>
                     </tr>

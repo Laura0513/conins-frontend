@@ -489,6 +489,367 @@ type UsuarioExport = {
   activo: boolean
 }
 
+// ═════════════════════════════════════════════════
+// REPORTES INDIVIDUALES
+// ═════════════════════════════════════════════════
+
+// ─── Sección de info (key-value pairs) ───
+function addInfoSection(doc: jsPDF, items: { label: string; value: string }[], startY: number): number {
+  let y = startY
+  const m = 14
+  for (const item of items) {
+    doc.setFontSize(8)
+    doc.setFont("helvetica", "bold")
+    doc.setTextColor(...GRAY_500)
+    doc.text(item.label + ":", m, y)
+    doc.setFont("helvetica", "normal")
+    doc.setTextColor(...GRAY_900)
+    doc.text(item.value || "—", m + 40, y)
+    y += 6
+  }
+  return y + 4
+}
+
+function addSectionTitle(doc: jsPDF, title: string, y: number): number {
+  doc.setFontSize(10)
+  doc.setFont("helvetica", "bold")
+  doc.setTextColor(...GRAY_900)
+  doc.text(title, 14, y)
+  doc.setDrawColor(...SENA)
+  doc.setLineWidth(0.5)
+  doc.line(14, y + 2, 60, y + 2)
+  return y + 8
+}
+
+// ─── Instructor Individual ───
+type InstructorIndividualData = {
+  nombre: string
+  email: string
+  tipo_area: string
+  horas_semana?: number
+  activo: boolean
+}
+
+type AsignacionRelacionada = {
+  ficha_numero: string
+  competencia: string
+  jornada: string
+  ambiente?: string
+  es_lider?: boolean
+}
+
+type HorarioRelacionado = {
+  ficha_numero: string
+  competencia: string
+  dias: string[]
+  horas: string
+  ambiente?: string
+  estado?: string
+}
+
+export function exportarInstructorIndividualPDF(
+  instructor: InstructorIndividualData,
+  asignaciones: AsignacionRelacionada[],
+  horarios: HorarioRelacionado[]
+) {
+  const doc = new jsPDF()
+  addHeader(doc, `Reporte — ${instructor.nombre}`, `Instructor · Generado el ${new Date().toLocaleDateString("es-CO")}`)
+
+  let y = addInfoSection(doc, [
+    { label: "Nombre", value: instructor.nombre },
+    { label: "Correo", value: instructor.email },
+    { label: "Área", value: instructor.tipo_area?.charAt(0).toUpperCase() + instructor.tipo_area?.slice(1) || "—" },
+    { label: "Horas/semana", value: instructor.horas_semana != null ? `${instructor.horas_semana}h` : "—" },
+    { label: "Estado", value: instructor.activo ? "Activo" : "Inactivo" },
+  ], 46)
+
+  // Asignaciones
+  y = addSectionTitle(doc, `Asignaciones (${asignaciones.length})`, y)
+
+  if (asignaciones.length > 0) {
+    autoTable(doc, {
+      startY: y,
+      head: [["Grupo", "Competencia", "Jornada", "Ambiente", "Líder"]],
+      body: asignaciones.map((a) => [
+        a.ficha_numero,
+        a.competencia,
+        a.jornada || "—",
+        a.ambiente || "—",
+        a.es_lider ? "Sí" : "No",
+      ]),
+      ...tableDefaults,
+      columnStyles: {
+        0: { cellWidth: 22, halign: "center" },
+        1: { cellWidth: 55 },
+        2: { cellWidth: 25, halign: "center" },
+        3: { cellWidth: 35 },
+        4: { cellWidth: 16, halign: "center" },
+      },
+    })
+    y = (doc as any).lastAutoTable.finalY + 10
+  } else {
+    doc.setFontSize(8)
+    doc.setTextColor(...GRAY_400)
+    doc.text("Sin asignaciones activas", 14, y + 2)
+    y += 12
+  }
+
+  // Horarios
+  y = addSectionTitle(doc, `Horarios (${horarios.length})`, y)
+
+  if (horarios.length > 0) {
+    autoTable(doc, {
+      startY: y,
+      head: [["Grupo", "Competencia", "Días", "Horas", "Ambiente", "Estado"]],
+      body: horarios.map((h) => [
+        h.ficha_numero,
+        h.competencia,
+        h.dias.join(", "),
+        h.horas,
+        h.ambiente || "—",
+        h.estado || "—",
+      ]),
+      ...tableDefaults,
+      bodyStyles: { ...tableDefaults.bodyStyles, fontSize: 7 },
+      headStyles: { ...tableDefaults.headStyles, fontSize: 7 },
+      columnStyles: {
+        0: { cellWidth: 20, halign: "center" },
+        1: { cellWidth: 45 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 22, halign: "center" },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 20, halign: "center" },
+      },
+      didParseCell: (d: any) => {
+        if (d.column.index === 5 && d.section === "body") {
+          const v = d.cell.raw
+          if (v === "Aprobado") { d.cell.styles.textColor = COLOR_OK; d.cell.styles.fontStyle = "bold" }
+          else if (v === "Pendiente") d.cell.styles.textColor = COLOR_WARN
+          else if (v === "Rechazado") d.cell.styles.textColor = COLOR_DANGER
+        }
+      },
+    })
+  } else {
+    doc.setFontSize(8)
+    doc.setTextColor(...GRAY_400)
+    doc.text("Sin horarios registrados", 14, y + 2)
+  }
+
+  addFooter(doc)
+  const nombre = instructor.nombre.replace(/\s+/g, "-").toLowerCase()
+  doc.save(`instructor-${nombre}-${new Date().toISOString().split("T")[0]}.pdf`)
+}
+
+// ─── Ficha/Grupo Individual ───
+type FichaIndividualData = {
+  numero_ficha: string
+  programa: string
+  jornada: string
+  etapa: string
+  modalidad?: string
+  activo: boolean
+}
+
+type InstructorRelacionado = {
+  instructor_nombre: string
+  competencia: string
+  es_lider?: boolean
+}
+
+export function exportarFichaIndividualPDF(
+  ficha: FichaIndividualData,
+  instructores: InstructorRelacionado[],
+  horarios: HorarioRelacionado[]
+) {
+  const doc = new jsPDF()
+  addHeader(doc, `Reporte — Grupo ${ficha.numero_ficha}`, `${ficha.programa} · Generado el ${new Date().toLocaleDateString("es-CO")}`)
+
+  let y = addInfoSection(doc, [
+    { label: "No. Grupo", value: ficha.numero_ficha },
+    { label: "Programa", value: ficha.programa },
+    { label: "Jornada", value: ficha.jornada },
+    { label: "Etapa", value: ficha.etapa?.charAt(0).toUpperCase() + ficha.etapa?.slice(1) || "—" },
+    { label: "Modalidad", value: ficha.modalidad || "—" },
+    { label: "Estado", value: ficha.activo ? "Activo" : "Inactivo" },
+  ], 46)
+
+  // Instructores asignados
+  y = addSectionTitle(doc, `Instructores asignados (${instructores.length})`, y)
+
+  if (instructores.length > 0) {
+    autoTable(doc, {
+      startY: y,
+      head: [["Instructor", "Competencia", "Líder"]],
+      body: instructores.map((i) => [
+        i.instructor_nombre,
+        i.competencia,
+        i.es_lider ? "Sí" : "No",
+      ]),
+      ...tableDefaults,
+      columnStyles: {
+        0: { cellWidth: 55 },
+        1: { cellWidth: 80 },
+        2: { cellWidth: 16, halign: "center" },
+      },
+    })
+    y = (doc as any).lastAutoTable.finalY + 10
+  } else {
+    doc.setFontSize(8)
+    doc.setTextColor(...GRAY_400)
+    doc.text("Sin instructores asignados", 14, y + 2)
+    y += 12
+  }
+
+  // Horarios
+  y = addSectionTitle(doc, `Horarios (${horarios.length})`, y)
+
+  if (horarios.length > 0) {
+    autoTable(doc, {
+      startY: y,
+      head: [["Instructor", "Competencia", "Días", "Horas", "Ambiente", "Estado"]],
+      body: horarios.map((h) => [
+        h.ficha_numero, // reused as instructor name in this context
+        h.competencia,
+        h.dias.join(", "),
+        h.horas,
+        h.ambiente || "—",
+        h.estado || "—",
+      ]),
+      ...tableDefaults,
+      bodyStyles: { ...tableDefaults.bodyStyles, fontSize: 7 },
+      headStyles: { ...tableDefaults.headStyles, fontSize: 7 },
+      didParseCell: (d: any) => {
+        if (d.column.index === 5 && d.section === "body") {
+          const v = d.cell.raw
+          if (v === "Aprobado") { d.cell.styles.textColor = COLOR_OK; d.cell.styles.fontStyle = "bold" }
+          else if (v === "Pendiente") d.cell.styles.textColor = COLOR_WARN
+          else if (v === "Rechazado") d.cell.styles.textColor = COLOR_DANGER
+        }
+      },
+    })
+  } else {
+    doc.setFontSize(8)
+    doc.setTextColor(...GRAY_400)
+    doc.text("Sin horarios registrados", 14, y + 2)
+  }
+
+  addFooter(doc)
+  doc.save(`grupo-${ficha.numero_ficha}-${new Date().toISOString().split("T")[0]}.pdf`)
+}
+
+// ─── Ambiente Individual ───
+type AmbienteIndividualData = {
+  nombre: string
+  tipo: string
+  capacidad: number
+  activo: boolean
+}
+
+type HorarioAmbiente = {
+  instructor_nombre: string
+  ficha_numero: string
+  competencia: string
+  dias: string[]
+  horas: string
+  estado?: string
+}
+
+export function exportarAmbienteIndividualPDF(
+  ambiente: AmbienteIndividualData,
+  horarios: HorarioAmbiente[]
+) {
+  const doc = new jsPDF()
+  addHeader(doc, `Reporte — ${ambiente.nombre}`, `Ambiente · Generado el ${new Date().toLocaleDateString("es-CO")}`)
+
+  let y = addInfoSection(doc, [
+    { label: "Nombre", value: ambiente.nombre },
+    { label: "Tipo", value: ambiente.tipo },
+    { label: "Capacidad", value: ambiente.capacidad ? `${ambiente.capacidad} personas` : "—" },
+    { label: "Estado", value: ambiente.activo ? "Activo" : "Inactivo" },
+  ], 46)
+
+  // Horarios en este ambiente
+  y = addSectionTitle(doc, `Uso del ambiente (${horarios.length} horarios)`, y)
+
+  if (horarios.length > 0) {
+    autoTable(doc, {
+      startY: y,
+      head: [["Instructor", "Grupo", "Competencia", "Días", "Horas", "Estado"]],
+      body: horarios.map((h) => [
+        h.instructor_nombre,
+        h.ficha_numero,
+        h.competencia,
+        h.dias.join(", "),
+        h.horas,
+        h.estado || "—",
+      ]),
+      ...tableDefaults,
+      bodyStyles: { ...tableDefaults.bodyStyles, fontSize: 7 },
+      headStyles: { ...tableDefaults.headStyles, fontSize: 7 },
+      columnStyles: {
+        0: { cellWidth: 35 },
+        1: { cellWidth: 20, halign: "center" },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 22, halign: "center" },
+        5: { cellWidth: 20, halign: "center" },
+      },
+      didParseCell: (d: any) => {
+        if (d.column.index === 5 && d.section === "body") {
+          const v = d.cell.raw
+          if (v === "Aprobado") { d.cell.styles.textColor = COLOR_OK; d.cell.styles.fontStyle = "bold" }
+          else if (v === "Pendiente") d.cell.styles.textColor = COLOR_WARN
+          else if (v === "Rechazado") d.cell.styles.textColor = COLOR_DANGER
+        }
+      },
+    })
+  } else {
+    doc.setFontSize(8)
+    doc.setTextColor(...GRAY_400)
+    doc.text("Sin horarios registrados en este ambiente", 14, y + 2)
+  }
+
+  addFooter(doc)
+  const nombre = ambiente.nombre.replace(/\s+/g, "-").toLowerCase()
+  doc.save(`ambiente-${nombre}-${new Date().toISOString().split("T")[0]}.pdf`)
+}
+
+// ─── Horario Individual ───
+type HorarioIndividualData = {
+  ficha_numero: string
+  instructor_nombre: string
+  competencia: string
+  ambiente: string
+  jornada: string
+  tipo_actividad: string | null
+  dias: string[]
+  horas: string
+  estado: string
+  rap_codigo?: string | null
+  rap_descripcion?: string | null
+}
+
+export function exportarHorarioIndividualPDF(horario: HorarioIndividualData) {
+  const doc = new jsPDF()
+  addHeader(doc, `Reporte de Horario`, `${horario.instructor_nombre} — Grupo ${horario.ficha_numero}`)
+
+  addInfoSection(doc, [
+    { label: "Instructor", value: horario.instructor_nombre },
+    { label: "Grupo", value: horario.ficha_numero },
+    { label: "Competencia", value: horario.competencia },
+    { label: "RAP", value: horario.rap_codigo ? `${horario.rap_codigo} — ${horario.rap_descripcion || ""}` : "—" },
+    { label: "Ambiente", value: horario.ambiente || "—" },
+    { label: "Jornada", value: horario.jornada },
+    { label: "Tipo actividad", value: horario.tipo_actividad || "—" },
+    { label: "Días", value: horario.dias.join(", ") },
+    { label: "Horas", value: horario.horas },
+    { label: "Estado", value: horario.estado },
+  ], 46)
+
+  addFooter(doc)
+  doc.save(`horario-${horario.ficha_numero}-${horario.instructor_nombre.replace(/\s+/g, "-").toLowerCase()}-${new Date().toISOString().split("T")[0]}.pdf`)
+}
+
 export function exportarUsuariosPDF(data: UsuarioExport[]) {
   const doc = new jsPDF()
   addHeader(doc, "Listado de Usuarios", `${data.length} usuarios`)
