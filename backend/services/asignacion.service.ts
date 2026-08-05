@@ -66,6 +66,22 @@ export const AsignacionService = {
       await PermisoService.validarAlcanceCoordinador(data.usuarioId, data.ficha_id);
     }
 
+    // El UNIQUE(instructor_id, ficha_id) no distingue activo/inactivo. Si existe
+    // una asignacion inactiva (historica), se reactiva en vez de fallar (Laura 29/07).
+    const existente = await AsignacionModel.findRawByInstructorFicha(data.instructor_id, data.ficha_id);
+    if (existente) {
+      if ((existente as any).activo) {
+        throw new ConflictError('Ya existe una asignacion activa para este instructor en esta ficha');
+      }
+      await AsignacionModel.reactivar((existente as any).id, {
+        jornada_id: data.jornada_id,
+        es_lider_ficha: data.es_lider_ficha,
+        es_provisional: data.es_provisional,
+        competencia_ids: data.competencia_ids,
+      });
+      return AsignacionModel.findById((existente as any).id);
+    }
+
     const id = await AsignacionModel.create(data);
     return AsignacionModel.findById(id);
   },

@@ -21,6 +21,7 @@ export interface AsignacionDetail extends RowDataPacket {
   ficha_numero: string;
   competencia: string;
   ambiente: string;
+  jornada_id: number | null;
   jornada: string;
   es_lider: boolean;
   es_provisional: boolean;
@@ -35,6 +36,7 @@ export const AsignacionModel = {
              c.nombre AS competencia,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
              ab.id AS ambiente_id,
+             COALESCE(a.jornada_id, f.jornada_id) AS jornada_id,
              j.nombre AS jornada,
              a.es_lider_ficha AS es_lider,
              a.es_provisional,
@@ -45,7 +47,7 @@ export const AsignacionModel = {
       JOIN fichas f ON a.ficha_id = f.id
       JOIN asignacion_competencia ac ON ac.asignacion_id = a.id
       JOIN competencias c ON ac.competencia_id = c.id
-      JOIN jornadas j ON f.jornada_id = j.id
+      JOIN jornadas j ON COALESCE(a.jornada_id, f.jornada_id) = j.id
       LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
       ORDER BY a.id
     `);
@@ -59,6 +61,7 @@ export const AsignacionModel = {
              c.nombre AS competencia,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
              ab.id AS ambiente_id,
+             COALESCE(a.jornada_id, f.jornada_id) AS jornada_id,
              j.nombre AS jornada,
              a.es_lider_ficha AS es_lider,
              a.es_provisional,
@@ -69,7 +72,7 @@ export const AsignacionModel = {
       JOIN fichas f ON a.ficha_id = f.id
       JOIN asignacion_competencia ac ON ac.asignacion_id = a.id
       JOIN competencias c ON ac.competencia_id = c.id
-      JOIN jornadas j ON f.jornada_id = j.id
+      JOIN jornadas j ON COALESCE(a.jornada_id, f.jornada_id) = j.id
       LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
       WHERE a.instructor_id = ?
       ORDER BY a.id
@@ -79,9 +82,10 @@ export const AsignacionModel = {
 
   async findById(id: number): Promise<AsignacionDetail | null> {
     const [rows] = await pool.query<AsignacionDetail[]>(`
-      SELECT a.id, u.nombre AS instructor_nombre, f.numero_ficha AS ficha_numero,
+      SELECT a.id, a.instructor_id, a.ficha_id, u.nombre AS instructor_nombre, f.numero_ficha AS ficha_numero,
              c.nombre AS competencia,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
+             COALESCE(a.jornada_id, f.jornada_id) AS jornada_id,
              j.nombre AS jornada,
              a.es_lider_ficha AS es_lider,
              a.es_provisional,
@@ -92,7 +96,7 @@ export const AsignacionModel = {
       JOIN fichas f ON a.ficha_id = f.id
       JOIN asignacion_competencia ac ON ac.asignacion_id = a.id AND ac.activo = TRUE
       JOIN competencias c ON ac.competencia_id = c.id
-      JOIN jornadas j ON f.jornada_id = j.id
+      JOIN jornadas j ON COALESCE(a.jornada_id, f.jornada_id) = j.id
       LEFT JOIN ambientes ab ON COALESCE(ac.ambiente_excepcion_id, f.ambiente_id) = ab.id
       WHERE a.id = ?
       ORDER BY ac.competencia_id
@@ -143,6 +147,42 @@ export const AsignacionModel = {
     }
   },
 
+  // Devuelve la asignacion (activa o inactiva) de un instructor en una ficha.
+  // El UNIQUE(instructor_id, ficha_id) no distingue estado, por eso se consulta
+  // para decidir entre reactivar o rechazar (feedback Laura 29/07).
+  async findRawByInstructorFicha(instructorId: number, fichaId: number): Promise<RowDataPacket | null> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      'SELECT id, activo FROM asignacion WHERE instructor_id = ? AND ficha_id = ? LIMIT 1',
+      [instructorId, fichaId],
+    );
+    return rows[0] ?? null;
+  },
+
+  // Reactiva una asignacion inactiva (en vez de insertar una nueva que chocaria
+  // con el UNIQUE). Restablece sus datos y su conjunto de competencias.
+  async reactivar(id: number, data: {
+    jornada_id?: number | null;
+    es_lider_ficha?: boolean;
+    es_provisional?: boolean;
+    competencia_ids: number[];
+  }): Promise<void> {
+    await pool.query(
+      `UPDATE asignacion
+         SET activo = TRUE, jornada_id = ?, es_lider_ficha = ?, es_provisional = ?, fecha_asignacion = CURDATE()
+       WHERE id = ?`,
+      [data.jornada_id ?? null, data.es_lider_ficha ?? false, data.es_provisional ?? false, id],
+    );
+    // Reset de competencias: desactivar todas y reactivar/insertar las de la lista
+    await pool.query('UPDATE asignacion_competencia SET activo = FALSE WHERE asignacion_id = ?', [id]);
+    for (const competenciaId of data.competencia_ids) {
+      await pool.query(
+        `INSERT INTO asignacion_competencia (asignacion_id, competencia_id) VALUES (?, ?)
+         ON DUPLICATE KEY UPDATE activo = TRUE`,
+        [id, competenciaId],
+      );
+    }
+  },
+
   async update(id: number, data: {
     competencia_id?: number;
     ambiente_excepcion_id?: number | null;
@@ -176,8 +216,26 @@ export const AsignacionModel = {
   },
 
   async desactivar(id: number): Promise<void> {
+    // Obtener instructor+ficha para la cascada de horarios (horarios no tiene
+    // asignacion_id; la asignacion es unica por instructor+ficha).
+    const [rows] = await pool.query<RowDataPacket[]>(
+      'SELECT instructor_id, ficha_id FROM asignacion WHERE id = ?',
+      [id],
+    );
+    const asg = rows[0] as any;
+
     await pool.query('UPDATE asignacion SET activo = FALSE WHERE id = ?', [id]);
     await pool.query('UPDATE asignacion_competencia SET activo = FALSE WHERE asignacion_id = ?', [id]);
+
+    // L-31.2 (Laura 31/07): al desactivar la asignacion se desactivan en cascada
+    // sus horarios (mismo instructor en la misma ficha).
+    if (asg) {
+      await pool.query(
+        `UPDATE horarios SET activo = FALSE, motivo_suspension = 'Asignacion desactivada'
+         WHERE instructor_id = ? AND ficha_id = ? AND activo = TRUE`,
+        [asg.instructor_id, asg.ficha_id],
+      );
+    }
   },
 
   async tieneNovedadActiva(instructorId: number): Promise<boolean> {

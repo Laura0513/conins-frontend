@@ -25,7 +25,9 @@ export const getCargaHoraria = asyncHandler(async (_req: Request, res: Response)
     GROUP BY i.id, u.nombre
     ORDER BY total_horas DESC
   `);
-  ApiResponse.success(res, rows);
+  // total_horas viene como string (DECIMAL de mysql2) — se envia como number
+  const data = (rows as any[]).map((r) => ({ ...r, total_horas: Number(r.total_horas) }));
+  ApiResponse.success(res, data);
 });
 
 export const getHorariosFicha = asyncHandler(async (_req: Request, res: Response) => {

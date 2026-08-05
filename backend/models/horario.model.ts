@@ -167,10 +167,12 @@ export const HorarioModel = {
     jornada_id: number;
     semana: string;
   }): Promise<number> {
+    // estado 'aprobado' por defecto: Leidy eliminó el flujo de aprobacion manual
+    // de horarios (feedback 31/07/2026). Se crean ya aprobados.
     const [result] = await pool.query(
       `INSERT INTO horarios (ficha_id, instructor_id, competencia_id, rap_id, ambiente_id,
-        dia_semana, hora_inicio, hora_fin, tipo_actividad_id, jornada_id, semana)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        dia_semana, hora_inicio, hora_fin, tipo_actividad_id, jornada_id, semana, estado)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprobado')`,
       [
         data.ficha_id,
         data.instructor_id,
@@ -317,12 +319,10 @@ export const HorarioModel = {
     return (rows as any[]).length > 0;
   },
 
-  async isInstructorDePlanta(instructorId: number): Promise<boolean> {
-    const [rows] = await pool.query(
-      `SELECT 1 FROM instructores WHERE id = ? AND tipo_contrato = 'de_planta' LIMIT 1`,
-      [instructorId],
-    );
-    return (rows as any[]).length > 0;
+  // tipo_contrato se eliminó el 14/07/2026 — RN-03 (jornada restringida) aplica
+  // a TODOS los instructores. Se conserva la firma para no romper llamadas.
+  async isInstructorDePlanta(_instructorId: number): Promise<boolean> {
+    return true;
   },
 
   async isJornadaNocturnaOFinDeSemana(jornadaId: number, diaSemana: number): Promise<boolean> {

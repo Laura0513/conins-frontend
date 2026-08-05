@@ -4725,3 +4725,638 @@ Error: Ya existe una asignacion para este instructor en esta ficha
     at async Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:68:16)
     at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:19:22)
 ---
+[2026-07-29T18:40:53.371Z] Error: Unknown column 'sede_id' in 'field list'
+Error: Unknown column 'sede_id' in 'field list'
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-29T18:40:53.382Z] Error: Unknown column 'sede_id' in 'field list'
+Error: Unknown column 'sede_id' in 'field list'
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-29T18:40:57.407Z] Error: Unknown column 'sede_id' in 'field list'
+Error: Unknown column 'sede_id' in 'field list'
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-29T18:40:57.420Z] Error: Unknown column 'sede_id' in 'field list'
+Error: Unknown column 'sede_id' in 'field list'
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-29T18:41:51.173Z] Error: Unknown column 'sede_id' in 'field list'
+Error: Unknown column 'sede_id' in 'field list'
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ambiente.controller.ts:8:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-29T18:42:02.216Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:02.220Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:02.224Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:02.232Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:02.236Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:02.238Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:03.573Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:03.575Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:07.799Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:07.802Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:07.804Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:07.809Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:07.812Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:07.813Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:08.973Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:08.978Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:08.981Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:42:38.759Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:45:11.731Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+    at router (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:60:12)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+---
+[2026-07-29T18:45:11.737Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-07-29T18:45:30.905Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-29T18:46:27.976Z] Error: Unknown column 'jornada_id' in 'field list'
+Error: Unknown column 'jornada_id' in 'field list'
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:114:35)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:69:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:20:22)
+---
+[2026-07-29T18:49:21.363Z] Error: Unknown column 'jornada_id' in 'field list'
+Error: Unknown column 'jornada_id' in 'field list'
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:114:35)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:69:38)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:20:22)
+---
+[2026-07-29T18:56:19.770Z] Error: Asignacion no encontrada
+Error: Asignacion no encontrada
+    at Object.desactivar (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:108:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:39:18)
+---
+[2026-07-29T18:56:30.895Z] Error: Asignacion no encontrada
+Error: Asignacion no encontrada
+    at Object.desactivar (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:108:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:39:18)
+---
+[2026-07-29T19:01:06.650Z] Error: No existe una asignacion activa de esa competencia para este instructor
+Error: No existe una asignacion activa de esa competencia para este instructor
+    at Object.getRaps (C:\Users\laura\Desktop\Conins\backend\services\asignacion-rap.service.ts:15:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:79:16)
+---
+[2026-07-29T19:04:47.801Z] Error: Asignacion no encontrada
+Error: Asignacion no encontrada
+    at Object.desactivar (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:108:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:39:18)
+---
+[2026-07-29T19:09:19.307Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T19:13:38.596Z] Error: Ya existe una asignacion para este instructor en esta ficha
+Error: Ya existe una asignacion para este instructor en esta ficha
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\models\asignacion.model.ts:140:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Object.create (C:\Users\laura\Desktop\Conins\backend\services\asignacion.service.ts:69:16)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:20:22)
+---
+[2026-07-29T19:14:49.238Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T19:42:07.447Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T19:42:07.460Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T19:42:07.482Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T19:42:07.498Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T19:42:07.515Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T19:59:21.144Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T20:49:37.144Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T20:49:37.155Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T20:52:57.033Z] Error: El RAP 79 ya esta asignado a otro instructor en este grupo (RN-06)
+Error: El RAP 79 ya esta asignado a otro instructor en este grupo (RN-06)
+    at Object.setRaps (C:\Users\laura\Desktop\Conins\backend\services\asignacion-rap.service.ts:55:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:89:16)
+---
+[2026-07-29T20:52:57.046Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T20:52:57.057Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T20:55:24.114Z] Error: El RAP 78 ya esta asignado a otro instructor en este grupo (RN-06)
+Error: El RAP 78 ya esta asignado a otro instructor en este grupo (RN-06)
+    at Object.setRaps (C:\Users\laura\Desktop\Conins\backend\services\asignacion-rap.service.ts:55:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\asignacion.controller.ts:89:16)
+---
+[2026-07-29T20:55:24.125Z] Error: Unknown column 'tipo_contrato' in 'where clause'
+Error: Unknown column 'tipo_contrato' in 'where clause'
+    at Object.isInstructorDePlanta (C:\Users\laura\Desktop\Conins\backend\models\horario.model.ts:321:31)
+    at Object.create (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:91:43)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:19:18)
+---
+[2026-07-29T21:00:33.450Z] Error: La ficha ya esta finalizada
+Error: La ficha ya esta finalizada
+    at Object.finalizar (C:\Users\laura\Desktop\Conins\backend\services\ficha.service.ts:73:46)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\ficha.controller.ts:36:17)
+---
+[2026-07-30T18:32:30.131Z] Error: Table 'conins.alertas' doesn't exist
+Error: Table 'conins.alertas' doesn't exist
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\alerta.controller.ts:35:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-07-30T18:32:30.140Z] Error: Table 'conins.notificaciones' doesn't exist
+Error: Table 'conins.notificaciones' doesn't exist
+    at Object.getNoLeidasCount (C:\Users\laura\Desktop\Conins\backend\models\notificacion.model.ts:48:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\notificacion.controller.ts:14:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-30T18:33:00.135Z] Error: Table 'conins.notificaciones' doesn't exist
+Error: Table 'conins.notificaciones' doesn't exist
+    at Object.getNoLeidasCount (C:\Users\laura\Desktop\Conins\backend\models\notificacion.model.ts:48:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\notificacion.controller.ts:14:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-07-31T18:21:37.782Z] AggregateError: 
+AggregateError: 
+    at Object.findByEmail (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:32:31)
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:84:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:36)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:11:7)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-31T18:21:44.160Z] AggregateError: 
+AggregateError: 
+    at Object.findByEmail (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:32:31)
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:84:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:36)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:11:7)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-07-31T18:22:07.492Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:22:09.050Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:22:09.430Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:22:09.593Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:22:09.741Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:22:10.190Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:22:10.490Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:22:16.783Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:23:29.229Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-07-31T18:43:42.179Z] Error: Horario no encontrado
+Error: Horario no encontrado
+    at Object.toggleActivo (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:215:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:68:18)
+---
+[2026-07-31T18:43:45.229Z] Error: Horario no encontrado
+Error: Horario no encontrado
+    at Object.toggleActivo (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:215:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:68:18)
+---
+[2026-08-05T18:13:54.566Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-08-05T18:14:39.051Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---

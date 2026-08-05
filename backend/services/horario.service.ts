@@ -293,7 +293,7 @@ export const HorarioService = {
       }
 
       await pool.query(
-        'INSERT INTO horarios (ficha_id, instructor_id, competencia_id, ambiente_id, dia_semana, hora_inicio, hora_fin, jornada_id, semana) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        "INSERT INTO horarios (ficha_id, instructor_id, competencia_id, ambiente_id, dia_semana, hora_inicio, hora_fin, jornada_id, semana, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprobado')",
         [base.ficha_id, base.instructor_id, base.competencia_id, data.ambiente_id ?? base.ambiente_id, dia, data.hora_inicio, data.hora_fin, data.jornada_id, base.semana],
       );
     }
