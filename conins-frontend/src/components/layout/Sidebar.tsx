@@ -17,6 +17,7 @@ import {
   ChevronDown,
   FileText,
   Shield,
+  FileUp,
 } from "lucide-react"
 import { useAuth } from "@/lib/AuthContext"
 import { api } from "@/lib/api"
@@ -44,7 +45,7 @@ function isGroup(entry: SidebarEntry): entry is MenuGroup {
 const MENU_ADMIN: SidebarEntry[] = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   {
-    label: "Asignaciones",
+    label: "Gestión",
     icon: ClipboardList,
     items: [
       { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },
@@ -55,6 +56,7 @@ const MENU_ADMIN: SidebarEntry[] = [
       { name: "Ambientes", href: "/ambientes", icon: Building2 },
     ],
   },
+  { name: "Importar datos", href: "/importar", icon: FileUp },
   { name: "Alertas", href: "/alertas", icon: Bell, showBadge: true },
   { name: "Reportes", href: "/consultas", icon: Search },
   { name: "Usuarios", href: "/usuarios", icon: UserCog },
@@ -65,7 +67,7 @@ const MENU_ADMIN: SidebarEntry[] = [
 const MENU_SUBDIRECTOR: SidebarEntry[] = [
   { name: "Inicio", href: "/", icon: LayoutDashboard },
   {
-    label: "Asignaciones",
+    label: "Gestión",
     icon: ClipboardList,
     items: [
       { name: "Asignaciones", href: "/asignaciones", icon: ClipboardList },

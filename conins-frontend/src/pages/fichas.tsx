@@ -29,6 +29,7 @@ import {
 import { exportarGruposPDF, exportarFichaIndividualPDF } from "@/lib/exportPDF"
 import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
+import MultiSelect from "@/components/ui/MultiSelect"
 
 type Ficha = {
   id: number
@@ -70,11 +71,11 @@ export default function FichasPage() {
   const [search, setSearch] = useState("")
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
-  const [filtroPrograma, setFiltroPrograma] = useState("todos")
+  const [filtroPrograma, setFiltroPrograma] = useState<string[]>([])
   const [programas, setProgramas] = useState<{ id: number; nombre: string }[]>([])
-  const [filtroJornada, setFiltroJornada] = useState("todas")
-  const [filtroEtapa, setFiltroEtapa] = useState("todas")
-  const [filtroModalidad, setFiltroModalidad] = useState("todas")
+  const [filtroJornada, setFiltroJornada] = useState<string[]>([])
+  const [filtroEtapa, setFiltroEtapa] = useState<string[]>([])
+  const [filtroModalidad, setFiltroModalidad] = useState<string[]>([])
 
   const rol = user?.roles?.[0]?.trim() || ""
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
@@ -126,10 +127,10 @@ export default function FichasPage() {
     const coincideBusqueda =
       ficha.numero_ficha.toLowerCase().includes(texto) ||
       ficha.programa.toLowerCase().includes(texto)
-    const coincidePrograma = filtroPrograma === "todos" || ficha.programa === filtroPrograma
-    const coincideJornada = filtroJornada === "todas" || ficha.jornada === filtroJornada
-    const coincideEtapa = filtroEtapa === "todas" || ficha.etapa === filtroEtapa
-    const coincideModalidad = filtroModalidad === "todas" || ficha.modalidad === filtroModalidad
+    const coincidePrograma = filtroPrograma.length === 0 || filtroPrograma.includes(ficha.programa)
+    const coincideJornada = filtroJornada.length === 0 || filtroJornada.includes(ficha.jornada)
+    const coincideEtapa = filtroEtapa.length === 0 || filtroEtapa.includes(ficha.etapa)
+    const coincideModalidad = filtroModalidad.length === 0 || filtroModalidad.includes(ficha.modalidad)
     return coincideBusqueda && coincidePrograma && coincideJornada && coincideEtapa && coincideModalidad
   })
 
@@ -262,49 +263,46 @@ export default function FichasPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 w-full md:flex md:flex-wrap md:w-auto">
-            <select
-              value={filtroPrograma}
-              onChange={(e) => setFiltroPrograma(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todos">Programa: Todos</option>
-              {programas.map((p) => (
-                <option key={p.id} value={p.nombre}>{p.nombre}</option>
-              ))}
-            </select>
-
-            <select
-              value={filtroJornada}
-              onChange={(e) => setFiltroJornada(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todas">Jornada: Todas</option>
-              <option value="manana">Mañana</option>
-              <option value="mixta">Mixta</option>
-              <option value="noche">Noche</option>
-              <option value="virtual">Virtual</option>
-            </select>
-
-            <select
-              value={filtroEtapa}
-              onChange={(e) => setFiltroEtapa(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todas">Etapa: Todas</option>
-              <option value="lectiva">Lectiva</option>
-              <option value="productiva">Productiva</option>
-            </select>
-
-            <select
-              value={filtroModalidad}
-              onChange={(e) => setFiltroModalidad(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todas">Modalidad: Todas</option>
-              <option value="Presencial">Presencial</option>
-              <option value="Virtual">Virtual</option>
-              <option value="A distancia">A distancia</option>
-            </select>
+            <MultiSelect
+              label="Programa"
+              allLabel="Todos"
+              options={programas.map((p) => ({ value: p.nombre, label: p.nombre }))}
+              selected={filtroPrograma}
+              onChange={setFiltroPrograma}
+            />
+            <MultiSelect
+              label="Jornada"
+              allLabel="Todas"
+              options={[
+                { value: "manana", label: "Mañana" },
+                { value: "mixta", label: "Mixta" },
+                { value: "noche", label: "Noche" },
+                { value: "virtual", label: "Virtual" },
+              ]}
+              selected={filtroJornada}
+              onChange={setFiltroJornada}
+            />
+            <MultiSelect
+              label="Etapa"
+              allLabel="Todas"
+              options={[
+                { value: "lectiva", label: "Lectiva" },
+                { value: "productiva", label: "Productiva" },
+              ]}
+              selected={filtroEtapa}
+              onChange={setFiltroEtapa}
+            />
+            <MultiSelect
+              label="Modalidad"
+              allLabel="Todas"
+              options={[
+                { value: "Presencial", label: "Presencial" },
+                { value: "Virtual", label: "Virtual" },
+                { value: "A distancia", label: "A distancia" },
+              ]}
+              selected={filtroModalidad}
+              onChange={setFiltroModalidad}
+            />
           </div>
         </div>
 

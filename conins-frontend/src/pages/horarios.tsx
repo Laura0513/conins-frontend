@@ -13,6 +13,7 @@ import GrillaHorarios from "@/components/horarios/GrillaHorarios"
 import ConfirmDialog from "@/components/ui/ConfirmDialog"
 import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
+import MultiSelect from "@/components/ui/MultiSelect"
 import {
   Search,
   Plus,
@@ -73,10 +74,10 @@ export default function HorariosPage() {
   const [search, setSearch] = useState("")
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
-  const [filtroFicha, setFiltroFicha] = useState("todas")
-  const [filtroInstructor, setFiltroInstructor] = useState("todos")
-  const [filtroJornada, setFiltroJornada] = useState("todas")
-  const [filtroEstado, setFiltroEstado] = useState("todos")
+  const [filtroFicha, setFiltroFicha] = useState<string[]>([])
+  const [filtroInstructor, setFiltroInstructor] = useState<string[]>([])
+  const [filtroJornada, setFiltroJornada] = useState<string[]>([])
+  const [filtroEstado, setFiltroEstado] = useState<string[]>([])
   const [vistaGrilla, setVistaGrilla] = useState(false)
 
   const rol = user?.roles?.[0]?.trim() || ""
@@ -104,12 +105,12 @@ export default function HorariosPage() {
     const coincideBusqueda =
       h.ficha_numero.toLowerCase().includes(texto) ||
       h.instructor_nombre.toLowerCase().includes(texto)
-    
-    const coincideFicha = filtroFicha === "todas" || h.ficha_numero === filtroFicha
-    const coincideInstructor = filtroInstructor === "todos" || h.instructor_nombre === filtroInstructor
-    const coincideJornada = filtroJornada === "todas" || h.jornada === filtroJornada
-    const coincideEstado = filtroEstado === "todos" || h.estado === filtroEstado
-    
+
+    const coincideFicha = filtroFicha.length === 0 || filtroFicha.includes(h.ficha_numero)
+    const coincideInstructor = filtroInstructor.length === 0 || filtroInstructor.includes(h.instructor_nombre)
+    const coincideJornada = filtroJornada.length === 0 || filtroJornada.includes(h.jornada)
+    const coincideEstado = filtroEstado.length === 0 || filtroEstado.includes(h.estado)
+
     return coincideBusqueda && coincideFicha && coincideInstructor && coincideJornada && coincideEstado
   })
 
@@ -265,50 +266,43 @@ export default function HorariosPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 w-full md:flex md:flex-wrap md:w-auto">
-            <select
-              value={filtroFicha}
-              onChange={(e) => setFiltroFicha(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todas">Grupo: Todos</option>
-              {[...new Set(horarios.map((h) => h.ficha_numero))].sort().map((f) => (
-                <option key={f} value={f}>{f}</option>
-              ))}
-            </select>
-
-            <select
-              value={filtroInstructor}
-              onChange={(e) => setFiltroInstructor(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todos">Instructor: Todos</option>
-              {[...new Set(horarios.map((h) => h.instructor_nombre))].sort().map((i) => (
-                <option key={i} value={i}>{i}</option>
-              ))}
-            </select>
-
-            <select
-              value={filtroJornada}
-              onChange={(e) => setFiltroJornada(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todas">Jornada: Todas</option>
-              <option value="manana">Mañana</option>
-              <option value="mixta">Mixta</option>
-              <option value="noche">Noche</option>
-              <option value="virtual">Virtual</option>
-            </select>
-
-            <select
-              value={filtroEstado}
-              onChange={(e) => setFiltroEstado(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todos">Estado: Todos</option>
-              <option value="Aprobado">Aprobado</option>
-              <option value="Pendiente">Pendiente</option>
-              <option value="Rechazado">Rechazado</option>
-            </select>
+            <MultiSelect
+              label="Grupo"
+              allLabel="Todos"
+              options={[...new Set(horarios.map((h) => h.ficha_numero))].sort().map((f) => ({ value: f, label: f }))}
+              selected={filtroFicha}
+              onChange={setFiltroFicha}
+            />
+            <MultiSelect
+              label="Instructor"
+              allLabel="Todos"
+              options={[...new Set(horarios.map((h) => h.instructor_nombre))].sort().map((i) => ({ value: i, label: i }))}
+              selected={filtroInstructor}
+              onChange={setFiltroInstructor}
+            />
+            <MultiSelect
+              label="Jornada"
+              allLabel="Todas"
+              options={[
+                { value: "manana", label: "Mañana" },
+                { value: "mixta", label: "Mixta" },
+                { value: "noche", label: "Noche" },
+                { value: "virtual", label: "Virtual" },
+              ]}
+              selected={filtroJornada}
+              onChange={setFiltroJornada}
+            />
+            <MultiSelect
+              label="Estado"
+              allLabel="Todos"
+              options={[
+                { value: "Aprobado", label: "Aprobado" },
+                { value: "Pendiente", label: "Pendiente" },
+                { value: "Rechazado", label: "Rechazado" },
+              ]}
+              selected={filtroEstado}
+              onChange={setFiltroEstado}
+            />
           </div>
         </div>
 

@@ -458,6 +458,15 @@ export const api = {
         },
     },
 
+    importar: {
+        cargar(archivo_base64: string) {
+            return apiFetch('/importar', {
+                method: 'POST',
+                body: JSON.stringify({ archivo_base64 }),
+            })
+        },
+    },
+
     users: {
         getAll() {
             return apiFetch('/auth/usuarios')

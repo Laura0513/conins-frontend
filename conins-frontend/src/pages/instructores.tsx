@@ -22,6 +22,7 @@ import {
 } from "lucide-react"
 import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
+import MultiSelect from "@/components/ui/MultiSelect"
 import { exportarInstructoresPDF, exportarInstructorIndividualPDF } from "@/lib/exportPDF"
 
 type Instructor = {
@@ -60,8 +61,8 @@ export default function InstructoresPage() {
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
 
-  const [filtroArea, setFiltroArea] = useState("todas")
-  const [filtroEstado, setFiltroEstado] = useState("todos")
+  const [filtroArea, setFiltroArea] = useState<string[]>([])
+  const [filtroEstado, setFiltroEstado] = useState<string[]>([])
 
   const rol = user?.roles?.[0]?.trim() || ""
   const esSubdirector = rol === "Subdirector"
@@ -173,15 +174,16 @@ export default function InstructoresPage() {
   const listaFiltrada = instructores.filter((inst) => {
     const texto = search.toLowerCase()
     const coincideBusqueda = inst.nombre.toLowerCase().includes(texto) || inst.email.toLowerCase().includes(texto)
-    const coincideArea = filtroArea === "todas" || inst.tipo_area === filtroArea
+    const coincideArea = filtroArea.length === 0 || filtroArea.includes(inst.tipo_area)
 
     let coincideEstado = true
-    if (filtroEstado === "activo") {
-      coincideEstado = inst.activo && !inst.tiene_novedad
-    } else if (filtroEstado === "con_novedad") {
-      coincideEstado = !!inst.tiene_novedad
-    } else if (filtroEstado === "inactivo") {
-      coincideEstado = !inst.activo
+    if (filtroEstado.length > 0) {
+      coincideEstado = filtroEstado.some((f) => {
+        if (f === "activo") return inst.activo && !inst.tiene_novedad
+        if (f === "con_novedad") return !!inst.tiene_novedad
+        if (f === "inactivo") return !inst.activo
+        return false
+      })
     }
 
     return coincideBusqueda && coincideArea && coincideEstado
@@ -238,26 +240,27 @@ export default function InstructoresPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 w-full md:flex md:flex-wrap md:w-auto">
-            <select
-              value={filtroArea}
-              onChange={(e) => setFiltroArea(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todas">Area: Todas</option>
-              <option value="tecnica">Tecnica</option>
-              <option value="transversal">Transversal</option>
-            </select>
-
-            <select
-              value={filtroEstado}
-              onChange={(e) => setFiltroEstado(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todos">Estado: Todos</option>
-              <option value="activo">Activo</option>
-              <option value="con_novedad">Con novedad</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
+            <MultiSelect
+              label="Área"
+              allLabel="Todas"
+              options={[
+                { value: "tecnica", label: "Técnica" },
+                { value: "transversal", label: "Transversal" },
+              ]}
+              selected={filtroArea}
+              onChange={setFiltroArea}
+            />
+            <MultiSelect
+              label="Estado"
+              allLabel="Todos"
+              options={[
+                { value: "activo", label: "Activo" },
+                { value: "con_novedad", label: "Con novedad" },
+                { value: "inactivo", label: "Inactivo" },
+              ]}
+              selected={filtroEstado}
+              onChange={setFiltroEstado}
+            />
           </div>
         </div>
 

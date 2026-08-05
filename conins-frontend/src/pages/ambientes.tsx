@@ -12,6 +12,7 @@ import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import { exportarAmbientesPDF, exportarAmbienteIndividualPDF } from "@/lib/exportPDF"
 import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
+import MultiSelect from "@/components/ui/MultiSelect"
 import {
   Search,
   Plus,
@@ -59,8 +60,8 @@ export default function AmbientesPage() {
   const [search, setSearch] = useState("")
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
-  const [filtroTipo, setFiltroTipo] = useState("todos")
-  const [filtroEstado, setFiltroEstado] = useState("todos")
+  const [filtroTipo, setFiltroTipo] = useState<string[]>([])
+  const [filtroEstado, setFiltroEstado] = useState<string[]>([])
 
   const rol = user?.roles?.[0]?.trim() || ""
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
@@ -85,8 +86,8 @@ export default function AmbientesPage() {
   const listaFiltrada = ambientes.filter((amb) => {
     const texto = search.toLowerCase()
     const coincideBusqueda = amb.nombre.toLowerCase().includes(texto)
-    const coincideTipo = filtroTipo === "todos" || amb.tipo === filtroTipo
-    const coincideEstado = filtroEstado === "todos" || (filtroEstado === "activo" ? amb.activo : !amb.activo)
+    const coincideTipo = filtroTipo.length === 0 || filtroTipo.includes(amb.tipo)
+    const coincideEstado = filtroEstado.length === 0 || filtroEstado.some((f) => f === "activo" ? amb.activo : !amb.activo)
     return coincideBusqueda && coincideTipo && coincideEstado
   })
 
@@ -231,27 +232,28 @@ export default function AmbientesPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 w-full md:flex md:flex-wrap md:w-auto">
-            <select
-              value={filtroTipo}
-              onChange={(e) => setFiltroTipo(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todos">Tipo: Todos</option>
-              <option value="Aula">Aula</option>
-              <option value="Taller">Taller</option>
-              <option value="Laboratorio">Laboratorio</option>
-              <option value="Auditorio">Auditorio</option>
-            </select>
-
-            <select
-              value={filtroEstado}
-              onChange={(e) => setFiltroEstado(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-            >
-              <option value="todos">Estado: Todos</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
+            <MultiSelect
+              label="Tipo"
+              allLabel="Todos"
+              options={[
+                { value: "Aula", label: "Aula" },
+                { value: "Taller", label: "Taller" },
+                { value: "Laboratorio", label: "Laboratorio" },
+                { value: "Auditorio", label: "Auditorio" },
+              ]}
+              selected={filtroTipo}
+              onChange={setFiltroTipo}
+            />
+            <MultiSelect
+              label="Estado"
+              allLabel="Todos"
+              options={[
+                { value: "activo", label: "Activo" },
+                { value: "inactivo", label: "Inactivo" },
+              ]}
+              selected={filtroEstado}
+              onChange={setFiltroEstado}
+            />
           </div>
         </div>
 
