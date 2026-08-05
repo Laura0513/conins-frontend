@@ -126,7 +126,11 @@ export default function ImportarPage() {
           <p className="text-sm text-gray-600 mb-3">
             El archivo debe tener hojas con estos nombres exactos (incluye solo las que necesites):
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="border border-gray-200 rounded-lg p-3">
+              <p className="text-sm font-medium text-gray-900 mb-1">Hoja "Instructores"</p>
+              <p className="text-xs text-gray-500">nombre, email, tipo_area, codigos_competencia (opcional, separados por coma)</p>
+            </div>
             <div className="border border-gray-200 rounded-lg p-3">
               <p className="text-sm font-medium text-gray-900 mb-1">Hoja "Grupos"</p>
               <p className="text-xs text-gray-500">numero_grupo, codigo_programa, jornada, ambiente, lider_email, etapa, fechas</p>
@@ -140,7 +144,7 @@ export default function ImportarPage() {
               <p className="text-xs text-gray-500">instructor_email, numero_grupo, codigo_competencia, dia_semana, hora_inicio, hora_fin, jornada, semana</p>
             </div>
           </div>
-          <p className="text-xs text-gray-400 mt-3">Se procesan en orden: Grupos → Asignaciones → Horarios. Las filas válidas se crean aunque otras tengan errores.</p>
+          <p className="text-xs text-gray-400 mt-3">Se procesan en orden: Instructores → Grupos → Asignaciones → Horarios. Las filas válidas se crean aunque otras tengan errores.</p>
         </div>
 
         {/* Zona de carga */}
