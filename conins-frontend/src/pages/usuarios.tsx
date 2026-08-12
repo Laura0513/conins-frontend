@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -45,6 +46,7 @@ export default function UsuariosPage() {
   const [selectedUsuario, setSelectedUsuario] = useState<Usuario | null>(null)
 
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
   const [filtroRol, setFiltroRol] = useState("todos")
@@ -68,7 +70,7 @@ export default function UsuariosPage() {
   }
 
   const listaFiltrada = usuarios.filter((u) => {
-    const texto = search.toLowerCase()
+    const texto = debouncedSearch.toLowerCase()
     const coincideBusqueda = u.nombre.toLowerCase().includes(texto) || u.email.toLowerCase().includes(texto) || (u.documento || "").toLowerCase().includes(texto)
     const coincideRol = filtroRol === "todos" || u.rol === filtroRol
     const coincideEstado = filtroEstado === "todos" || (filtroEstado === "activo" ? u.activo : !u.activo)

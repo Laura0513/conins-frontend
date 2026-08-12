@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -74,6 +75,7 @@ export default function HorariosPage() {
   }>({ isOpen: false, title: "", message: "", onConfirm: () => {}, showMotivo: false })
 
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
   const [filtroFicha, setFiltroFicha] = useState<string[]>([])
@@ -108,7 +110,7 @@ export default function HorariosPage() {
   const listaFiltrada = horarios.filter((h) => {
     if (!mostrarInactivos && !h.activo) return false
 
-    const texto = search.toLowerCase()
+    const texto = debouncedSearch.toLowerCase()
     const coincideBusqueda =
       h.ficha_numero.toLowerCase().includes(texto) ||
       h.instructor_nombre.toLowerCase().includes(texto)

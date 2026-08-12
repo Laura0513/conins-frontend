@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -69,6 +70,7 @@ export default function FichasPage() {
   }>({ isOpen: false, title: "", message: "", onConfirm: () => {} })
 
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
   const [filtroPrograma, setFiltroPrograma] = useState<string[]>([])
@@ -123,7 +125,7 @@ export default function FichasPage() {
   }
 
   const listaFiltrada = fichas.filter((ficha) => {
-    const texto = search.toLowerCase()
+    const texto = debouncedSearch.toLowerCase()
     const coincideBusqueda =
       ficha.numero_ficha.toLowerCase().includes(texto) ||
       ficha.programa.toLowerCase().includes(texto)

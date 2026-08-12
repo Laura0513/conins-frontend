@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 import { useAuth } from "@/lib/AuthContext"
 import { api } from "@/lib/api"
 import { useState, useRef, useEffect, useCallback } from "react"
+import GlobalSearch from "./GlobalSearch"
 
 type Notificacion = {
   id: number
@@ -147,7 +148,10 @@ export default function Header({ alertasViewed, onViewAlertas, onToggleSidebar }
         </div>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
+        {/* Búsqueda global */}
+        <GlobalSearch />
+
         {/* Notificaciones */}
         <div className="relative" ref={dropdownRef}>
           <button

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -39,6 +40,7 @@ export default function ProgramasPage() {
   const [savingId, setSavingId] = useState<number | null>(null)
 
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
 
@@ -93,7 +95,7 @@ export default function ProgramasPage() {
   }
 
   const listaFiltrada = programas.filter((p) => {
-    const texto = search.toLowerCase()
+    const texto = debouncedSearch.toLowerCase()
     return (
       p.nombre.toLowerCase().includes(texto) ||
       (p.tipo_linea || "").toLowerCase().includes(texto) ||

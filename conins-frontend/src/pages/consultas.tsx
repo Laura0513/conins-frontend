@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
@@ -325,6 +326,7 @@ export default function ConsultasPage() {
 
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [filtroFicha, setFiltroFicha] = useState("")
   const [filtroEstado, setFiltroEstado] = useState("todos")
 
@@ -368,7 +370,7 @@ export default function ConsultasPage() {
 
   // Filtros
   const cargaFiltrada = carga.filter((c) => {
-    const coincideBusqueda = c.instructor_nombre.toLowerCase().includes(search.toLowerCase())
+    const coincideBusqueda = c.instructor_nombre.toLowerCase().includes(debouncedSearch.toLowerCase())
     const coincideEstado = filtroEstado === "todos" || c.estado === filtroEstado
     return coincideBusqueda && coincideEstado
   })

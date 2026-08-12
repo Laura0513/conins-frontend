@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -58,6 +59,7 @@ export default function AmbientesPage() {
   const [selectedFicha, setSelectedFicha] = useState<any>(null)
 
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
   const [filtroTipo, setFiltroTipo] = useState<string[]>([])
@@ -84,7 +86,7 @@ export default function AmbientesPage() {
   }
 
   const listaFiltrada = ambientes.filter((amb) => {
-    const texto = search.toLowerCase()
+    const texto = debouncedSearch.toLowerCase()
     const coincideBusqueda = amb.nombre.toLowerCase().includes(texto)
     const coincideTipo = filtroTipo.length === 0 || filtroTipo.includes(amb.tipo)
     const coincideEstado = filtroEstado.length === 0 || filtroEstado.some((f) => f === "activo" ? amb.activo : !amb.activo)

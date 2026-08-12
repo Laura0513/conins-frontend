@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/router"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -74,6 +75,7 @@ export default function AsignacionesPage() {
   }>({ isOpen: false, title: "", message: "", onConfirm: () => {} })
 
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
   const [filtroPrograma, setFiltroPrograma] = useState("todos")
@@ -105,7 +107,7 @@ export default function AsignacionesPage() {
 
   const listaFiltrada = asignaciones.filter((asig) => {
     const coincideTab = asig.tipo === activeTab
-    const texto = search.toLowerCase()
+    const texto = debouncedSearch.toLowerCase()
     const coincideBusqueda =
       asig.instructor_nombre.toLowerCase().includes(texto) ||
       asig.ficha_numero.toLowerCase().includes(texto) ||

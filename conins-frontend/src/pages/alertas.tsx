@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -94,6 +95,7 @@ export default function AlertasPage() {
   const [alertas, setAlertas] = useState<Alerta[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [filtroTipo, setFiltroTipo] = useState("todas")
   const [filtroEstado, setFiltroEstado] = useState("todas")
   const [activeTab, setActiveTab] = useState<"pendientes" | "historial">("pendientes")
@@ -138,7 +140,7 @@ export default function AlertasPage() {
 
   const listaFiltrada = alertas.filter((a) => {
     const coincideTab = activeTab === "pendientes" ? !a.atendida : a.atendida
-    const texto = search.toLowerCase()
+    const texto = debouncedSearch.toLowerCase()
     const coincideBusqueda =
       a.mensaje.toLowerCase().includes(texto) ||
       a.instructor_nombre.toLowerCase().includes(texto)

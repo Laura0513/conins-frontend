@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
@@ -56,6 +57,7 @@ export default function GestionCompetenciasPage() {
   }>({ isOpen: false, title: "", message: "", onConfirm: () => {} })
 
   const [search, setSearch] = useState("")
+  const debouncedSearch = useDebounce(search)
   const [paginaActual, setPaginaActual] = useState(1)
   const porPagina = 10
   const [filtroPrograma, setFiltroPrograma] = useState("todos")
@@ -140,7 +142,7 @@ export default function GestionCompetenciasPage() {
   }
 
   const listaFiltrada = competencias.filter((comp) => {
-    const texto = search.toLowerCase()
+    const texto = debouncedSearch.toLowerCase()
     const coincideBusqueda =
       comp.nombre.toLowerCase().includes(texto) ||
       comp.codigo.toLowerCase().includes(texto) ||
