@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
@@ -17,6 +17,8 @@ import {
   Building2,
   Calendar,
   BarChart3,
+  TrendingUp,
+  ArrowUpRight,
 } from "lucide-react"
 
 // --- Types ---
@@ -47,6 +49,268 @@ type OcupacionAmbiente = {
   horas_ocupadas: number
   horas_totales: number
   porcentaje: number
+}
+
+// --- Chart Components ---
+
+function BarChartHorizontal({
+  data,
+  maxValue,
+}: {
+  data: { label: string; value: number; color: string }[]
+  maxValue: number
+}) {
+  const barHeight = 28
+  const labelWidth = 140
+  const chartWidth = 500
+  const gap = 6
+  const height = data.length * (barHeight + gap) + 10
+
+  return (
+    <svg
+      viewBox={`0 0 ${labelWidth + chartWidth + 60} ${height}`}
+      className="w-full"
+      style={{ maxHeight: `${Math.min(height, 400)}px` }}
+    >
+      {data.map((d, i) => {
+        const y = i * (barHeight + gap) + 5
+        const barWidth = maxValue > 0 ? (d.value / maxValue) * chartWidth : 0
+        return (
+          <g key={i}>
+            <text
+              x={labelWidth - 8}
+              y={y + barHeight / 2 + 4}
+              textAnchor="end"
+              className="text-[11px] fill-gray-600"
+            >
+              {d.label.length > 18 ? d.label.slice(0, 18) + "…" : d.label}
+            </text>
+            <rect
+              x={labelWidth}
+              y={y}
+              width={Math.max(barWidth, 2)}
+              height={barHeight}
+              rx={4}
+              fill={d.color}
+              opacity={0.85}
+            />
+            <text
+              x={labelWidth + barWidth + 8}
+              y={y + barHeight / 2 + 4}
+              className="text-[11px] font-semibold fill-gray-700"
+            >
+              {d.value.toFixed(0)}h
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+function DonutChart({
+  segments,
+  centerLabel,
+  centerValue,
+  size = 160,
+}: {
+  segments: { value: number; color: string; label: string }[]
+  centerLabel: string
+  centerValue: string
+  size?: number
+}) {
+  const total = segments.reduce((s, seg) => s + seg.value, 0)
+  const radius = size / 2 - 20
+  const strokeWidth = 24
+  const circumference = 2 * Math.PI * radius
+  let offset = 0
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="#f3f4f6"
+          strokeWidth={strokeWidth}
+        />
+        {segments.map((seg, i) => {
+          const pct = total > 0 ? seg.value / total : 0
+          const dashLength = pct * circumference
+          const currentOffset = offset
+          offset += dashLength
+          if (pct === 0) return null
+          return (
+            <circle
+              key={i}
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={seg.color}
+              strokeWidth={strokeWidth}
+              strokeDasharray={`${dashLength} ${circumference - dashLength}`}
+              strokeDashoffset={-currentOffset}
+              strokeLinecap="round"
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+              style={{ transition: "stroke-dasharray 0.5s ease" }}
+            />
+          )
+        })}
+        <text
+          x={size / 2}
+          y={size / 2 - 6}
+          textAnchor="middle"
+          className="text-2xl font-bold fill-gray-900"
+        >
+          {centerValue}
+        </text>
+        <text
+          x={size / 2}
+          y={size / 2 + 14}
+          textAnchor="middle"
+          className="text-[11px] fill-gray-500"
+        >
+          {centerLabel}
+        </text>
+      </svg>
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+        {segments.map((seg, i) => (
+          <div key={i} className="flex items-center gap-1.5 text-xs text-gray-600">
+            <span
+              className="w-2.5 h-2.5 rounded-full inline-block"
+              style={{ backgroundColor: seg.color }}
+            />
+            {seg.label} ({seg.value})
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function OcupacionBarChart({ data }: { data: OcupacionAmbiente[] }) {
+  const barWidth = 40
+  const gap = 12
+  const chartHeight = 180
+  const labelHeight = 60
+  const width = data.length * (barWidth + gap) + gap + 40
+  const maxPct = 100
+
+  return (
+    <svg
+      viewBox={`0 0 ${Math.max(width, 300)} ${chartHeight + labelHeight + 30}`}
+      className="w-full"
+      style={{ maxHeight: "280px" }}
+    >
+      {/* Grid lines */}
+      {[0, 25, 50, 75, 100].map((pct) => {
+        const y = chartHeight - (pct / maxPct) * chartHeight + 10
+        return (
+          <g key={pct}>
+            <line
+              x1={35}
+              y1={y}
+              x2={width}
+              y2={y}
+              stroke="#e5e7eb"
+              strokeWidth={1}
+              strokeDasharray={pct > 0 ? "4 4" : "0"}
+            />
+            <text x={30} y={y + 4} textAnchor="end" className="text-[10px] fill-gray-400">
+              {pct}%
+            </text>
+          </g>
+        )
+      })}
+
+      {data.map((o, i) => {
+        const x = i * (barWidth + gap) + gap + 35
+        const pct = Math.min(Number(o.porcentaje), 100)
+        const barH = (pct / maxPct) * chartHeight
+        const y = chartHeight - barH + 10
+        const color =
+          pct > 80 ? "#ef4444" : pct > 50 ? "#f59e0b" : "#39A900"
+
+        return (
+          <g key={i}>
+            <rect
+              x={x}
+              y={y}
+              width={barWidth}
+              height={barH}
+              rx={4}
+              fill={color}
+              opacity={0.85}
+            />
+            <text
+              x={x + barWidth / 2}
+              y={y - 6}
+              textAnchor="middle"
+              className="text-[10px] font-semibold fill-gray-700"
+            >
+              {pct.toFixed(0)}%
+            </text>
+            <text
+              x={x + barWidth / 2}
+              y={chartHeight + 24}
+              textAnchor="middle"
+              className="text-[9px] fill-gray-500"
+              transform={`rotate(-35 ${x + barWidth / 2} ${chartHeight + 24})`}
+            >
+              {o.ambiente_nombre.length > 12
+                ? o.ambiente_nombre.slice(0, 12) + "…"
+                : o.ambiente_nombre}
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+function FichaHeatmap({ data }: { data: HorarioFicha[] }) {
+  const dias = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
+  const keys: (keyof HorarioFicha)[] = [
+    "lunes",
+    "martes",
+    "miercoles",
+    "jueves",
+    "viernes",
+    "sabado",
+  ]
+
+  const conteo = dias.map((_, i) => {
+    return data.filter((h) => h[keys[i]] != null && h[keys[i]] !== "").length
+  })
+  const maxCount = Math.max(...conteo, 1)
+
+  return (
+    <div className="flex items-end gap-3 justify-center">
+      {dias.map((dia, i) => {
+        const pct = conteo[i] / maxCount
+        const height = Math.max(pct * 120, 8)
+        const opacity = 0.3 + pct * 0.7
+        return (
+          <div key={dia} className="flex flex-col items-center gap-1">
+            <span className="text-xs font-semibold text-gray-700">{conteo[i]}</span>
+            <div
+              className="rounded-t-md transition-all"
+              style={{
+                width: "36px",
+                height: `${height}px`,
+                backgroundColor: "#39A900",
+                opacity,
+              }}
+            />
+            <span className="text-[10px] text-gray-500 font-medium">{dia}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 // --- Component ---
@@ -116,10 +380,45 @@ export default function ConsultasPage() {
   // Stats
   const totalHoras = carga.reduce((sum, c) => sum + Number(c.total_horas), 0)
   const enSobrecarga = carga.filter((c) => c.estado === "Sobrecarga").length
+  const enBajoCarga = carga.filter((c) => c.estado === "Bajo carga").length
+  const enNormal = carga.filter((c) => c.estado === "Normal").length
+  const promedioHoras = carga.length > 0 ? totalHoras / carga.length : 0
   const promedioOcupacion =
     ocupacion.length > 0
       ? Math.round(ocupacion.reduce((sum, o) => sum + Number(o.porcentaje), 0) / ocupacion.length)
       : 0
+
+  // Chart data
+  const topInstructores = useMemo(() => {
+    return [...cargaFiltrada]
+      .sort((a, b) => Number(b.total_horas) - Number(a.total_horas))
+      .slice(0, 10)
+      .map((c) => ({
+        label: c.instructor_nombre,
+        value: Number(c.total_horas),
+        color:
+          c.estado === "Sobrecarga"
+            ? "#ef4444"
+            : c.estado === "Bajo carga"
+              ? "#f59e0b"
+              : "#39A900",
+      }))
+  }, [cargaFiltrada])
+
+  const ocupacionTop = useMemo(() => {
+    return [...ocupacion]
+      .sort((a, b) => Number(b.porcentaje) - Number(a.porcentaje))
+      .slice(0, 10)
+  }, [ocupacion])
+
+  const ambientesPorEstado = useMemo(() => {
+    const critico = ocupacion.filter((o) => Number(o.porcentaje) > 80).length
+    const medio = ocupacion.filter(
+      (o) => Number(o.porcentaje) > 50 && Number(o.porcentaje) <= 80
+    ).length
+    const disponible = ocupacion.filter((o) => Number(o.porcentaje) <= 50).length
+    return { critico, medio, disponible }
+  }, [ocupacion])
 
   if (authLoading || !user) return <PageSkeleton />
 
@@ -144,48 +443,74 @@ export default function ConsultasPage() {
 
         {/* Tarjetas resumen */}
         {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:hidden">
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
-                <Users className="w-5 h-5 text-sena" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-sena" />
+                </div>
+                <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Total</span>
               </div>
-              <div>
-                <p className="text-xs text-gray-500">Instructores</p>
-                <p className="text-lg font-bold text-gray-900">{carga.length}</p>
-                <p className="text-xs text-gray-400">{totalHoras.toFixed(0)}h totales</p>
-              </div>
+              <p className="text-2xl font-bold text-gray-900">{carga.length}</p>
+              <p className="text-xs text-gray-500 mt-1">Instructores registrados</p>
             </div>
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${enSobrecarga > 0 ? "bg-red-50" : "bg-green-50"}`}>
-                {enSobrecarga > 0 ? (
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
-                ) : (
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-blue-500" />
+                </div>
+                <div className="flex items-center gap-1 text-xs text-blue-600">
+                  <TrendingUp className="w-3 h-3" />
+                  {promedioHoras.toFixed(1)}h prom
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{totalHoras.toFixed(0)}h</p>
+              <p className="text-xs text-gray-500 mt-1">Horas totales asignadas</p>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${enSobrecarga > 0 ? "bg-red-50" : "bg-green-50"}`}>
+                  {enSobrecarga > 0 ? (
+                    <ArrowUpRight className="w-5 h-5 text-red-500" />
+                  ) : (
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  )}
+                </div>
+                {enSobrecarga > 0 && (
+                  <span className="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full font-medium">Alerta</span>
                 )}
               </div>
-              <div>
-                <p className="text-xs text-gray-500">En sobrecarga</p>
-                <p className={`text-lg font-bold ${enSobrecarga > 0 ? "text-red-600" : "text-green-600"}`}>
-                  {enSobrecarga}
-                </p>
-                <p className="text-xs text-gray-400">de {carga.length} instructores</p>
-              </div>
+              <p className={`text-2xl font-bold ${enSobrecarga > 0 ? "text-red-600" : "text-green-600"}`}>
+                {enSobrecarga}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">Instructores en sobrecarga</p>
             </div>
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-sena" />
+
+            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-10 h-10 rounded-lg bg-sena/10 flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-sena" />
+                </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                  promedioOcupacion > 80
+                    ? "text-red-600 bg-red-50"
+                    : promedioOcupacion > 50
+                      ? "text-yellow-600 bg-yellow-50"
+                      : "text-green-600 bg-green-50"
+                }`}>
+                  {promedioOcupacion > 80 ? "Alta" : promedioOcupacion > 50 ? "Media" : "Baja"}
+                </span>
               </div>
-              <div>
-                <p className="text-xs text-gray-500">Ocupacion promedio</p>
-                <p className="text-lg font-bold text-gray-900">{promedioOcupacion}%</p>
-                <p className="text-xs text-gray-400">{ocupacion.length} ambientes</p>
-              </div>
+              <p className="text-2xl font-bold text-gray-900">{promedioOcupacion}%</p>
+              <p className="text-xs text-gray-500 mt-1">Ocupacion promedio ({ocupacion.length} ambientes)</p>
             </div>
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-gray-200 print:hidden">
+        <div className="flex gap-2 border-b border-gray-200 print:hidden overflow-x-auto">
           {[
             { id: "carga", label: "Carga Horaria", icon: Users },
             { id: "ficha", label: "Horario por Grupo", icon: Calendar },
@@ -194,7 +519,7 @@ export default function ConsultasPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? "border-sena text-sena"
                   : "border-transparent text-gray-500 hover:text-gray-700"
@@ -214,6 +539,43 @@ export default function ConsultasPage() {
             {/* Tab: Carga Horaria */}
             {activeTab === "carga" && (
               <div className="space-y-4">
+                {/* Charts Row */}
+                {carga.length > 0 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 print:hidden">
+                    {/* Bar Chart - Top instructores */}
+                    <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                        Top instructores por carga horaria
+                      </h3>
+                      <p className="text-xs text-gray-400 mb-4">
+                        {cargaFiltrada.length > 10
+                          ? "Mostrando los 10 con mayor carga"
+                          : `${cargaFiltrada.length} instructores`}
+                      </p>
+                      <BarChartHorizontal data={topInstructores} maxValue={50} />
+                    </div>
+
+                    {/* Donut Chart - Distribución por estado */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex flex-col items-center justify-center">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                        Distribucion por estado
+                      </h3>
+                      <p className="text-xs text-gray-400 mb-4">Clasificacion de instructores</p>
+                      <DonutChart
+                        segments={[
+                          { value: enNormal, color: "#22c55e", label: "Normal" },
+                          { value: enSobrecarga, color: "#ef4444", label: "Sobrecarga" },
+                          { value: enBajoCarga, color: "#f59e0b", label: "Bajo carga" },
+                        ]}
+                        centerLabel="instructores"
+                        centerValue={String(carga.length)}
+                        size={170}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Filters */}
                 <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between print:hidden">
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -237,6 +599,7 @@ export default function ConsultasPage() {
                   </select>
                 </div>
 
+                {/* Table */}
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   {cargaFiltrada.length === 0 ? (
                     <EmptyState icon={BarChart3} title="Sin resultados" description="No se encontraron resultados con los filtros seleccionados." />
@@ -330,6 +693,28 @@ export default function ConsultasPage() {
             {/* Tab: Horario por Ficha */}
             {activeTab === "ficha" && (
               <div className="space-y-4">
+                {/* Heatmap visual */}
+                {horariosFicha.length > 0 && (
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 print:hidden">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-900">
+                          Grupos con clase por dia
+                        </h3>
+                        <p className="text-xs text-gray-400">
+                          Cantidad de grupos que tienen horario asignado cada dia
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-gray-900">{horariosFicha.length}</p>
+                        <p className="text-xs text-gray-500">grupos activos</p>
+                      </div>
+                    </div>
+                    <FichaHeatmap data={horariosFicha} />
+                  </div>
+                )}
+
+                {/* Search */}
                 <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm print:hidden">
                   <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -343,6 +728,7 @@ export default function ConsultasPage() {
                   </div>
                 </div>
 
+                {/* Table */}
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   {fichasFiltradas.length === 0 ? (
                     <EmptyState icon={Calendar} title="Sin horarios" description="No se encontraron grupos con horarios activos." />
@@ -398,6 +784,43 @@ export default function ConsultasPage() {
             {/* Tab: Ocupación Ambientes */}
             {activeTab === "ocupacion" && (
               <div className="space-y-4">
+                {/* Charts Row */}
+                {ocupacion.length > 0 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 print:hidden">
+                    {/* Bar Chart */}
+                    <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                        Ocupacion por ambiente
+                      </h3>
+                      <p className="text-xs text-gray-400 mb-4">
+                        {ocupacion.length > 10
+                          ? "Top 10 ambientes por ocupacion"
+                          : `${ocupacion.length} ambientes`}
+                      </p>
+                      <OcupacionBarChart data={ocupacionTop} />
+                    </div>
+
+                    {/* Donut - Distribution */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex flex-col items-center justify-center">
+                      <h3 className="text-sm font-semibold text-gray-900 mb-1">
+                        Estado de ambientes
+                      </h3>
+                      <p className="text-xs text-gray-400 mb-4">Por nivel de ocupacion</p>
+                      <DonutChart
+                        segments={[
+                          { value: ambientesPorEstado.disponible, color: "#22c55e", label: "Disponible (≤50%)" },
+                          { value: ambientesPorEstado.medio, color: "#f59e0b", label: "Medio (51-80%)" },
+                          { value: ambientesPorEstado.critico, color: "#ef4444", label: "Critico (>80%)" },
+                        ]}
+                        centerLabel="ambientes"
+                        centerValue={String(ocupacion.length)}
+                        size={170}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Table */}
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
                   {ocupacion.length === 0 ? (
                     <EmptyState icon={Building2} title="Sin datos" description="No hay datos de ocupacion disponibles." />

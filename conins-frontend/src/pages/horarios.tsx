@@ -29,6 +29,8 @@ import {
   LayoutGrid,
   List,
   Calendar,
+  Eye,
+  EyeOff,
 } from "lucide-react"
 
 type Horario = {
@@ -79,6 +81,7 @@ export default function HorariosPage() {
   const [filtroJornada, setFiltroJornada] = useState<string[]>([])
   const [filtroEstado, setFiltroEstado] = useState<string[]>([])
   const [vistaGrilla, setVistaGrilla] = useState(false)
+  const [mostrarInactivos, setMostrarInactivos] = useState(false)
 
   const rol = user?.roles?.[0]?.trim() || ""
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
@@ -100,7 +103,11 @@ export default function HorariosPage() {
     }
   }
 
+  const inactivosCount = horarios.filter((h) => !h.activo).length
+
   const listaFiltrada = horarios.filter((h) => {
+    if (!mostrarInactivos && !h.activo) return false
+
     const texto = search.toLowerCase()
     const coincideBusqueda =
       h.ficha_numero.toLowerCase().includes(texto) ||
@@ -306,6 +313,21 @@ export default function HorariosPage() {
           </div>
         </div>
 
+        {/* Toggle inactivos */}
+        {inactivosCount > 0 && (
+          <button
+            onClick={() => setMostrarInactivos(!mostrarInactivos)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${
+              mostrarInactivos
+                ? "bg-gray-100 border-gray-300 text-gray-700"
+                : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50"
+            }`}
+          >
+            {mostrarInactivos ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {mostrarInactivos ? "Ocultar inactivos" : `Mostrar inactivos (${inactivosCount})`}
+          </button>
+        )}
+
         {vistaGrilla ? (
           <GrillaHorarios horarios={listaFiltrada} />
         ) : (
@@ -333,7 +355,7 @@ export default function HorariosPage() {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {listaPaginada.map((h) => (
-                    <tr key={h.id} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={h.id} className={`hover:bg-gray-50/50 transition-colors ${!h.activo ? "opacity-50 bg-gray-50" : ""}`}>
                       <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{h.ficha_numero}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{h.instructor_nombre}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{h.competencia}</td>
@@ -395,7 +417,7 @@ export default function HorariosPage() {
                             <button
                               onClick={() => handleDesactivar(h)}
                               className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                              title={h.activo ? "Deshabilitar" : "Habilitar"}
+                              title={h.activo ? "Desactivar" : "Activar"}
                             >
                               <Power className="w-4 h-4" />
                             </button>
