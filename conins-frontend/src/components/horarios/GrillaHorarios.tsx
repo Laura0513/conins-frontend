@@ -1,5 +1,4 @@
-import { useState, useMemo } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useMemo } from "react"
 import { formatJornada } from "@/lib/terminology"
 
 type Horario = {
@@ -75,9 +74,6 @@ type GrillaHorariosProps = {
 }
 
 export default function GrillaHorarios({ horarios }: GrillaHorariosProps) {
-  const [semanaOffset, setSemanaOffset] = useState(0)
-  const lunes = getLunes(semanaOffset)
-
   // Build grid: dia → hora → Horario[] (multiple per slot)
   const { grilla, ocupados } = useMemo(() => {
     const map: Record<string, Record<string, Horario[]>> = {}
@@ -113,26 +109,9 @@ export default function GrillaHorarios({ horarios }: GrillaHorariosProps) {
 
   return (
     <div className="space-y-4">
-      {/* Navegación semanal */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-3 flex items-center justify-between">
-        <button
-          onClick={() => setSemanaOffset((o) => o - 1)}
-          className="p-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <div className="text-center">
-          <p className="text-sm font-semibold text-gray-900">
-            {semanaOffset === 0 ? "Semana actual" : semanaOffset > 0 ? `+${semanaOffset} semana${semanaOffset > 1 ? "s" : ""}` : `${semanaOffset} semana${semanaOffset < -1 ? "s" : ""}`}
-          </p>
-          <p className="text-xs text-gray-500">{formatFechaSemana(lunes)}</p>
-        </div>
-        <button
-          onClick={() => setSemanaOffset((o) => o + 1)}
-          className="p-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition-colors"
-        >
-          <ChevronRight className="w-4 h-4" />
-        </button>
+      {/* Etiqueta de programación semanal */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-3 flex items-center justify-center">
+        <p className="text-sm font-semibold text-gray-900">Programación semanal</p>
       </div>
 
       {/* Grilla */}
