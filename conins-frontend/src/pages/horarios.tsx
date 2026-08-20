@@ -348,7 +348,7 @@ export default function HorariosPage() {
                     <th className="px-3 py-3 md:px-6 md:py-4">Competencia</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Ambiente</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Jornada</th>
-                    <th className="px-3 py-3 md:px-6 md:py-4">Tipo actividad</th>
+                    {/* <th className="px-3 py-3 md:px-6 md:py-4">Tipo actividad</th> */}
                     <th className="px-3 py-3 md:px-6 md:py-4">Días</th>
                     <th className="px-3 py-3 md:px-6 md:py-4">Horas</th>
                     <th className="px-3 py-3 md:px-6 md:py-4 text-center">Estado</th>
@@ -369,9 +369,9 @@ export default function HorariosPage() {
                           {formatJornada(h.jornada)}
                         </span>
                       </td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
+                      {/* <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
                         {h.tipo_actividad || <span className="text-gray-300">—</span>}
-                      </td>
+                      </td> */}
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <div className="flex flex-wrap gap-1">
                           {h.dias.map((d) => (

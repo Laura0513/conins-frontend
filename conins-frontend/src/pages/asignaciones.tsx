@@ -80,13 +80,37 @@ export default function AsignacionesPage() {
   const porPagina = 10
   const [filtroPrograma, setFiltroPrograma] = useState("todos")
   const [filtroCoordinacion, setFiltroCoordinacion] = useState("todos")
+  const [programas, setProgramas] = useState<{ id: number; nombre: string; tipo_linea: string }[]>([])
+  const [competenciaPrograma, setCompetenciaPrograma] = useState<Record<number, number>>({})
 
   const rol = user?.roles?.[0]?.trim() || ""
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
 
   useEffect(() => {
     cargarAsignaciones()
+    cargarProgramasYCompetencias()
   }, [])
+
+  const cargarProgramasYCompetencias = async () => {
+    try {
+      const [progRes, compRes] = await Promise.allSettled([
+        api.programs.getAll(),
+        api.competencias.getAll(),
+      ])
+      if (progRes.status === "fulfilled") {
+        setProgramas(progRes.value.data || [])
+      }
+      if (compRes.status === "fulfilled") {
+        const map: Record<number, number> = {}
+        for (const c of (compRes.value.data || [])) {
+          map[c.id] = c.programa_id
+        }
+        setCompetenciaPrograma(map)
+      }
+    } catch (err) {
+      console.warn("Error cargando programas/competencias:", err)
+    }
+  }
 
   const cargarAsignaciones = async () => {
     setLoading(true)
@@ -113,8 +137,10 @@ export default function AsignacionesPage() {
       asig.ficha_numero.toLowerCase().includes(texto) ||
       asig.competencia.toLowerCase().includes(texto)
     
-    const coincidePrograma = filtroPrograma === "todos" || asig.competencia === filtroPrograma
-    const coincideCoordinacion = filtroCoordinacion === "todos"
+    const progId = competenciaPrograma[asig.competencia_id]
+    const prog = programas.find(p => p.id === progId)
+    const coincidePrograma = filtroPrograma === "todos" || String(progId) === filtroPrograma
+    const coincideCoordinacion = filtroCoordinacion === "todos" || prog?.tipo_linea === filtroCoordinacion
     
     return coincideTab && coincideBusqueda && coincidePrograma && coincideCoordinacion
   })
@@ -361,9 +387,9 @@ export default function AsignacionesPage() {
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
               >
                 <option value="todos">Programa: Todos</option>
-                <option value="ADSO">ADSO</option>
-                <option value="Contabilidad">Contabilidad</option>
-                <option value="Logística">Logística</option>
+                {programas.map(p => (
+                  <option key={p.id} value={String(p.id)}>{p.nombre}</option>
+                ))}
               </select>
 
               <select
@@ -372,7 +398,7 @@ export default function AsignacionesPage() {
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
               >
                 <option value="todos">Coordinación: Todas</option>
-                <option value="tecnica">Técnica</option>
+                <option value="medular">Medular</option>
                 <option value="transversal">Transversal</option>
               </select>
             </div>
