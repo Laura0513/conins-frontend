@@ -233,8 +233,8 @@ export const api = {
     },
 
     horarios: {
-        getAll() {
-            return apiFetch('/horarios')
+        getAll(semana?: string) {
+            return apiFetch(`/horarios${semana ? `?semana=${semana}` : ''}`)
         },
         getById(id: number) {
             return apiFetch(`/horarios/${id}`)

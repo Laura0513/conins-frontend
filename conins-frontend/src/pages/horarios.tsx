@@ -84,6 +84,9 @@ export default function HorariosPage() {
   const [filtroEstado, setFiltroEstado] = useState<string[]>([])
   const [vistaGrilla, setVistaGrilla] = useState(false)
   const [mostrarInactivos, setMostrarInactivos] = useState(false)
+  const [semanaGrilla, setSemanaGrilla] = useState<string | undefined>(undefined)
+  const [horariosGrilla, setHorariosGrilla] = useState<Horario[]>([])
+  const [loadingGrilla, setLoadingGrilla] = useState(false)
 
   const rol = user?.roles?.[0]?.trim() || ""
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
@@ -103,6 +106,30 @@ export default function HorariosPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Fetch horarios por semana para la grilla
+  const cargarHorariosGrilla = async (semana?: string) => {
+    setLoadingGrilla(true)
+    try {
+      const res = await api.horarios.getAll(semana)
+      setHorariosGrilla(res.data || [])
+    } catch (err) {
+      console.warn("Error cargando horarios grilla:", err)
+      setHorariosGrilla([])
+    } finally {
+      setLoadingGrilla(false)
+    }
+  }
+
+  useEffect(() => {
+    if (vistaGrilla) {
+      cargarHorariosGrilla(semanaGrilla)
+    }
+  }, [vistaGrilla, semanaGrilla])
+
+  const handleSemanaChange = (semana: string | undefined) => {
+    setSemanaGrilla(semana)
   }
 
   const inactivosCount = horarios.filter((h) => !h.activo).length
@@ -331,7 +358,7 @@ export default function HorariosPage() {
         )}
 
         {vistaGrilla ? (
-          <GrillaHorarios horarios={listaFiltrada} />
+          <GrillaHorarios horarios={horariosGrilla} onSemanaChange={handleSemanaChange} loading={loadingGrilla} />
         ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
