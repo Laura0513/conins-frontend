@@ -1,5 +1,6 @@
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
+import { formatJornada } from "@/lib/terminology"
 
 // ─── Paleta alineada con la UI (Tailwind + globals.css) ───
 const SENA: [number, number, number] = [57, 169, 0]          // #39A900 — color principal
@@ -135,7 +136,7 @@ export function exportarHorariosPDF(horarios: Horario[], titulo: string = "Malla
       h.instructor_nombre,
       h.competencia,
       h.ambiente || "—",
-      h.jornada,
+      formatJornada(h.jornada),
       h.tipo_actividad || "—",
       h.dias.join(", "),
       h.horas,
@@ -262,13 +263,14 @@ type OcupacionAmbiente = {
 
 export function exportarOcupacionPDF(data: OcupacionAmbiente[]) {
   const doc = new jsPDF()
-  const prom = data.length ? Math.round(data.reduce((s, o) => s + (o.porcentaje ?? 0), 0) / data.length) : 0
-  addHeader(doc, "Ocupación de Ambientes", `${data.length} ambientes · Ocupación promedio: ${prom}%`)
+  const ocupados = data.filter((o) => (o.porcentaje ?? 0) > 0)
+  const prom = ocupados.length ? Math.round(ocupados.reduce((s, o) => s + (o.porcentaje ?? 0), 0) / ocupados.length) : 0
+  addHeader(doc, "Ocupación de Ambientes", `${data.length} ambientes · ${ocupados.length} en uso · Ocupación promedio: ${prom}%`)
 
   autoTable(doc, {
     startY: 46,
     head: [["Ambiente", "Tipo", "Capacidad", "Horas", "Ocupación"]],
-    body: data.map((o) => [o.ambiente_nombre || "—", o.tipo || "—", o.capacidad != null ? String(o.capacidad) : "—", `${o.horas_ocupadas ?? 0}h / ${o.horas_totales ?? 0}h`, `${o.porcentaje ?? 0}%`]),
+    body: data.map((o) => [o.ambiente_nombre || "—", o.tipo || "—", o.capacidad != null ? String(o.capacidad) : "—", `${Math.round(Number(o.horas_ocupadas) || 0)}h / ${Math.round(Number(o.horas_totales) || 0)}h`, `${Math.round(Number(o.porcentaje) || 0)}%`]),
     ...tableDefaults,
     columnStyles: {
       0: { cellWidth: 45 },
@@ -359,7 +361,7 @@ export function exportarGruposPDF(data: GrupoExport[]) {
     body: data.map((g) => [
       g.numero_ficha,
       g.programa,
-      g.jornada,
+      formatJornada(g.jornada),
       g.etapa?.charAt(0).toUpperCase() + g.etapa?.slice(1) || "—",
       String(g.instructores_count),
       g.activo ? "Activo" : "Inactivo",
@@ -455,7 +457,7 @@ export function exportarAsignacionesPDF(data: AsignacionExport[], tipo: string =
       a.ficha_numero,
       a.competencia,
       a.ambiente || "—",
-      a.jornada || "—",
+      formatJornada(a.jornada || "—"),
       a.es_lider ? "Sí" : "No",
     ]),
     ...tableDefaults,
@@ -573,7 +575,7 @@ export function exportarInstructorIndividualPDF(
       body: asignaciones.map((a) => [
         a.ficha_numero,
         a.competencia,
-        a.jornada || "—",
+        formatJornada(a.jornada || "—"),
         a.ambiente || "—",
         a.es_lider ? "Sí" : "No",
       ]),
@@ -667,7 +669,7 @@ export function exportarFichaIndividualPDF(
   let y = addInfoSection(doc, [
     { label: "No. Grupo", value: ficha.numero_ficha },
     { label: "Programa", value: ficha.programa },
-    { label: "Jornada", value: ficha.jornada },
+    { label: "Jornada", value: formatJornada(ficha.jornada) },
     { label: "Etapa", value: ficha.etapa?.charAt(0).toUpperCase() + ficha.etapa?.slice(1) || "—" },
     { label: "Modalidad", value: ficha.modalidad || "—" },
     { label: "Estado", value: ficha.activo ? "Activo" : "Inactivo" },
@@ -839,7 +841,7 @@ export function exportarHorarioIndividualPDF(horario: HorarioIndividualData) {
     { label: "Competencia", value: horario.competencia },
     { label: "RAP", value: horario.rap_codigo ? `${horario.rap_codigo} — ${horario.rap_descripcion || ""}` : "—" },
     { label: "Ambiente", value: horario.ambiente || "—" },
-    { label: "Jornada", value: horario.jornada },
+    { label: "Jornada", value: formatJornada(horario.jornada) },
     { label: "Tipo actividad", value: horario.tipo_actividad || "—" },
     { label: "Días", value: horario.dias.join(", ") },
     { label: "Horas", value: horario.horas },
