@@ -305,7 +305,18 @@ export default function AsignacionesPage() {
   const handleEditAsignacion = async (data: any) => {
     if (!selectedAsignacion) return
     try {
-      await api.assignments.update(selectedAsignacion.id, data)
+      const { raps, ...asignacionData } = data
+      await api.assignments.update(selectedAsignacion.id, asignacionData)
+
+      // Guardar RAPs si se proporcionaron
+      if (raps && raps.competencia_id) {
+        try {
+          await api.assignments.setRaps(selectedAsignacion.id, raps.competencia_id, raps.rap_ids || [])
+        } catch (rapErr: any) {
+          showToast(rapErr.message || "Error al actualizar RAPs", "error")
+        }
+      }
+
       showToast("Asignación actualizada exitosamente", "success")
       setIsEditModalOpen(false)
       cargarAsignaciones()
