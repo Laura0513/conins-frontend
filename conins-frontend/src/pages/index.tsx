@@ -150,7 +150,7 @@ export default function Home() {
 
   const rol = user?.roles?.[0]?.trim() || "admin"
   const esAdmin = rol !== "Instructor"
-  const puedeCrear = ["Coordinadora Academica", "Asistente Coordinacion"].includes(rol)
+  const puedeCrear = ["Administrador", "Coordinadora Academica", "Asistente Coordinacion"].includes(rol)
 
   useEffect(() => {
     if (!loading && !user) {

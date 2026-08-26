@@ -157,16 +157,23 @@ export default function AsignacionesPage() {
       const asignacionId = res.data?.id
 
       // Guardar RAPs seleccionados por competencia
+      let rapError = false
       if (asignacionId && rapsSeleccionados) {
         for (const [competenciaId, rapIds] of Object.entries(rapsSeleccionados)) {
           if ((rapIds as number[]).length > 0) {
             try {
               await api.assignments.setRaps(asignacionId, Number(competenciaId), rapIds as number[])
             } catch (rapErr: any) {
+              rapError = true
               showToast(rapErr.message || "Error al asignar RAPs", "error")
             }
           }
         }
+      }
+
+      if (rapError) {
+        cargarAsignaciones()
+        return // No cerrar modal — el usuario debe corregir los RAPs
       }
 
       // Crear horario si se proporcionó
@@ -309,13 +316,17 @@ export default function AsignacionesPage() {
       await api.assignments.update(selectedAsignacion.id, asignacionData)
 
       // Guardar RAPs si se proporcionaron
+      let rapError = false
       if (raps && raps.competencia_id) {
         try {
           await api.assignments.setRaps(selectedAsignacion.id, raps.competencia_id, raps.rap_ids || [])
         } catch (rapErr: any) {
+          rapError = true
           showToast(rapErr.message || "Error al actualizar RAPs", "error")
         }
       }
+
+      if (rapError) return // No cerrar modal — el usuario debe corregir
 
       showToast("Asignación actualizada exitosamente", "success")
       setIsEditModalOpen(false)

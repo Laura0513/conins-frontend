@@ -14,12 +14,6 @@ export const crearPasswordSchema = z.object({
   path: ['confirmar_password'],
 });
 
-export const registerSchema = z.object({
-  email: z.string().email('Email invalido').max(100),
-  password: z.string().min(6, 'Minimo 6 caracteres'),
-  tipo_area: z.enum(['tecnica', 'transversal']).optional(),
-});
-
 export const changePasswordSchema = z.object({
   contrasena_actual: z.string().min(1, 'Requerido'),
   nueva_contrasena: z.string().min(6, 'Minimo 6 caracteres'),

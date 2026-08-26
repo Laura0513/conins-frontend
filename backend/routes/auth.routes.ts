@@ -4,7 +4,6 @@ import { validate } from '../middleware/validate.js';
 import {
   loginSchema,
   crearPasswordSchema,
-  registerSchema,
   changePasswordSchema,
   updateUserSchema,
   recuperarContrasenaSchema,
@@ -17,8 +16,10 @@ const router = Router();
 
 // Public endpoints
 router.post('/login', validate(loginSchema), authController.login);
+// Onboarding (RN-01, paso 2): setear contrasena a un usuario preexistente activo.
+// Camino unico. El antiguo /register (equivalente y sin uso en el frontend) fue
+// retirado en la auditoria 25/08 para evitar dos rutas publicas redundantes.
 router.post('/crear-password', validate(crearPasswordSchema), authController.crearPassword);
-router.post('/register', validate(registerSchema), authController.register);
 
 router.post('/recuperar-contrasena', validate(recuperarContrasenaSchema), authController.recuperarContrasena);
 router.post('/resetear-contrasena', validate(resetearContrasenaSchema), authController.resetearContrasena);

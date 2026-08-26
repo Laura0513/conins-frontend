@@ -11,6 +11,9 @@ import CrearHorarioModal from "@/components/horarios/CrearHorarioModal"
 import CrearBloqueHorarioModal from "@/components/horarios/CrearBloqueHorarioModal"
 import EditarHorarioModal from "@/components/horarios/EditarHorarioModal"
 import GrillaHorarios from "@/components/horarios/GrillaHorarios"
+import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
+import DetailFichaModal from "@/components/fichas/DetailFichaModal"
+import VerAgendaAmbienteModal from "@/components/ambientes/VerAgendaAmbienteModal"
 import ConfirmDialog from "@/components/ui/ConfirmDialog"
 import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
@@ -46,6 +49,8 @@ type Horario = {
   horas: string
   estado: string
   activo: boolean
+  instructor_id?: number | null
+  ficha_id?: number | null
   asignacion_id?: number | null
   competencia_id?: number | null
   ambiente_id?: number | null
@@ -66,6 +71,14 @@ export default function HorariosPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedHorario, setSelectedHorario] = useState<Horario | null>(null)
 
+  // Accesos directos — modales de detalle
+  const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false)
+  const [selectedInstructor, setSelectedInstructor] = useState<{ id: number; nombre: string; email: string; tipo_area: string; activo: boolean; roles: string } | null>(null)
+  const [isFichaModalOpen, setIsFichaModalOpen] = useState(false)
+  const [selectedFicha, setSelectedFicha] = useState<any>(null)
+  const [isAmbienteModalOpen, setIsAmbienteModalOpen] = useState(false)
+  const [selectedAmbiente, setSelectedAmbiente] = useState<any>(null)
+
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
     title: string
@@ -82,7 +95,7 @@ export default function HorariosPage() {
   const [filtroInstructor, setFiltroInstructor] = useState<string[]>([])
   const [filtroJornada, setFiltroJornada] = useState<string[]>([])
   const [filtroEstado, setFiltroEstado] = useState<string[]>([])
-  const [vistaGrilla, setVistaGrilla] = useState(false)
+  const [vistaGrilla, setVistaGrilla] = useState(true)
   const [mostrarInactivos, setMostrarInactivos] = useState(false)
   const [semanaGrilla, setSemanaGrilla] = useState<string | undefined>(undefined)
   const [horariosGrilla, setHorariosGrilla] = useState<Horario[]>([])
@@ -154,6 +167,59 @@ export default function HorariosPage() {
   const listaPaginada = listaFiltrada.slice((paginaActual - 1) * porPagina, paginaActual * porPagina)
 
   useEffect(() => { setPaginaActual(1) }, [search, filtroFicha, filtroInstructor, filtroJornada, filtroEstado])
+
+  // ─── Accesos directos ───
+  const openInstructorDetail = async (h: Horario) => {
+    if (h.instructor_id) {
+      try {
+        const res = await api.instructors.getById(h.instructor_id)
+        setSelectedInstructor(res.data)
+        setIsInstructorModalOpen(true)
+        return
+      } catch {}
+    }
+    // Fallback: buscar por nombre
+    try {
+      const res = await api.instructors.getAll()
+      const inst = (res.data || []).find((i: any) => i.nombre === h.instructor_nombre)
+      if (inst) {
+        setSelectedInstructor(inst)
+        setIsInstructorModalOpen(true)
+      }
+    } catch {}
+  }
+
+  const openFichaDetail = async (h: Horario) => {
+    if (h.ficha_id) {
+      try {
+        const res = await api.fichas.getById(h.ficha_id)
+        setSelectedFicha(res.data)
+        setIsFichaModalOpen(true)
+        return
+      } catch {}
+    }
+    // Fallback: buscar por número de ficha
+    try {
+      const res = await api.fichas.getAll()
+      const ficha = (res.data || []).find((f: any) => String(f.numero_ficha) === String(h.ficha_numero))
+      if (ficha) {
+        setSelectedFicha(ficha)
+        setIsFichaModalOpen(true)
+      }
+    } catch {}
+  }
+
+  const openAmbienteDetail = async (h: Horario) => {
+    if (!h.ambiente) return
+    try {
+      const res = await api.ambientes.getAll()
+      const amb = (res.data || []).find((a: any) => a.nombre === h.ambiente)
+      if (amb) {
+        setSelectedAmbiente(amb)
+        setIsAmbienteModalOpen(true)
+      }
+    } catch {}
+  }
 
   const handleCreate = async (data: any) => {
     try {
@@ -385,10 +451,24 @@ export default function HorariosPage() {
                 <tbody className="divide-y divide-gray-100">
                   {listaPaginada.map((h) => (
                     <tr key={h.id} className={`hover:bg-gray-50/50 transition-colors ${!h.activo ? "opacity-50 bg-gray-50" : ""}`}>
-                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">{h.ficha_numero}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">{h.instructor_nombre}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">
+                        <button onClick={() => openFichaDetail(h)} className="hover:text-sena hover:underline transition-colors text-left">
+                          {h.ficha_numero}
+                        </button>
+                      </td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">
+                        <button onClick={() => openInstructorDetail(h)} className="hover:text-sena hover:underline transition-colors text-left">
+                          {h.instructor_nombre}
+                        </button>
+                      </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{h.competencia}</td>
-                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{h.ambiente}</td>
+                      <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
+                        {h.ambiente ? (
+                          <button onClick={() => openAmbienteDetail(h)} className="hover:text-sena hover:underline transition-colors text-left">
+                            {h.ambiente}
+                          </button>
+                        ) : <span className="text-gray-300">—</span>}
+                      </td>
                       <td className="px-3 py-3 md:px-6 md:py-4">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           formatJornada(h.jornada) === 'Mañana' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
@@ -524,6 +604,34 @@ export default function HorariosPage() {
           onCancel={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
         />
       )}
+
+      <DetailInstructorModal
+        isOpen={isInstructorModalOpen}
+        onClose={() => setIsInstructorModalOpen(false)}
+        instructor={selectedInstructor}
+        puedeEditar={puedeEditar}
+      />
+
+      <DetailFichaModal
+        isOpen={isFichaModalOpen}
+        onClose={() => setIsFichaModalOpen(false)}
+        ficha={selectedFicha}
+        onInstructorClick={async (instructorId, nombre) => {
+          try {
+            const res = await api.instructors.getById(instructorId)
+            setSelectedInstructor(res.data)
+          } catch {
+            setSelectedInstructor({ id: instructorId, nombre, email: "", tipo_area: "", activo: true, roles: "Instructor" })
+          }
+          setIsInstructorModalOpen(true)
+        }}
+      />
+
+      <VerAgendaAmbienteModal
+        isOpen={isAmbienteModalOpen}
+        onClose={() => setIsAmbienteModalOpen(false)}
+        ambiente={selectedAmbiente}
+      />
 
     </DashboardLayout>
   )

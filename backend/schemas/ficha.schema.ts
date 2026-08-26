@@ -16,6 +16,14 @@ export const crearFichaSchema = z.object({
   fecha_fin_ficha:         z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
 });
 
+// POST /:id/novedades (RF-47) — novedad del grupo
+export const crearNovedadFichaSchema = z.object({
+  tipo_novedad_id: z.number().int().positive(),
+  fecha_inicio:    z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
+  fecha_regreso:   z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
+  observacion:     z.string().max(500).optional(),
+});
+
 export const actualizarFichaSchema = z.object({
   numero_ficha: z.string().min(1).max(50).optional(),
   programa_id:  z.number().int().positive().optional(),

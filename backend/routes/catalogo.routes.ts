@@ -3,8 +3,12 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { CatalogoService } from '../services/catalogo.service.js';
 import * as catalogoController from '../controllers/catalogo.controller.js';
+import { verifyToken } from '../middleware/auth.js';
 
 const router = Router();
+
+// Catalogo requiere autenticacion como el resto de la API (antes era publico).
+router.use(verifyToken);
 
 router.get('/areas', asyncHandler(async (_req, res) => {
   const areas = await CatalogoService.getAreas();

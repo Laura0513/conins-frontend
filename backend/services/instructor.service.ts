@@ -3,6 +3,7 @@ import { CompetenciaModel } from '../models/competencia.model.js';
 import { UsuarioModel } from '../models/usuario.model.js';
 import { NotFoundError, ForbiddenError, ValidationError, ConflictError } from '../utils/errors.js';
 import pool from '../config/db.js';
+import { auditStore } from '../config/audit-context.js';
 import { getLunesSemanaActual } from '../utils/date.js';
 
 export const InstructorService = {
@@ -102,6 +103,11 @@ export const InstructorService = {
     try {
       await conn.beginTransaction();
 
+      // Atribucion de auditoria en la MISMA conexion de la transaccion (esta ruta
+      // usa getConnection y no pasa por el wrapper de pool.query).
+      const auditUid = auditStore.getStore()?.usuarioId ?? null;
+      await conn.query('SET @audit_usuario_id = ?', [auditUid]);
+
       const [userResult] = await conn.query(
         'INSERT INTO usuarios (nombre, email) VALUES (?, ?)',
         [nombre, email],
@@ -110,7 +116,7 @@ export const InstructorService = {
 
       await conn.query(
         'INSERT INTO usuario_roles (usuario_id, rol_id) VALUES (?, ?)',
-        [usuarioId, 5],
+        [usuarioId, 4], // ID 4 = Instructor (era 5 antes del cambio de roles 01/07/2026)
       );
 
       const [instResult] = await conn.query(
@@ -126,6 +132,25 @@ export const InstructorService = {
     } finally {
       conn.release();
     }
+  },
+
+  // Idempotente por email. Usado por el importador (P39): si el usuario ya
+  // existe (p. ej. cargado por seed o import previo), reusa su instructor en
+  // vez de romper con ConflictError; si el usuario existe pero no tiene fila
+  // de instructor, la crea. Solo crea usuario nuevo cuando el email no existe.
+  async findOrCreateByEmail(nombre: string, email: string, tipoArea: string) {
+    const emailNorm = email.trim().toLowerCase();
+    const usuario = await UsuarioModel.findByEmail(emailNorm);
+    if (usuario) {
+      const inst = await InstructorModel.findByUsuarioId(usuario.id);
+      if (inst) return { id: inst.id, usuario_id: usuario.id, reused: true };
+      await InstructorModel.create(usuario.id, tipoArea);
+      const creado = await InstructorModel.findByUsuarioId(usuario.id);
+      if (!creado) throw new NotFoundError('No se pudo crear el instructor para el usuario existente');
+      return { id: creado.id, usuario_id: usuario.id, reused: true };
+    }
+    const nuevo = await this.create(nombre, emailNorm, tipoArea);
+    return { ...nuevo, reused: false };
   },
 
   async registrarNovedad(

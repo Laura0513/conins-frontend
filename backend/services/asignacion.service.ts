@@ -1,8 +1,8 @@
 import { AsignacionModel } from '../models/asignacion.model.js';
+import { AlertaService, TIPOS_ALERTA } from './alerta.service.js';
 import { AsignacionCompetenciaModel } from '../models/asignacion-competencia.model.js';
 import { InstructorModel } from '../models/instructor.model.js';
 import { FichaModel } from '../models/ficha.model.js';
-import { PermisoService } from '../services/permiso.service.js';
 import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from '../utils/errors.js';
 import { ROLES, RoleKey } from '../constants/roles.js';
 import pool from '../config/db.js';
@@ -34,7 +34,7 @@ export const AsignacionService = {
     motivo_provisional?: string | null;
     competencia_ids: number[];
     usuarioId?: number;
-  }) {
+  }, origin: 'import' | 'ui' = 'ui') {
     const instructor = await InstructorModel.findById(data.instructor_id);
     if (!instructor) throw new NotFoundError('Instructor no encontrado');
 
@@ -46,8 +46,11 @@ export const AsignacionService = {
     if (tieneNovedad) throw new ValidationError('El instructor tiene una novedad activa vigente (RN-08)');
 
     for (const competenciaId of data.competencia_ids) {
+      // RN-06: en accion interactiva (boton) se BLOQUEA; en carga masiva por
+      // Excel se deja pasar (permisivo) y el conflicto real se alerta a nivel de
+      // horario/RAP para su correccion.
       const hasRap = await AsignacionModel.hasRapEnFicha(data.ficha_id, competenciaId);
-      if (hasRap) {
+      if (hasRap && origin === 'ui') {
         throw new ConflictError('Un RAP de esta competencia ya esta asignado a otro instructor en la misma ficha (RN-06)');
       }
 
@@ -60,10 +63,6 @@ export const AsignacionService = {
       if ((rows as any[]).length === 0) {
         throw new ValidationError(`El instructor no tiene habilitada esta competencia segun su contrato (RN-13)`);
       }
-    }
-
-    if (data.usuarioId) {
-      await PermisoService.validarAlcanceCoordinador(data.usuarioId, data.ficha_id);
     }
 
     // El UNIQUE(instructor_id, ficha_id) no distingue activo/inactivo. Si existe
@@ -83,6 +82,20 @@ export const AsignacionService = {
     }
 
     const id = await AsignacionModel.create(data);
+
+    // Alerta SOFT: asignacion provisional (instructor fuera de su area). Visible
+    // hasta que el admin la atienda.
+    if (data.es_provisional) {
+      await AlertaService.crear({
+        instructor_id: data.instructor_id,
+        tipo: TIPOS_ALERTA.ASIGNACION_PROVISIONAL,
+        ficha_id: data.ficha_id,
+        mensaje: data.motivo_provisional
+          ? `Asignacion provisional: ${data.motivo_provisional}`
+          : 'Asignacion provisional (instructor fuera de su area tecnica).',
+      });
+    }
+
     return AsignacionModel.findById(id);
   },
 
@@ -135,8 +148,6 @@ export const AsignacionService = {
     competencia_ids: number[];
     usuarioId: number;
   }) {
-    await PermisoService.validarNoLiderParaProvisional(data.usuarioId);
-
     return AsignacionService.create({
       ...data,
       es_provisional: true,

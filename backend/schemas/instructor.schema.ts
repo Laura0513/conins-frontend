@@ -25,3 +25,15 @@ export const registrarNovedadSchema = z.object({
 export const actualizarCompetenciasSchema = z.object({
   competencia_ids: z.array(z.number().int().positive()),
 });
+
+// POST /:id/competencias — habilitar una competencia
+export const addCompetenciaSchema = z.object({
+  competencia_id: z.number().int().positive(),
+});
+
+// POST /:id/baja — registrar baja del instructor (24/07)
+export const bajaInstructorSchema = z.object({
+  fecha_salida:  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
+  motivo:        z.string().max(500).optional(),
+  fecha_ingreso: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD').optional(),
+});

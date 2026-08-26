@@ -5,17 +5,18 @@ import { AmbienteModel } from '../models/ambiente.model.js';
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors.js';
 import { getLunesSemanaActual } from '../utils/date.js';
 import { ROLES, RoleKey } from '../constants/roles.js';
+import { AlertaService, TIPOS_ALERTA } from './alerta.service.js';
 import pool from '../config/db.js';
 
 export const HorarioService = {
-  async getAll(userId?: number, roles?: RoleKey[]) {
+  async getAll(userId?: number, roles?: RoleKey[], semana?: string) {
     // P22: instructor solo ve sus propios horarios
     if (userId && roles && roles.length === 1 && roles[0] === ROLES.INSTRUCTOR) {
       const instructor = await InstructorModel.findByUsuarioId(userId);
       if (!instructor) return [];
-      return HorarioModel.findAllByInstructorId(instructor.id);
+      return HorarioModel.findAllByInstructorId(instructor.id, semana);
     }
-    return HorarioModel.findAll();
+    return HorarioModel.findAll(semana);
   },
 
   async getById(id: number) {
@@ -36,7 +37,7 @@ export const HorarioService = {
     tipo_actividad_id?: number | null;
     jornada_id: number;
     semana?: string;
-  }) {
+  }, origin: 'import' | 'ui' = 'ui') {
     const instructor = await InstructorModel.findById(data.instructor_id);
     if (!instructor) throw new NotFoundError('Instructor no encontrado');
 
@@ -72,19 +73,41 @@ export const HorarioService = {
       throw new ConflictError('El instructor tiene un horario superpuesto en ese dia y hora (RN-04)');
     }
 
+    // Conflictos que en ACCION INTERACTIVA (boton del sistema) se BLOQUEAN, pero
+    // en carga masiva por Excel solo generan ALERTA (permisivo para no rechazar
+    // el archivo real): RN-05 (ambiente ocupado), RN-06 (RAP compartido), carga >40h.
+    const conflictos: { tipo: string; mensaje: string }[] = [];
+
     let ambienteOcupado = false;
     if (data.ambiente_id) {
+      const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(data.ambiente_id, semana);
+      if (tieneBloqueo) {
+        throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+      }
       ambienteOcupado = await HorarioModel.hasAmbienteOcupado(
         data.ambiente_id,
         data.dia_semana,
         data.jornada_id,
         semana,
       );
-
-      const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(data.ambiente_id, semana);
-      if (tieneBloqueo) {
-        throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+      if (ambienteOcupado) {
+        conflictos.push({ tipo: TIPOS_ALERTA.AMBIENTE_OCUPADO, mensaje: 'Ambiente ocupado en la misma jornada (RN-05).' });
       }
+    }
+
+    let rapCompartido = false;
+    if (data.rap_id) {
+      rapCompartido = await HorarioModel.rapAsignadoAOtroEnFicha(data.ficha_id, data.rap_id, data.instructor_id);
+      if (rapCompartido) {
+        conflictos.push({ tipo: TIPOS_ALERTA.RAP_COMPARTIDO, mensaje: `RN-06: el RAP ${data.rap_id} ya esta a cargo de otro instructor en este grupo. Reasignelo a uno solo.` });
+      }
+    }
+
+    const horasActuales = await HorarioModel.getHorasPorInstructor(data.instructor_id, semana);
+    const nuevasHoras = ((new Date(`2000-01-01T${data.hora_fin}`).getTime() - new Date(`2000-01-01T${data.hora_inicio}`).getTime()) / (1000 * 60 * 60));
+    const totalHoras = horasActuales + nuevasHoras;
+    if (totalHoras > 40) {
+      conflictos.push({ tipo: TIPOS_ALERTA.HORAS_EXCEDIDAS, mensaje: `El instructor excede el limite de 40 horas semanales (total ${totalHoras}h).` });
     }
 
     let alertaJornadaRestringida = false;
@@ -94,16 +117,30 @@ export const HorarioService = {
       alertaJornadaRestringida = true;
     }
 
-    const horasActuales = await HorarioModel.getHorasPorInstructor(data.instructor_id, semana);
-    const nuevasHoras = ((new Date(`2000-01-01T${data.hora_fin}`).getTime() - new Date(`2000-01-01T${data.hora_inicio}`).getTime()) / (1000 * 60 * 60));
-    const totalHoras = horasActuales + nuevasHoras;
-
-    if (totalHoras > 40) {
-      throw new ValidationError(`El instructor excede el limite de 40 horas semanales (actual: ${horasActuales}h, nuevas: ${nuevasHoras}h)`);
+    // Boton del sistema: se bloquea hasta corregir. La carga por Excel no.
+    if (origin === 'ui' && conflictos.length > 0) {
+      throw new ConflictError(conflictos.map((c) => c.mensaje).join(' '));
     }
 
     const id = await HorarioModel.create({ ...data, semana });
     const horario = await HorarioModel.findById(id);
+
+    // Persistir alertas (llega aca en carga masiva, o en UI sin conflictos).
+    for (const c of conflictos) {
+      if (c.tipo === TIPOS_ALERTA.RAP_COMPARTIDO && data.rap_id) {
+        await AlertaService.rapCompartido(data.instructor_id, data.ficha_id, data.rap_id, c.mensaje);
+      } else {
+        await AlertaService.crear({ instructor_id: data.instructor_id, tipo: c.tipo, mensaje: c.mensaje, semana, total_horas: totalHoras });
+      }
+    }
+    if (alertaJornadaRestringida) {
+      await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.JORNADA_RESTRINGIDA, semana, total_horas: totalHoras,
+        mensaje: `Instructor de planta en jornada nocturna o fin de semana (semana ${semana}).` });
+    }
+    if (totalHoras < 20) {
+      await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.HORAS_INSUFICIENTES, semana, total_horas: totalHoras,
+        mensaje: `Carga por debajo del minimo de 20h: ${totalHoras}h en la semana ${semana}.` });
+    }
 
     return {
       ...horario,
@@ -178,16 +215,29 @@ export const HorarioService = {
       }
     }
 
-    // RN-05: ambiente ocupado (soft alert) — revalida si cambia ambiente o dia
-    let alertaAmbienteOcupado = false;
+    // RN-05 (edicion interactiva = boton): BLOQUEA si el ambiente (aula/lab) queda
+    // ocupado en esa jornada. Los talleres no cuentan (ver hasAmbienteOcupado).
     if (finalAmbienteId && (data.ambiente_id !== undefined || data.dia_semana !== undefined)) {
-      alertaAmbienteOcupado = await HorarioModel.hasAmbienteOcupado(
+      const ocupado = await HorarioModel.hasAmbienteOcupado(
         finalAmbienteId,
         finalDia,
         existing.jornada_id,
         semana,
         id,
       );
+      if (ocupado) {
+        throw new ConflictError('El ambiente ya esta ocupado en esa jornada (RN-05). Elija otro ambiente u horario.');
+      }
+    }
+
+    // RN-06 (edicion interactiva): BLOQUEA si el RAP quedaria a cargo de otro
+    // instructor en el mismo grupo. La correccion (reasignar) si se permite.
+    const finalRapId = data.rap_id !== undefined ? data.rap_id : existing.rap_id;
+    if (finalRapId) {
+      const compartido = await HorarioModel.rapAsignadoAOtroEnFicha(existing.ficha_id, finalRapId, existing.instructor_id);
+      if (compartido) {
+        throw new ConflictError(`RN-06: el RAP ${finalRapId} ya esta a cargo de otro instructor en este grupo. Reasignelo a uno solo.`);
+      }
     }
 
     // RN-03: jornada restringida (soft alert) — revalida si cambia dia
@@ -205,14 +255,16 @@ export const HorarioService = {
 
     return {
       ...updated,
-      alerta_ambiente_ocupado: alertaAmbienteOcupado,
+      alerta_ambiente_ocupado: false, // si estuviera ocupado, se habria bloqueado arriba
       alerta_jornada_restringida: alertaJornadaRestringida,
     };
   },
 
   async toggleActivo(id: number, motivo?: string) {
-    const horario = await HorarioModel.findById(id);
-    if (!horario) throw new NotFoundError('Horario no encontrado');
+    // existsById (no findById): findById filtra activos por su JOIN, y aqui
+    // necesitamos poder REACTIVAR un horario inactivo (Laura 05/08).
+    const existe = await HorarioModel.existsById(id);
+    if (!existe) throw new NotFoundError('Horario no encontrado');
 
     const nuevoEstado = await HorarioModel.toggleActivo(id, motivo);
     return { activo: nuevoEstado };
@@ -289,6 +341,11 @@ export const HorarioService = {
         const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(ambienteId, base.semana);
         if (tieneBloqueo) {
           throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+        }
+        // RN-05 (edicion interactiva): bloquea si el aula/lab ya esta ocupado ese dia.
+        const ocupado = await HorarioModel.hasAmbienteOcupado(ambienteId, dia, data.jornada_id, base.semana);
+        if (ocupado) {
+          throw new ConflictError(`El ambiente ya esta ocupado en esa jornada el dia ${dia} (RN-05). Elija otro ambiente u horario.`);
         }
       }
 

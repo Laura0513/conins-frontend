@@ -18,8 +18,21 @@ export const asignarCompetenciaSchema = z.object({
 export const registrarProvisionalSchema = z.object({
   instructor_id: z.number().int().positive(),
   ficha_id: z.number().int().positive(),
-  autorizado_por_id: z.number().int().positive(),
+  // autorizado_por_id lo inyecta el backend desde req.user — opcional en el body
+  autorizado_por_id: z.number().int().positive().optional(),
   fecha_autorizacion: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato YYYY-MM-DD'),
   motivo_provisional: z.string().min(10).max(500),
   competencia_ids: z.array(z.number().int().positive()).min(1),
+});
+
+export const actualizarAsignacionSchema = z.object({
+  competencia_id: z.number().int().positive().optional(),
+  ambiente_excepcion_id: z.number().int().positive().nullable().optional(),
+  es_lider_ficha: z.boolean().optional(),
+  nuevo_instructor_id: z.number().int().positive().optional(),
+});
+
+// PUT /:id/competencia/:competenciaId/raps (RF-42)
+export const setRapsSchema = z.object({
+  rap_ids: z.array(z.number().int().positive()),
 });

@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { verifyToken, requireRole } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
 import * as programaController from '../controllers/programa.controller.js';
 import { ROLES_ADMIN } from '../constants/roles.js';
+import { setReferenteSchema } from '../schemas/programa.schema.js';
 
 const router = Router();
 
@@ -14,6 +16,7 @@ router.get('/:id', programaController.getById);
 router.patch(
   '/:id/referente',
   requireRole([...ROLES_ADMIN]),
+  validate(setReferenteSchema),
   programaController.setReferente,
 );
 

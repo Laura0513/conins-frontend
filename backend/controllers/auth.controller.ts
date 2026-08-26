@@ -15,12 +15,6 @@ export const crearPassword = asyncHandler(async (req: Request, res: Response) =>
   ApiResponse.success(res, null, 'Contrasena creada exitosamente');
 });
 
-export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password, tipo_area } = req.body;
-  const result = await AuthService.register(email, password, tipo_area);
-  ApiResponse.created(res, result, 'Cuenta activada exitosamente');
-});
-
 export const changePassword = asyncHandler(async (req: Request, res: Response) => {
   const { contrasena_actual, nueva_contrasena } = req.body;
   await AuthService.changePassword(req.user.id, contrasena_actual, nueva_contrasena);

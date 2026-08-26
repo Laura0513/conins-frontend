@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { securityHeaders, rateLimiterGlobal, authRateLimiter} from './middleware/security.js';
-import { auditLogger } from './middleware/audit.js';
+import { auditContext } from './middleware/audit.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { verifyToken } from './middleware/auth.js';
 
@@ -52,8 +52,9 @@ app.use('/api/importar', express.json({ limit: '15mb' }));
 
 app.use(express.json({ limit: '10kb' }));
 
-// Audit logger — tracks all API calls
-app.use(auditLogger);
+// Audit context — abre el contexto por-request para atribuir la auditoria.
+// verifyToken (por-router) completa el usuarioId cuando hay token valido.
+app.use(auditContext);
 
 // Auth routes with strict rate limiting
 app.use('/api/auth/login', authRateLimiter);
@@ -76,6 +77,11 @@ app.use('/api/importar', importarRoutes);
 app.use('/api/auditoria', auditoriaRoutes);
 app.use('/api/consultas', consultaRoutes);
 app.use('/api/rap-seguimiento', rapSeguimientoRoutes);
+
+// 404 — ruta no encontrada (JSON consistente, antes del error handler)
+app.use((_req, res) => {
+  res.status(404).json({ success: false, message: 'Recurso no encontrado' });
+});
 
 // Error handler — must be last
 app.use(errorHandler);

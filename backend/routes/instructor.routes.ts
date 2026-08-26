@@ -3,7 +3,7 @@ import { verifyToken, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import * as instructorController from '../controllers/instructor.controller.js';
 import { ROLES } from '../constants/roles.js';
-import { crearInstructorCompletoSchema, registrarNovedadSchema } from '../schemas/instructor.schema.js';
+import { crearInstructorCompletoSchema, registrarNovedadSchema, actualizarInstructorSchema, addCompetenciaSchema, bajaInstructorSchema } from '../schemas/instructor.schema.js';
 
 const router = Router();
 
@@ -22,16 +22,16 @@ router.get('/perfil', instructorController.getOwnProfile);
 
 // Histórico de instructores (ruta literal antes de /:id)
 router.get('/historico', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.getHistorico);
-router.post('/:id/baja', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.registrarBaja);
+router.post('/:id/baja', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), validate(bajaInstructorSchema), instructorController.registrarBaja);
 
 router.get('/:id', instructorController.getById);
 router.get('/:id/detalle', instructorController.getDetalle);
 
-router.patch('/:id', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.update);
+router.patch('/:id', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), validate(actualizarInstructorSchema), instructorController.update);
 
 router.get('/:id/competencias', instructorController.getCompetenciasHabilitadas);
 
-router.post('/:id/competencias', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.addCompetencia);
+router.post('/:id/competencias', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), validate(addCompetenciaSchema), instructorController.addCompetencia);
 
 router.delete('/:id/competencias/:competenciaId', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.removeCompetencia);
 

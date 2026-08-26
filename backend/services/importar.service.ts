@@ -5,6 +5,7 @@ import { ValidationError } from '../utils/errors.js';
 import { FichaService } from './ficha.service.js';
 import { AsignacionService } from './asignacion.service.js';
 import { HorarioService } from './horario.service.js';
+import { InstructorService } from './instructor.service.js';
 
 // ============================================================
 // P39 — Importador de datos via Excel (24/07 feedback lider, 31/07 Laura)
@@ -62,7 +63,7 @@ const resolver = {
   async instructor(email: unknown): Promise<number> {
     return unico(
       `SELECT i.id FROM instructores i JOIN usuarios u ON i.usuario_id = u.id
-       WHERE u.email = ? AND i.activo = TRUE LIMIT 1`,
+       WHERE LOWER(u.email) = LOWER(?) AND i.activo = TRUE LIMIT 1`,
       [String(email ?? '').trim()], 'Instructor', email);
   },
   async ambiente(nombre: unknown): Promise<number | null> {
@@ -75,7 +76,7 @@ const resolver = {
   },
   async usuarioEmail(email: unknown): Promise<number | null> {
     if (!email) return null;
-    const [rows] = await pool.query<RowDataPacket[]>('SELECT id FROM usuarios WHERE email = ? LIMIT 1', [String(email).trim()]);
+    const [rows] = await pool.query<RowDataPacket[]>('SELECT id FROM usuarios WHERE LOWER(email) = LOWER(?) LIMIT 1', [String(email).trim()]);
     return rows.length ? (rows[0] as any).id : null;
   },
   async tipoActividad(nombre: unknown): Promise<number | null> {
@@ -86,6 +87,30 @@ const resolver = {
 };
 
 // --- procesadores por hoja ---
+async function procesarInstructor(row: any): Promise<void> {
+  const nombre = String(row['nombre'] ?? '').trim();
+  const email = String(row['email'] ?? '').trim();
+  const tipoArea = norm(row['tipo_area']);
+  if (!nombre || !email) throw new ValidationError('nombre y email son obligatorios');
+  if (tipoArea !== 'tecnica' && tipoArea !== 'transversal') {
+    throw new ValidationError(`tipo_area invalido: "${row['tipo_area']}" (usa tecnica o transversal)`);
+  }
+
+  // Idempotente: si el instructor ya existe (seed o import previo) se reusa,
+  // y de todos modos se aplican las habilitadas. Antes lanzaba ConflictError
+  // y omitia las habilitadas, dejando al instructor sin competencias y
+  // bloqueando sus asignaciones por RN-13.
+  const inst = await InstructorService.findOrCreateByEmail(nombre, email, tipoArea);
+
+  // Competencias habilitadas (opcional) — evita bloqueos RN-13 al asignar.
+  // addCompetencia es INSERT IGNORE, asi que reimportar no duplica.
+  const cods = String(row['codigos_competencia'] ?? '').split(/[,;]/).map((s) => s.trim()).filter(Boolean);
+  for (const cod of cods) {
+    const compId = await resolver.competencia(cod);
+    await InstructorService.addCompetencia(inst.id, compId);
+  }
+}
+
 async function procesarGrupo(row: any): Promise<void> {
   await FichaService.create({
     numero_ficha: String(row['numero_grupo'] ?? row['numero_ficha'] ?? '').trim(),
@@ -108,13 +133,25 @@ async function procesarAsignacion(row: any): Promise<void> {
   }
   if (competencia_ids.length === 0) throw new ValidationError('Se requiere al menos un codigo_competencia');
 
+  const instructor_id = await resolver.instructor(row['instructor_email']);
+
+  // La asignacion importada es fuente autoritativa (viene del reporte oficial de
+  // coordinacion). Garantizamos que el instructor quede habilitado para esas
+  // competencias antes de crear la asignacion, para que RN-13 no bloquee la
+  // carga masiva cuando la hoja Instructores no listo la competencia. Solo
+  // aplica en el importador; el flujo de UI sigue exigiendo habilitacion previa.
+  // addCompetencia es INSERT IGNORE: no duplica en reimports.
+  for (const compId of competencia_ids) {
+    await InstructorService.addCompetencia(instructor_id, compId);
+  }
+
   await AsignacionService.create({
-    instructor_id: await resolver.instructor(row['instructor_email']),
+    instructor_id,
     ficha_id: await resolver.ficha(row['numero_grupo'] ?? row['numero_ficha']),
     jornada_id: row['jornada'] ? await resolver.jornada(row['jornada']) : null,
     es_lider_ficha: norm(row['es_lider']) === 'si' || norm(row['es_lider']) === 'true',
     competencia_ids,
-  });
+  }, 'import'); // carga masiva: permisivo (alerta), no bloquea RN-06/05/carga
 }
 
 async function procesarHorario(row: any): Promise<void> {
@@ -130,10 +167,11 @@ async function procesarHorario(row: any): Promise<void> {
     tipo_actividad_id: await resolver.tipoActividad(row['tipo_actividad']),
     jornada_id: await resolver.jornada(row['jornada']),
     semana: row['semana'] ? toFecha(row['semana']) : undefined,
-  });
+  }, 'import'); // carga masiva: permisivo (alerta), no bloquea RN-06/05/carga
 }
 
 const HOJAS: { nombre: string; fn: (row: any) => Promise<void> }[] = [
+  { nombre: 'Instructores', fn: procesarInstructor },
   { nombre: 'Grupos', fn: procesarGrupo },
   { nombre: 'Asignaciones', fn: procesarAsignacion },
   { nombre: 'Horarios', fn: procesarHorario },
@@ -182,7 +220,7 @@ export const ImportarService = {
     }
 
     if (resumen.length === 0) {
-      throw new ValidationError('El archivo no contiene ninguna hoja valida (Grupos, Asignaciones u Horarios)');
+      throw new ValidationError('El archivo no contiene ninguna hoja valida (Instructores, Grupos, Asignaciones u Horarios)');
     }
 
     return { resumen };

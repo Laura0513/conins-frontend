@@ -43,7 +43,7 @@ const DIAS_MAP: Record<number, string> = {
 };
 
 export const HorarioModel = {
-  async findAll(): Promise<HorarioDetail[]> {
+  async findAll(semana?: string): Promise<HorarioDetail[]> {
     const [rows] = await pool.query<HorarioDetail[]>(`
       SELECT MIN(h.id) AS id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
              c.nombre AS competencia,
@@ -68,10 +68,11 @@ export const HorarioModel = {
       LEFT JOIN ambientes ab ON h.ambiente_id = ab.id
       JOIN jornadas j ON h.jornada_id = j.id
       LEFT JOIN tipos_actividad ta ON h.tipo_actividad_id = ta.id
+      ${semana ? 'WHERE h.semana = ?' : ''}
       GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.ambiente_id, h.jornada_id,
                h.tipo_actividad_id, h.hora_inicio, h.hora_fin, h.estado, h.motivo_rechazo, h.activo
       ORDER BY MIN(h.id)
-    `);
+    `, semana ? [semana] : []);
 
     return rows.map((row) => ({
       ...row,
@@ -81,7 +82,7 @@ export const HorarioModel = {
     })) as unknown as HorarioDetail[];
   },
 
-  async findAllByInstructorId(instructorId: number): Promise<HorarioDetail[]> {
+  async findAllByInstructorId(instructorId: number, semana?: string): Promise<HorarioDetail[]> {
     const [rows] = await pool.query<HorarioDetail[]>(`
       SELECT MIN(h.id) AS id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
              c.nombre AS competencia,
@@ -106,11 +107,11 @@ export const HorarioModel = {
       LEFT JOIN ambientes ab ON h.ambiente_id = ab.id
       JOIN jornadas j ON h.jornada_id = j.id
       LEFT JOIN tipos_actividad ta ON h.tipo_actividad_id = ta.id
-      WHERE h.instructor_id = ?
+      WHERE h.instructor_id = ? ${semana ? 'AND h.semana = ?' : ''}
       GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.ambiente_id, h.jornada_id,
                h.tipo_actividad_id, h.hora_inicio, h.hora_fin, h.estado, h.motivo_rechazo, h.activo
       ORDER BY MIN(h.id)
-    `, [instructorId]);
+    `, semana ? [instructorId, semana] : [instructorId]);
 
     return rows.map((row) => ({
       ...row,
@@ -217,6 +218,17 @@ export const HorarioModel = {
   },
 
   // RN-27: el RAP debe pertenecer a una competencia del programa del grupo.
+  // RN-06 (soft): ¿el RAP ya lo dicta OTRO instructor en el mismo grupo?
+  async rapAsignadoAOtroEnFicha(fichaId: number, rapId: number, instructorId: number): Promise<boolean> {
+    const [rows] = await pool.query(
+      `SELECT 1 FROM horarios
+       WHERE ficha_id = ? AND rap_id = ? AND instructor_id != ? AND activo = TRUE
+       LIMIT 1`,
+      [fichaId, rapId, instructorId],
+    );
+    return (rows as any[]).length > 0;
+  },
+
   async rapPerteneceAlProgramaDeFicha(rapId: number, fichaId: number): Promise<boolean> {
     const [rows] = await pool.query(
       `SELECT 1
@@ -227,6 +239,13 @@ export const HorarioModel = {
        LIMIT 1`,
       [rapId, fichaId],
     );
+    return (rows as any[]).length > 0;
+  },
+
+  // Existencia por ID SIN filtrar por activo (findById solo trae activos por su
+  // JOIN h2.activo = TRUE, por eso no sirve para reactivar un horario inactivo).
+  async existsById(id: number): Promise<boolean> {
+    const [rows] = await pool.query('SELECT 1 FROM horarios WHERE id = ? LIMIT 1', [id]);
     return (rows as any[]).length > 0;
   },
 
@@ -306,10 +325,14 @@ export const HorarioModel = {
     semana: string,
     excludeId?: number,
   ): Promise<boolean> {
+    // RN-05: los TALLERES pueden albergar varios grupos a la vez, asi que no se
+    // consideran "ocupados". Solo aulas y laboratorios generan conflicto.
     const query = `
-      SELECT 1 FROM horarios
-      WHERE ambiente_id = ? AND dia_semana = ? AND jornada_id = ? AND semana = ? AND activo = TRUE
-      ${excludeId ? 'AND id != ?' : ''}
+      SELECT 1 FROM horarios h
+      JOIN ambientes a ON h.ambiente_id = a.id
+      WHERE h.ambiente_id = ? AND h.dia_semana = ? AND h.jornada_id = ? AND h.semana = ? AND h.activo = TRUE
+        AND a.tipo <> 'taller'
+      ${excludeId ? 'AND h.id != ?' : ''}
       LIMIT 1
     `;
     const params = excludeId

@@ -383,11 +383,21 @@ export const api = {
     },
 
     alertas: {
-        getAll() {
-            return apiFetch('/alertas')
+        getAll(soloNoAtendidas = false) {
+            return apiFetch(`/alertas${soloNoAtendidas ? '?solo_no_atendidas=true' : ''}`)
         },
         marcarAtendida(id: number) {
             return apiFetch(`/alertas/${id}/atendida`, {
+                method: 'PATCH',
+            })
+        },
+        marcarLeida(id: number) {
+            return apiFetch(`/alertas/${id}/leida`, {
+                method: 'PATCH',
+            })
+        },
+        marcarTodas() {
+            return apiFetch('/alertas/marcar-todas', {
                 method: 'PATCH',
             })
         },

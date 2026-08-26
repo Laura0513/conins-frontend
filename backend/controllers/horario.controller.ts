@@ -6,7 +6,10 @@ import { NotificacionService } from '../services/notificacion.service.js';
 import { InstructorModel } from '../models/instructor.model.js';
 
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
-  const horarios = await HorarioService.getAll(req.user?.id, req.user?.roles_globales);
+  // ?semana=YYYY-MM-DD (lunes) para proyectar una semana especifica.
+  // Sin el parametro: comportamiento actual (agregado de todas las semanas).
+  const semana = (req.query.semana as string) || undefined;
+  const horarios = await HorarioService.getAll(req.user?.id, req.user?.roles_globales, semana);
   ApiResponse.success(res, horarios);
 });
 

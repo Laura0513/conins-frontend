@@ -68,6 +68,22 @@ export const AsignacionRapModel = {
     return rows.length > 0;
   },
 
+  // RN-26: ¿el RAP tiene alguna asignacion activa a un instructor?
+  // Se usa para impedir deshabilitar un RAP que esta en uso.
+  async isRapAsignadoActivo(rapId: number): Promise<boolean> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT 1
+       FROM asignacion_rap ar
+       JOIN asignacion_competencia ac ON ar.asignacion_competencia_id = ac.id
+       JOIN asignacion a ON ac.asignacion_id = a.id
+       WHERE ar.rap_id = ?
+         AND ar.activo = TRUE AND ac.activo = TRUE AND a.activo = TRUE
+       LIMIT 1`,
+      [rapId],
+    );
+    return rows.length > 0;
+  },
+
   // Devuelve el ficha_id de un asignacion_competencia.
   async getFichaIdByAc(acId: number): Promise<number | null> {
     const [rows] = await pool.query<RowDataPacket[]>(
@@ -78,6 +94,30 @@ export const AsignacionRapModel = {
       [acId],
     );
     return rows.length ? (rows[0] as any).ficha_id : null;
+  },
+
+  // Cuantos instructores distintos tienen ese RAP activo en el grupo (RN-06).
+  async countInstructoresConRap(fichaId: number, rapId: number): Promise<number> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT COUNT(DISTINCT a.instructor_id) AS n
+       FROM asignacion_rap ar
+       JOIN asignacion_competencia ac ON ar.asignacion_competencia_id = ac.id
+       JOIN asignacion a ON ac.asignacion_id = a.id
+       WHERE a.ficha_id = ? AND ar.rap_id = ? AND ar.activo = TRUE AND a.activo = TRUE`,
+      [fichaId, rapId],
+    );
+    return Number((rows[0] as any)?.n ?? 0);
+  },
+
+  async getInstructorIdByAc(acId: number): Promise<number | null> {
+    const [rows] = await pool.query<RowDataPacket[]>(
+      `SELECT a.instructor_id
+       FROM asignacion_competencia ac
+       JOIN asignacion a ON ac.asignacion_id = a.id
+       WHERE ac.id = ? LIMIT 1`,
+      [acId],
+    );
+    return rows.length ? (rows[0] as any).instructor_id : null;
   },
 
   async competenciaIdByAc(acId: number): Promise<number | null> {

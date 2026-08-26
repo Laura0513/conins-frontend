@@ -3,7 +3,7 @@ import { verifyToken, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import * as asignacionController from '../controllers/asignacion.controller.js';
 import { ROLES } from '../constants/roles.js';
-import { crearAsignacionSchema } from '../schemas/asignacion.schema.js';
+import { crearAsignacionSchema, actualizarAsignacionSchema, registrarProvisionalSchema, setRapsSchema } from '../schemas/asignacion.schema.js';
 
 const router = Router();
 
@@ -18,6 +18,7 @@ router.get('/:id/competencia/:competenciaId/raps', asignacionController.getRapsD
 router.put(
   '/:id/competencia/:competenciaId/raps',
   requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
+  validate(setRapsSchema),
   asignacionController.setRapsDeCompetencia,
 );
 
@@ -33,6 +34,7 @@ router.post(
 router.patch(
   '/:id',
   requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
+  validate(actualizarAsignacionSchema),
   asignacionController.update,
 );
 
@@ -45,6 +47,7 @@ router.patch(
 router.post(
   '/provisional',
   requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
+  validate(registrarProvisionalSchema),
   asignacionController.registrarProvisional,
 );
 

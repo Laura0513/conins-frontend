@@ -42,7 +42,7 @@ export default function ImportarPage() {
   const [dragOver, setDragOver] = useState(false)
 
   const rol = user?.roles?.[0]?.trim() || ""
-  const esAdmin = ["Coordinadora Academica", "Asistente Coordinacion"].includes(rol)
+  const esAdmin = ["Administrador", "Coordinadora Academica", "Asistente Coordinacion"].includes(rol)
 
   const handleFileSelect = (file: File) => {
     if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {

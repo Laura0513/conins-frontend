@@ -3,7 +3,7 @@ import { verifyToken, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import * as fichaController from '../controllers/ficha.controller.js';
 import { ROLES } from '../constants/roles.js';
-import { crearFichaSchema, actualizarFichaSchema } from '../schemas/ficha.schema.js';
+import { crearFichaSchema, actualizarFichaSchema, crearNovedadFichaSchema } from '../schemas/ficha.schema.js';
 
 const router = Router();
 
@@ -30,6 +30,7 @@ router.post(
 router.post(
   '/:id/novedades',
   requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
+  validate(crearNovedadFichaSchema),
   fichaController.crearNovedad,
 );
 

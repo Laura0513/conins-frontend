@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
-import { NotFoundError, ValidationError } from '../utils/errors.js';
+import { NotFoundError, ValidationError, ConflictError } from '../utils/errors.js';
 import pool from '../config/db.js';
+import { AsignacionRapModel } from '../models/asignacion-rap.model.js';
 
 // ============================================================
 // COMPETENCIAS — RF-25, RF-26 (RN-25)
@@ -208,6 +209,15 @@ export const toggleRapEstado = asyncHandler(async (req: Request, res: Response) 
   if ((existing as any[]).length === 0) throw new NotFoundError('RAP no encontrado en esta competencia');
 
   const nuevoEstado = !(existing as any[])[0].activo;
+
+  // RN-26: no se puede deshabilitar un RAP que tiene asignacion activa.
+  if (!nuevoEstado) {
+    const enUso = await AsignacionRapModel.isRapAsignadoActivo(rapId);
+    if (enUso) {
+      throw new ConflictError('No se puede deshabilitar un RAP con asignacion activa (RN-26)');
+    }
+  }
+
   await pool.query('UPDATE raps SET activo = ? WHERE id = ?', [nuevoEstado, rapId]);
 
   const message = nuevoEstado ? 'RAP activado' : 'RAP desactivado';

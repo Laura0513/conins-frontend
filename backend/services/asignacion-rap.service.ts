@@ -1,5 +1,6 @@
 import { AsignacionRapModel } from '../models/asignacion-rap.model.js';
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors.js';
+import { AlertaService } from './alerta.service.js';
 
 // ============================================================
 // RF-42 — Asignacion explicita de RAP al instructor.
@@ -49,14 +50,21 @@ export const AsignacionRapService = {
         throw new ValidationError(`El RAP ${rapId} no pertenece a la competencia indicada o esta inactivo`);
       }
 
-      // RN-06: el RAP no puede estar a cargo de otro instructor en el mismo grupo
+      // RN-06 en ACCION INTERACTIVA (boton del sistema): se BLOQUEA. Un RAP no
+      // puede quedar a cargo de dos instructores en el mismo grupo (al evaluarlo,
+      // los aprendices no pueden tener dos juicios distintos del mismo RAP). La
+      // carga masiva por Excel si es permisiva (alerta, no bloqueo); aqui, como es
+      // una edicion deliberada, se impide dejar/introducir el conflicto.
       const tomado = await AsignacionRapModel.rapTakenByOtherInFicha(fichaId, rapId, acId);
       if (tomado) {
-        throw new ConflictError(`El RAP ${rapId} ya esta asignado a otro instructor en este grupo (RN-06)`);
+        throw new ConflictError(`RN-06: el RAP ${rapId} ya esta a cargo de otro instructor en este grupo. Reasignelo a uno solo antes de continuar.`);
       }
     }
 
     await AsignacionRapModel.syncRaps(acId, unicos);
+
+    // Al editar, cierra las alertas de RAP compartido del grupo que ya se resolvieron.
+    await AlertaService.recomputarRapCompartido(fichaId);
     return AsignacionRapModel.getRapsByAc(acId);
   },
 };

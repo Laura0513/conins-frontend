@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { verifyToken, requireRole } from '../middleware/auth.js';
+import { verifyToken } from '../middleware/auth.js';
 import * as alertaController from '../controllers/alerta.controller.js';
-import { ROLES } from '../constants/roles.js';
 
 const router = Router();
 
@@ -9,20 +8,14 @@ router.use(verifyToken);
 
 router.get('/', alertaController.listar);
 
-router.patch(
-  '/:id/atendida',
-  requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]),
-  alertaController.marcarAtendida,
-);
+// La autorizacion de "atender" se resuelve dentro del controller: admins
+// (Subdirector/Coordinadora/Asistente/Administrador) sobre cualquier alerta;
+// el lider de programa sobre las alertas de sus programas (el es quien arma los
+// Excel y corrige). Por eso no se usa requireRole fijo aqui.
+router.patch('/:id/atendida', alertaController.marcarAtendida);
 
-router.patch(
-  '/:id/leida',
-  alertaController.marcarLeida,
-);
+router.patch('/:id/leida', alertaController.marcarLeida);
 
-router.patch(
-  '/marcar-todas',
-  alertaController.marcarTodasLeidas,
-);
+router.patch('/marcar-todas', alertaController.marcarTodasLeidas);
 
 export default router;
