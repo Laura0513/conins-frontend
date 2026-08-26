@@ -5360,3 +5360,274 @@ Error: Cuenta sin activar. Cree su contrasena primero.
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
     at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
 ---
+[2026-08-05T18:49:49.288Z] PayloadTooLargeError: request entity too large
+PayloadTooLargeError: request entity too large
+    at readStream (C:\Users\laura\Desktop\Conins\backend\node_modules\raw-body\index.js:163:17)
+    at getRawBody (C:\Users\laura\Desktop\Conins\backend\node_modules\raw-body\index.js:116:12)
+    at read (C:\Users\laura\Desktop\Conins\backend\node_modules\body-parser\lib\read.js:113:3)
+    at jsonParser (C:\Users\laura\Desktop\Conins\backend\node_modules\body-parser\lib\types\json.js:88:5)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:342:13)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at file:///C:/Users/laura/Desktop/Conins/backend/node_modules/express-rate-limit/dist/index.mjs:860:9
+---
+[2026-08-05T20:58:35.872Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-05T20:58:35.881Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-05T21:06:43.585Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-05T21:06:43.591Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-11T18:29:40.895Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-08-12T18:58:08.826Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-08-12T19:06:56.609Z] Error: Horario no encontrado
+Error: Horario no encontrado
+    at Object.suspender (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:316:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:101:18)
+---
+[2026-08-12T19:42:53.095Z] Error: Horario no encontrado
+Error: Horario no encontrado
+    at Object.toggleActivo (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:215:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:68:18)
+---
+[2026-08-12T20:52:24.316Z] Error: Horario no encontrado
+Error: Horario no encontrado
+    at Object.suspender (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:316:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:101:18)
+---
+[2026-08-12T20:52:28.900Z] Error: Horario no encontrado
+Error: Horario no encontrado
+    at Object.toggleActivo (C:\Users\laura\Desktop\Conins\backend\services\horario.service.ts:215:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\horario.controller.ts:68:18)
+---
+[2026-08-12T21:29:48.573Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-08-12T21:48:23.123Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-12T21:48:23.129Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-12T21:48:26.446Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-12T21:48:26.451Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-14T18:23:31.445Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-08-14T18:23:31.455Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-08-14T18:26:45.859Z] AggregateError: 
+AggregateError: 
+    at Object.findByEmail (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:32:31)
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:84:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:36)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:11:7)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-08-14T18:29:02.065Z] Error: connect ETIMEDOUT
+Error: connect ETIMEDOUT
+    at Object.findByEmail (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:32:31)
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:84:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:36)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:11:7)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-08-14T18:29:30.160Z] Error: connect ETIMEDOUT
+Error: connect ETIMEDOUT
+    at Object.findByEmail (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:32:31)
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:84:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:36)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:11:7)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-08-14T18:31:09.265Z] Error: connect ETIMEDOUT
+Error: connect ETIMEDOUT
+    at Object.findByEmail (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:32:31)
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:84:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:36)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:11:7)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-08-14T18:40:25.081Z] Error: connect ETIMEDOUT
+Error: connect ETIMEDOUT
+    at Object.findByEmail (C:\Users\laura\Desktop\Conins\backend\models\usuario.model.ts:32:31)
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:84:37)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:36)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\middleware\validate.ts:11:7)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+---
+[2026-08-14T19:29:31.477Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-08-19T18:19:54.656Z] Error: Token invalido o expirado
+Error: Token invalido o expirado
+    at verifyToken (C:\Users\laura\Desktop\Conins\backend\middleware\auth.ts:41:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+    at router.handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:186:3)
+---
+[2026-08-19T20:55:40.950Z] Error: Table 'conins.notificaciones' doesn't exist
+Error: Table 'conins.notificaciones' doesn't exist
+    at Object.getNoLeidasCount (C:\Users\laura\Desktop\Conins\backend\models\notificacion.model.ts:48:31)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\notificacion.controller.ts:14:41)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+---
+[2026-08-19T20:55:40.960Z] Error: Table 'conins.alertas' doesn't exist
+Error: Table 'conins.alertas' doesn't exist
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\alerta.controller.ts:35:29)
+    at <anonymous> (C:\Users\laura\Desktop\Conins\backend\utils\asyncHandler.ts:7:21)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\laura\Desktop\Conins\backend\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:295:15
+    at processParams (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\laura\Desktop\Conins\backend\node_modules\router\index.js:291:5)
+---
+[2026-08-21T18:51:59.127Z] Error: Cuenta sin activar. Cree su contrasena primero.
+Error: Cuenta sin activar. Cree su contrasena primero.
+    at Object.login (C:\Users\laura\Desktop\Conins\backend\services\auth.service.ts:95:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\auth.controller.ts:8:18)
+---
+[2026-08-26T18:27:05.325Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---
+[2026-08-26T18:27:05.334Z] Error: Instructor no encontrado
+Error: Instructor no encontrado
+    at Object.getCompetenciasHabilitadas (C:\Users\laura\Desktop\Conins\backend\services\instructor.service.ts:71:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async <anonymous> (C:\Users\laura\Desktop\Conins\backend\controllers\instructor.controller.ts:68:24)
+---

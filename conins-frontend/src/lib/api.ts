@@ -471,12 +471,6 @@ export const api = {
         getAll() {
             return apiFetch('/auth/usuarios')
         },
-        create(data: any) {
-            return apiFetch('/auth/register', {
-                method: 'POST',
-                body: JSON.stringify(data),
-            })
-        },
         update(id: number, data: any) {
             return apiFetch(`/auth/usuarios/${id}`, {
                 method: 'PUT',

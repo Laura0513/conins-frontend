@@ -4,7 +4,6 @@ import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
 import { useToast } from "@/lib/ToastContext"
 import { useProtectedRoute } from "@/lib/useProtectedRoute"
-import CrearUsuarioModal from "@/components/usuarios/CrearUsuarioModal"
 import EditarUsuarioModal from "@/components/usuarios/EditarUsuarioModal"
 import AsignarProgramasLiderModal from "@/components/usuarios/AsignarProgramasLiderModal"
 import { exportarUsuariosPDF } from "@/lib/exportPDF"
@@ -12,7 +11,6 @@ import { TableSkeleton, PageSkeleton } from "@/components/ui/Skeleton"
 import EmptyState from "@/components/ui/EmptyState"
 import {
   Search,
-  Plus,
   Pencil,
   Power,
   ChevronLeft,
@@ -40,7 +38,6 @@ export default function UsuariosPage() {
   const { showToast } = useToast()
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [loading, setLoading] = useState(true)
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isAsignarProgramasModalOpen, setIsAsignarProgramasModalOpen] = useState(false)
   const [selectedUsuario, setSelectedUsuario] = useState<Usuario | null>(null)
@@ -82,16 +79,6 @@ export default function UsuariosPage() {
 
   useEffect(() => { setPaginaActual(1) }, [search, filtroRol, filtroEstado])
 
-  const handleCreate = async (data: any) => {
-    try {
-      await api.users.create(data)
-      showToast("Usuario registrado exitosamente", "success")
-      setIsCreateModalOpen(false)
-      cargarUsuarios()
-    } catch (err: any) {
-      showToast(err.message || "Error al registrar usuario", "error")
-    }
-  }
 
   const handleToggleEstado = async (usuario: Usuario) => {
     try {
@@ -155,13 +142,7 @@ export default function UsuariosPage() {
               <FileDown className="w-4 h-4" />
               PDF
             </button>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Nuevo usuario
-            </button>
+            {/* Registro de usuarios deshabilitado — los usuarios se cargan por importación */}
           </div>
         </div>
 
@@ -321,11 +302,7 @@ export default function UsuariosPage() {
         </div>
       </div>
 
-      <CrearUsuarioModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreate}
-      />
+      {/* CrearUsuarioModal retirado — endpoint /auth/register eliminado del backend */}
 
       <EditarUsuarioModal
         isOpen={isEditModalOpen}
