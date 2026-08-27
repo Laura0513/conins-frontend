@@ -469,10 +469,16 @@ export const api = {
     },
 
     importar: {
-        cargar(archivo_base64: string) {
+        preview(archivo_base64: string, programa_codigo?: string) {
+            return apiFetch('/importar/preview', {
+                method: 'POST',
+                body: JSON.stringify({ archivo_base64, programa_codigo }),
+            })
+        },
+        cargar(archivo_base64: string, crear_ambientes?: string[]) {
             return apiFetch('/importar', {
                 method: 'POST',
-                body: JSON.stringify({ archivo_base64 }),
+                body: JSON.stringify({ archivo_base64, crear_ambientes }),
             })
         },
     },
