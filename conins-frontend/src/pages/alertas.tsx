@@ -286,16 +286,7 @@ export default function AlertasPage() {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-4 text-xs text-gray-400 mt-2">
-                        {alerta.tipo !== "RAP_COMPARTIDO" && (
-                          <><span>{alerta.instructor_nombre}</span><span>·</span></>
-                        )}
-                        {alerta.semana && (
-                          <><span>Semana del {new Date(alerta.semana).toLocaleDateString("es-CO", { day: "numeric", month: "short" })}</span><span>·</span></>
-                        )}
-                        {alerta.total_horas != null && (
-                          <><span>{alerta.total_horas}h</span><span>·</span></>
-                        )}
+                      <div className="text-xs text-gray-400 mt-2">
                         <span>{formatTimeAgo(alerta.created_at)}</span>
                       </div>
                     </div>

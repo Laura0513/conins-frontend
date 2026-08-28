@@ -401,6 +401,9 @@ export const api = {
                 method: 'PATCH',
             })
         },
+        getNoAtendidasCount() {
+            return apiFetch('/alertas/no-atendidas/count')
+        },
     },
 
     notificaciones: {
