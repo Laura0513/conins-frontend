@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Clock,
   Loader2,
+  Users,
 } from "lucide-react"
 
 type Alerta = {
@@ -46,6 +47,8 @@ function getAlertIcon(tipo: string) {
       return <AlertCircle className="w-5 h-5 text-blue-500" />
     case "INSTRUCTOR_PLANTA_JORNADA_NOCTURNA":
       return <AlertCircle className="w-5 h-5 text-purple-500" />
+    case "CO_DOCENCIA":
+      return <Users className="w-5 h-5 text-indigo-500" />
     default:
       return <Bell className="w-5 h-5 text-gray-400" />
   }
@@ -65,6 +68,8 @@ function getAlertBadge(tipo: string) {
       return "bg-purple-100 text-purple-800"
     case "RAP_COMPARTIDO":
       return "bg-red-100 text-red-800"
+    case "CO_DOCENCIA":
+      return "bg-indigo-100 text-indigo-800"
     default:
       return "bg-gray-100 text-gray-800"
   }
@@ -84,6 +89,8 @@ function getAlertLabel(tipo: string) {
       return "Jornada nocturna"
     case "RAP_COMPARTIDO":
       return "RAP compartido"
+    case "CO_DOCENCIA":
+      return "Co-docencia"
     default:
       return tipo
   }
@@ -240,6 +247,7 @@ export default function AlertasPage() {
               <option value="HORAS_INSUFICIENTES">Horas insuficientes</option>
               <option value="INSTRUCTOR_PLANTA_JORNADA_NOCTURNA">Jornada nocturna</option>
               <option value="RAP_COMPARTIDO">RAP compartido</option>
+              <option value="CO_DOCENCIA">Co-docencia</option>
             </select>
 
             <select
