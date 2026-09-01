@@ -5,6 +5,10 @@
   --color-sena: #39A900;
 }
 
+html {
+  font-size: 17px;
+}
+
 * {
   font-family: 'Inter Variable', sans-serif;
 }
