@@ -1,0 +1,95 @@
+import { Request, Response } from 'express';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { ApiResponse } from '../utils/response.js';
+import { AsignacionService } from '../services/asignacion.service.js';
+import { AsignacionRapService } from '../services/asignacion-rap.service.js';
+import { NotificacionService } from '../services/notificacion.service.js';
+import { InstructorModel } from '../models/instructor.model.js';
+
+export const getAll = asyncHandler(async (req: Request, res: Response) => {
+  const asignaciones = await AsignacionService.getAll(req.user?.id, req.user?.roles_globales);
+  ApiResponse.success(res, asignaciones);
+});
+
+export const getById = asyncHandler(async (req: Request, res: Response) => {
+  const asignacion = await AsignacionService.getById(Number(req.params.id));
+  ApiResponse.success(res, asignacion);
+});
+
+export const create = asyncHandler(async (req: Request, res: Response) => {
+  const asignacion = await AsignacionService.create({
+    ...req.body,
+    usuarioId: req.user.id,
+  });
+
+  const instructor = await InstructorModel.findById(req.body.instructor_id);
+  if (instructor && asignacion) {
+    await NotificacionService.onAsignacionCreada(asignacion, instructor);
+  }
+
+  ApiResponse.created(res, asignacion, 'Asignacion creada exitosamente');
+});
+
+export const update = asyncHandler(async (req: Request, res: Response) => {
+  const asignacion = await AsignacionService.update(Number(req.params.id), req.body);
+  ApiResponse.success(res, asignacion, 'Asignacion actualizada exitosamente');
+});
+
+export const desactivar = asyncHandler(async (req: Request, res: Response) => {
+  const result = await AsignacionService.desactivar(Number(req.params.id));
+  ApiResponse.success(res, result, 'Asignacion desactivada exitosamente');
+});
+
+export const registrarProvisional = asyncHandler(async (req: Request, res: Response) => {
+  const asignacion = await AsignacionService.registrarProvisional({
+    ...req.body,
+    autorizado_por_id: req.user.id,
+    usuarioId: req.user.id,
+  });
+
+  const instructor = await InstructorModel.findById(req.body.instructor_id);
+  if (instructor && asignacion) {
+    await NotificacionService.onAsignacionProvisional(
+      asignacion,
+      instructor,
+      req.user.nombre,
+    );
+  }
+
+  ApiResponse.created(res, asignacion, 'Asignacion provisional registrada exitosamente');
+});
+
+export const getHistoricas = asyncHandler(async (_req: Request, res: Response) => {
+  const historicas = await AsignacionService.getHistoricas();
+  ApiResponse.success(res, historicas);
+});
+
+// ============================================================
+// RF-42 — Asignacion explicita de RAP (modelo RAP directo)
+// ============================================================
+
+// GET /api/asignaciones/:id/raps — RAPs asignados agrupados por competencia
+export const getRapsByAsignacion = asyncHandler(async (req: Request, res: Response) => {
+  const raps = await AsignacionRapService.getRapsByAsignacion(Number(req.params.id));
+  ApiResponse.success(res, raps);
+});
+
+// GET /api/asignaciones/:id/competencia/:competenciaId/raps — RAPs de esa competencia
+export const getRapsDeCompetencia = asyncHandler(async (req: Request, res: Response) => {
+  const raps = await AsignacionRapService.getRaps(
+    Number(req.params.id),
+    Number(req.params.competenciaId),
+  );
+  ApiResponse.success(res, raps);
+});
+
+// PUT /api/asignaciones/:id/competencia/:competenciaId/raps — define los RAPs
+// Body: { rap_ids: number[] }
+export const setRapsDeCompetencia = asyncHandler(async (req: Request, res: Response) => {
+  const raps = await AsignacionRapService.setRaps(
+    Number(req.params.id),
+    Number(req.params.competenciaId),
+    req.body?.rap_ids ?? [],
+  );
+  ApiResponse.success(res, raps, 'RAPs del instructor actualizados');
+});

@@ -75,8 +75,47 @@ export default function AmbientesPage() {
   const cargarAmbientes = async () => {
     setLoading(true)
     try {
-      const res = await api.ambientes.getAll()
-      setAmbientes(res.data || [])
+      const [ambRes, horRes] = await Promise.all([
+        api.ambientes.getAll(),
+        api.horarios.getAll(),
+      ])
+      const ambientesRaw: Ambiente[] = ambRes.data || []
+      const horarios = horRes.data || []
+
+      // Determinar día actual (1=Lun..6=Sab)
+      const hoy = new Date()
+      const diaJS = hoy.getDay() // 0=Dom..6=Sab
+      const diasMap: Record<number, string> = { 1: "Lun", 2: "Mar", 3: "Mie", 4: "Jue", 5: "Vie", 6: "Sab" }
+      const diaHoy = diasMap[diaJS] || ""
+
+      // Hora actual para comparar
+      const horaActual = `${String(hoy.getHours()).padStart(2, "0")}:${String(hoy.getMinutes()).padStart(2, "0")}`
+
+      // Cruzar: para cada ambiente, buscar si hay un horario activo ahora
+      const ambientesConOcupante = ambientesRaw.map((amb) => {
+        if (!diaHoy) return amb
+        const horarioActual = horarios.find((h: any) => {
+          if (h.ambiente !== amb.nombre) return false
+          if (!h.dias?.includes(diaHoy) && !h.dias?.includes("Mié" /* alt */)) return false
+          // Comparar hora: h.horas es "06:00 - 12:00"
+          const partes = (h.horas || "").split(" - ")
+          if (partes.length !== 2) return false
+          return horaActual >= partes[0] && horaActual < partes[1]
+        })
+        if (horarioActual) {
+          return {
+            ...amb,
+            ocupante_actual: {
+              instructor: horarioActual.instructor_nombre,
+              ficha: horarioActual.ficha_numero,
+              competencia: horarioActual.competencia,
+            },
+          }
+        }
+        return amb
+      })
+
+      setAmbientes(ambientesConOcupante)
     } catch (err) {
       console.warn("Error cargando ambientes:", err)
       setAmbientes([])

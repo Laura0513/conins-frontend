@@ -94,6 +94,7 @@ export default function HorariosPage() {
   const [filtroFicha, setFiltroFicha] = useState<string[]>([])
   const [filtroInstructor, setFiltroInstructor] = useState<string[]>([])
   const [filtroJornada, setFiltroJornada] = useState<string[]>([])
+  const [filtroAmbiente, setFiltroAmbiente] = useState<string[]>([])
   const [filtroEstado, setFiltroEstado] = useState<string[]>([])
   const [vistaGrilla, setVistaGrilla] = useState(true)
   const [mostrarInactivos, setMostrarInactivos] = useState(false)
@@ -147,6 +148,23 @@ export default function HorariosPage() {
 
   const inactivosCount = horarios.filter((h) => !h.activo).length
 
+  // Filtro compartido entre tabla y grilla
+  const aplicarFiltros = (lista: Horario[]) => lista.filter((h) => {
+    if (!mostrarInactivos && !h.activo) return false
+    const texto = debouncedSearch.toLowerCase()
+    const coincideBusqueda =
+      h.ficha_numero.toLowerCase().includes(texto) ||
+      h.instructor_nombre.toLowerCase().includes(texto)
+    const coincideFicha = filtroFicha.length === 0 || filtroFicha.includes(h.ficha_numero)
+    const coincideInstructor = filtroInstructor.length === 0 || filtroInstructor.includes(h.instructor_nombre)
+    const coincideAmbiente = filtroAmbiente.length === 0 || filtroAmbiente.includes(h.ambiente || "")
+    const coincideJornada = filtroJornada.length === 0 || filtroJornada.includes(h.jornada)
+    const coincideEstado = filtroEstado.length === 0 || filtroEstado.includes(h.estado)
+    return coincideBusqueda && coincideFicha && coincideInstructor && coincideAmbiente && coincideJornada && coincideEstado
+  })
+
+  const horariosGrillaFiltrados = aplicarFiltros(horariosGrilla)
+
   const listaFiltrada = horarios.filter((h) => {
     if (!mostrarInactivos && !h.activo) return false
 
@@ -157,16 +175,17 @@ export default function HorariosPage() {
 
     const coincideFicha = filtroFicha.length === 0 || filtroFicha.includes(h.ficha_numero)
     const coincideInstructor = filtroInstructor.length === 0 || filtroInstructor.includes(h.instructor_nombre)
+    const coincideAmbiente = filtroAmbiente.length === 0 || filtroAmbiente.includes(h.ambiente || "")
     const coincideJornada = filtroJornada.length === 0 || filtroJornada.includes(h.jornada)
     const coincideEstado = filtroEstado.length === 0 || filtroEstado.includes(h.estado)
 
-    return coincideBusqueda && coincideFicha && coincideInstructor && coincideJornada && coincideEstado
+    return coincideBusqueda && coincideFicha && coincideInstructor && coincideAmbiente && coincideJornada && coincideEstado
   })
 
   const totalPaginas = Math.ceil(listaFiltrada.length / porPagina)
   const listaPaginada = listaFiltrada.slice((paginaActual - 1) * porPagina, paginaActual * porPagina)
 
-  useEffect(() => { setPaginaActual(1) }, [search, filtroFicha, filtroInstructor, filtroJornada, filtroEstado])
+  useEffect(() => { setPaginaActual(1) }, [search, filtroFicha, filtroInstructor, filtroAmbiente, filtroJornada, filtroEstado])
 
   // ─── Accesos directos ───
   const openInstructorDetail = async (h: Horario) => {
@@ -383,6 +402,13 @@ export default function HorariosPage() {
               onChange={setFiltroInstructor}
             />
             <MultiSelect
+              label="Ambiente"
+              allLabel="Todos"
+              options={[...new Set(horarios.map((h) => h.ambiente).filter(Boolean))].sort().map((a) => ({ value: a, label: a }))}
+              selected={filtroAmbiente}
+              onChange={setFiltroAmbiente}
+            />
+            <MultiSelect
               label="Jornada"
               allLabel="Todas"
               options={[
@@ -424,7 +450,7 @@ export default function HorariosPage() {
         )}
 
         {vistaGrilla ? (
-          <GrillaHorarios horarios={horariosGrilla} onSemanaChange={handleSemanaChange} loading={loadingGrilla} />
+          <GrillaHorarios horarios={horariosGrillaFiltrados} onSemanaChange={handleSemanaChange} loading={loadingGrilla} />
         ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
