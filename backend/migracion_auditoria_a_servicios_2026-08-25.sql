@@ -1,2 +1,0 @@
--- OBSOLETA (25/08): se decidio CONSERVAR los triggers de auditoria (mas robustos).
--- No ejecutar. Ver AUDITORIA_BACKEND_BD_25-08.md seccion 9.
