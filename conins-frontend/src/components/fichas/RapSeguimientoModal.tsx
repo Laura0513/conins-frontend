@@ -3,12 +3,12 @@ import { api } from "@/lib/api"
 import {
   X,
   Loader2,
-  Plus,
   CheckCircle,
   XCircle,
   Clock,
   ChevronDown,
   ChevronRight,
+  CheckCheck,
 } from "lucide-react"
 
 type RapSeguimiento = {
@@ -24,14 +24,6 @@ type RapSeguimiento = {
   estado_evaluacion: "pendiente_por_evaluar" | "evaluado"
   estado_aprobacion: "aprobado" | "no_aprobado" | null
   activo: boolean
-}
-
-type RapDisponible = {
-  asignacion_competencia_id: number
-  competencia: string
-  rap_id: number
-  rap_codigo: string
-  rap_nombre: string
 }
 
 type Props = {
@@ -68,11 +60,6 @@ function EstadoBadge({ seg }: { seg: RapSeguimiento }) {
   )
 }
 
-function formatDate(d: string | null) {
-  if (!d) return "—"
-  return new Date(d).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" })
-}
-
 export default function RapSeguimientoModal({
   isOpen,
   onClose,
@@ -82,16 +69,9 @@ export default function RapSeguimientoModal({
   onToast,
 }: Props) {
   const [seguimientos, setSeguimientos] = useState<RapSeguimiento[]>([])
-  const [disponibles, setDisponibles] = useState<RapDisponible[]>([])
   const [loading, setLoading] = useState(true)
   const [expandedComps, setExpandedComps] = useState<Set<string>>(new Set())
-  const [showCrear, setShowCrear] = useState(false)
-  const [crearForm, setCrearForm] = useState({
-    selectedIndex: -1,
-    fecha_inicio: "",
-    fecha_fin_programada: "",
-  })
-  const [submitting, setSubmitting] = useState(false)
+  const [aprobandoTodos, setAprobandoTodos] = useState<string | null>(null)
 
   useEffect(() => {
     if (isOpen && fichaId) {
@@ -103,21 +83,16 @@ export default function RapSeguimientoModal({
     if (!fichaId) return
     setLoading(true)
     try {
-      const [segRes, dispRes] = await Promise.all([
-        api.rapSeguimiento.getByFicha(fichaId),
-        puedeEditar ? api.rapSeguimiento.getDisponibles(fichaId) : Promise.resolve({ data: [] }),
-      ])
-      setSeguimientos(segRes.data || [])
-      setDisponibles(dispRes.data || [])
+      const res = await api.rapSeguimiento.getByFicha(fichaId)
+      setSeguimientos(res.data || [])
 
-      // Expandir todas las competencias por defecto
+      // Expandir todas las competencias
       const comps = new Set<string>()
-      ;(segRes.data || []).forEach((s: RapSeguimiento) => comps.add(s.competencia))
+      ;(res.data || []).forEach((s: RapSeguimiento) => comps.add(s.competencia))
       setExpandedComps(comps)
     } catch (err) {
       console.warn("Error cargando RAPs:", err)
       setSeguimientos([])
-      setDisponibles([])
     } finally {
       setLoading(false)
     }
@@ -142,33 +117,29 @@ export default function RapSeguimientoModal({
     }
   }
 
-  const handleCrear = async () => {
-    if (crearForm.selectedIndex < 0) return
-    const rap = disponibles[crearForm.selectedIndex]
-    if (!rap) return
+  const handleAprobarTodos = async (competencia: string) => {
+    const pendientes = seguimientos.filter(
+      (s) => s.competencia === competencia && s.estado_evaluacion === "pendiente_por_evaluar" && s.activo
+    )
+    if (pendientes.length === 0) return
 
-    setSubmitting(true)
+    setAprobandoTodos(competencia)
     try {
-      await api.rapSeguimiento.create({
-        asignacion_competencia_id: rap.asignacion_competencia_id,
-        rap_id: rap.rap_id,
-        fecha_inicio: crearForm.fecha_inicio || null,
-        fecha_fin_programada: crearForm.fecha_fin_programada || null,
-      })
-      onToast("Seguimiento RAP creado exitosamente", "success")
-      setShowCrear(false)
-      setCrearForm({ selectedIndex: -1, fecha_inicio: "", fecha_fin_programada: "" })
+      for (const seg of pendientes) {
+        await api.rapSeguimiento.evaluar(seg.id, "aprobado")
+      }
+      onToast(`${pendientes.length} RAPs aprobados en ${competencia}`, "success")
       cargarDatos()
     } catch (err: any) {
-      onToast(err.message || "Error al crear seguimiento", "error")
+      onToast(err.message || "Error al aprobar RAPs", "error")
     } finally {
-      setSubmitting(false)
+      setAprobandoTodos(null)
     }
   }
 
   if (!isOpen || !fichaId) return null
 
-  // Agrupar seguimientos por competencia
+  // Agrupar por competencia
   const porCompetencia: Record<string, RapSeguimiento[]> = {}
   seguimientos.forEach((s) => {
     if (!porCompetencia[s.competencia]) porCompetencia[s.competencia] = []
@@ -186,7 +157,7 @@ export default function RapSeguimientoModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Seguimiento RAPs</h2>
+            <h2 className="text-lg font-bold text-gray-900">Evaluación de RAPs</h2>
             <p className="text-sm text-gray-500">Grupo {fichaNumero}</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -233,38 +204,39 @@ export default function RapSeguimientoModal({
               <Loader2 className="w-8 h-8 animate-spin text-sena mb-2" />
               <p>Cargando RAPs...</p>
             </div>
-          ) : totalRaps === 0 && disponibles.length === 0 ? (
+          ) : totalRaps === 0 ? (
             <div className="py-12 text-center text-gray-500">
-              <p>No hay RAPs registrados ni disponibles para este grupo.</p>
-              <p className="text-xs mt-1">Primero debe haber asignaciones con competencias asociadas.</p>
+              <p>No hay RAPs registrados para este grupo.</p>
+              <p className="text-xs mt-1">Los seguimientos se crean automáticamente al asignar competencias.</p>
             </div>
           ) : (
-            <>
-              {/* Lista agrupada por competencia */}
-              {Object.entries(porCompetencia).map(([comp, raps]) => {
-                const isExpanded = expandedComps.has(comp)
-                const compAprobados = raps.filter((r) => r.estado_aprobacion === "aprobado").length
+            Object.entries(porCompetencia).map(([comp, raps]) => {
+              const isExpanded = expandedComps.has(comp)
+              const compAprobados = raps.filter((r) => r.estado_aprobacion === "aprobado").length
+              const compPendientes = raps.filter((r) => r.estado_evaluacion === "pendiente_por_evaluar" && r.activo).length
 
-                return (
-                  <div key={comp} className="border border-gray-200 rounded-xl overflow-hidden">
+              return (
+                <div key={comp} className="border border-gray-200 rounded-xl overflow-hidden">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
                     <button
                       onClick={() => toggleComp(comp)}
-                      className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                      className="flex items-center gap-3 flex-1 text-left"
                     >
-                      <div className="flex items-center gap-3">
-                        {isExpanded ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">{comp}</p>
-                          <p className="text-xs text-gray-500">
-                            {compAprobados}/{raps.length} RAPs aprobados
-                          </p>
-                        </div>
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      )}
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{comp}</p>
+                        <p className="text-xs text-gray-500">
+                          {compAprobados}/{raps.length} aprobados
+                        </p>
                       </div>
-                      {/* Mini barra de progreso */}
+                    </button>
+
+                    <div className="flex items-center gap-3">
+                      {/* Barra de progreso */}
                       <div className="flex items-center gap-2">
                         <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                           <div
@@ -276,187 +248,100 @@ export default function RapSeguimientoModal({
                           {raps.length > 0 ? Math.round((compAprobados / raps.length) * 100) : 0}%
                         </span>
                       </div>
-                    </button>
 
-                    {isExpanded && (
-                      <div className="divide-y divide-gray-100">
-                        {raps.map((seg) => (
-                          <div
-                            key={seg.id}
-                            className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                              !seg.activo ? "opacity-50" : ""
-                            }`}
-                          >
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-xs font-mono text-sena bg-sena/10 px-2 py-0.5 rounded">
-                                  {seg.rap_codigo}
-                                </span>
-                                <EstadoBadge seg={seg} />
-                              </div>
-                              <p className="text-sm text-gray-700 mt-1 line-clamp-2">{seg.rap_nombre}</p>
-                              <div className="flex gap-4 mt-1.5 text-xs text-gray-400">
-                                <span>Inicio: {formatDate(seg.fecha_inicio)}</span>
-                                <span>Fin prog.: {formatDate(seg.fecha_fin_programada)}</span>
-                              </div>
-                              {seg.instructor_nombre && (
-                                <p className="text-xs text-gray-400 mt-0.5">
-                                  Instructor: {seg.instructor_nombre}
-                                </p>
-                              )}
+                      {/* Aprobar todos */}
+                      {puedeEditar && compPendientes > 0 && (
+                        <button
+                          onClick={() => handleAprobarTodos(comp)}
+                          disabled={aprobandoTodos === comp}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-sena bg-sena/10 hover:bg-sena/20 rounded-lg transition-colors disabled:opacity-50"
+                          title={`Aprobar ${compPendientes} RAPs pendientes`}
+                        >
+                          {aprobandoTodos === comp ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <CheckCheck className="w-3.5 h-3.5" />
+                          )}
+                          Aprobar todos ({compPendientes})
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {isExpanded && (
+                    <div className="divide-y divide-gray-100">
+                      {raps.map((seg) => (
+                        <div
+                          key={seg.id}
+                          className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                            !seg.activo ? "opacity-50" : ""
+                          }`}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs font-mono text-sena bg-sena/10 px-2 py-0.5 rounded">
+                                {seg.rap_codigo}
+                              </span>
+                              <EstadoBadge seg={seg} />
                             </div>
+                            <p className="text-sm text-gray-700 mt-1 line-clamp-2">{seg.rap_nombre}</p>
+                            {seg.instructor_nombre && (
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                Instructor: {seg.instructor_nombre}
+                              </p>
+                            )}
+                          </div>
 
-                            {/* Acciones de evaluación */}
-                            {puedeEditar && seg.activo && seg.estado_evaluacion === "pendiente_por_evaluar" && (
-                              <div className="flex items-center gap-2 shrink-0">
+                          {/* Acciones de evaluación */}
+                          {puedeEditar && seg.activo && seg.estado_evaluacion === "pendiente_por_evaluar" && (
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                onClick={() => handleEvaluar(seg.id, "aprobado")}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+                              >
+                                <CheckCircle className="w-3.5 h-3.5" />
+                                Aprobar
+                              </button>
+                              <button
+                                onClick={() => handleEvaluar(seg.id, "no_aprobado")}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
+                                No aprobar
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Re-evaluar */}
+                          {puedeEditar && seg.activo && seg.estado_evaluacion === "evaluado" && (
+                            <div className="flex items-center gap-2 shrink-0">
+                              {seg.estado_aprobacion === "no_aprobado" && (
                                 <button
                                   onClick={() => handleEvaluar(seg.id, "aprobado")}
                                   className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
-                                  title="Aprobar RAP"
                                 >
                                   <CheckCircle className="w-3.5 h-3.5" />
                                   Aprobar
                                 </button>
+                              )}
+                              {seg.estado_aprobacion === "aprobado" && (
                                 <button
                                   onClick={() => handleEvaluar(seg.id, "no_aprobado")}
                                   className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
-                                  title="No aprobar RAP"
                                 >
                                   <XCircle className="w-3.5 h-3.5" />
-                                  No aprobar
+                                  Revertir
                                 </button>
-                              </div>
-                            )}
-
-                            {/* Re-evaluar si ya fue evaluado */}
-                            {puedeEditar && seg.activo && seg.estado_evaluacion === "evaluado" && (
-                              <div className="flex items-center gap-2 shrink-0">
-                                {seg.estado_aprobacion === "no_aprobado" && (
-                                  <button
-                                    onClick={() => handleEvaluar(seg.id, "aprobado")}
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
-                                  >
-                                    <CheckCircle className="w-3.5 h-3.5" />
-                                    Aprobar
-                                  </button>
-                                )}
-                                {seg.estado_aprobacion === "aprobado" && (
-                                  <button
-                                    onClick={() => handleEvaluar(seg.id, "no_aprobado")}
-                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
-                                  >
-                                    <XCircle className="w-3.5 h-3.5" />
-                                    Revertir
-                                  </button>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-
-              {/* Empty state cuando hay disponibles pero no seguimientos */}
-              {totalRaps === 0 && disponibles.length > 0 && (
-                <div className="py-8 text-center text-gray-500">
-                  <p>No hay seguimientos registrados aun.</p>
-                  <p className="text-xs mt-1">
-                    Hay {disponibles.length} RAP(s) disponibles para registrar.
-                  </p>
-                </div>
-              )}
-
-              {/* Formulario crear seguimiento */}
-              {puedeEditar && disponibles.length > 0 && (
-                <div className="border border-gray-200 rounded-xl overflow-hidden">
-                  <button
-                    onClick={() => setShowCrear(!showCrear)}
-                    className="w-full flex items-center gap-2 p-4 bg-sena/5 hover:bg-sena/10 transition-colors text-left"
-                  >
-                    <Plus className="w-4 h-4 text-sena" />
-                    <span className="text-sm font-medium text-sena">
-                      Registrar seguimiento RAP ({disponibles.length} disponibles)
-                    </span>
-                  </button>
-
-                  {showCrear && (
-                    <div className="p-4 space-y-4 border-t border-gray-100">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
-                          RAP a registrar
-                        </label>
-                        <select
-                          value={crearForm.selectedIndex}
-                          onChange={(e) =>
-                            setCrearForm({ ...crearForm, selectedIndex: Number(e.target.value) })
-                          }
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena bg-white"
-                        >
-                          <option value={-1}>Seleccione un RAP...</option>
-                          {disponibles.map((d, i) => (
-                            <option key={`${d.asignacion_competencia_id}-${d.rap_id}`} value={i}>
-                              [{d.rap_codigo}] {d.rap_nombre} — {d.competencia}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Fecha inicio (opcional)
-                          </label>
-                          <input
-                            type="date"
-                            value={crearForm.fecha_inicio}
-                            onChange={(e) =>
-                              setCrearForm({ ...crearForm, fecha_inicio: e.target.value })
-                            }
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
-                          />
+                              )}
+                            </div>
+                          )}
                         </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Fecha fin programada (opcional)
-                          </label>
-                          <input
-                            type="date"
-                            value={crearForm.fecha_fin_programada}
-                            onChange={(e) =>
-                              setCrearForm({ ...crearForm, fecha_fin_programada: e.target.value })
-                            }
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 focus:border-sena"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() => {
-                            setShowCrear(false)
-                            setCrearForm({ selectedIndex: -1, fecha_inicio: "", fecha_fin_programada: "" })
-                          }}
-                          className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={handleCrear}
-                          disabled={crearForm.selectedIndex < 0 || submitting}
-                          className="px-4 py-2 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                        >
-                          {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                          Registrar
-                        </button>
-                      </div>
+                      ))}
                     </div>
                   )}
                 </div>
-              )}
-            </>
+              )
+            })
           )}
         </div>
 

@@ -64,6 +64,7 @@ export default function AmbientesPage() {
   const porPagina = 10
   const [filtroTipo, setFiltroTipo] = useState<string[]>([])
   const [filtroEstado, setFiltroEstado] = useState<string[]>([])
+  const [filtroDisponibilidad, setFiltroDisponibilidad] = useState<string[]>([])
 
   const rol = user?.roles?.[0]?.trim() || ""
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
@@ -129,13 +130,17 @@ export default function AmbientesPage() {
     const coincideBusqueda = amb.nombre.toLowerCase().includes(texto)
     const coincideTipo = filtroTipo.length === 0 || filtroTipo.includes(amb.tipo)
     const coincideEstado = filtroEstado.length === 0 || filtroEstado.some((f) => f === "activo" ? amb.activo : !amb.activo)
-    return coincideBusqueda && coincideTipo && coincideEstado
+    const coincideDisponibilidad = filtroDisponibilidad.length === 0 || filtroDisponibilidad.some((f) =>
+      f === "disponible" ? (!amb.ocupante_actual && amb.activo) :
+      f === "ocupado" ? !!amb.ocupante_actual : true
+    )
+    return coincideBusqueda && coincideTipo && coincideEstado && coincideDisponibilidad
   })
 
   const totalPaginas = Math.ceil(listaFiltrada.length / porPagina)
   const listaPaginada = listaFiltrada.slice((paginaActual - 1) * porPagina, paginaActual * porPagina)
 
-  useEffect(() => { setPaginaActual(1) }, [search, filtroTipo, filtroEstado])
+  useEffect(() => { setPaginaActual(1) }, [search, filtroTipo, filtroEstado, filtroDisponibilidad])
 
   const handleCreate = async (data: any) => {
     try {
@@ -284,6 +289,16 @@ export default function AmbientesPage() {
               ]}
               selected={filtroTipo}
               onChange={setFiltroTipo}
+            />
+            <MultiSelect
+              label="Disponibilidad"
+              allLabel="Todos"
+              options={[
+                { value: "disponible", label: "Disponible" },
+                { value: "ocupado", label: "Ocupado" },
+              ]}
+              selected={filtroDisponibilidad}
+              onChange={setFiltroDisponibilidad}
             />
             <MultiSelect
               label="Estado"

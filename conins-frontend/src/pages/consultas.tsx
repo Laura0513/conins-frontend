@@ -20,6 +20,7 @@ import {
   BarChart3,
   TrendingUp,
   ArrowUpRight,
+  FileSpreadsheet,
 } from "lucide-react"
 
 // --- Types ---
@@ -368,6 +369,25 @@ export default function ConsultasPage() {
     }
   }
 
+  const [exportandoExcel, setExportandoExcel] = useState(false)
+
+  const handleExportExcel = async () => {
+    setExportandoExcel(true)
+    try {
+      const reporteMap: Record<string, string> = {
+        carga: "carga",
+        ficha: "horarios",
+        ocupacion: "ocupacion",
+      }
+      await api.consultas.descargarExcel(reporteMap[activeTab] || "carga")
+      showToast("Excel descargado exitosamente", "success")
+    } catch {
+      showToast("Error al descargar Excel", "error")
+    } finally {
+      setExportandoExcel(false)
+    }
+  }
+
   // Filtros
   const cargaFiltrada = carga.filter((c) => {
     const coincideBusqueda = c.instructor_nombre.toLowerCase().includes(debouncedSearch.toLowerCase())
@@ -433,14 +453,24 @@ export default function ConsultasPage() {
             <h1 className="text-2xl font-bold text-gray-900">Reportes y Estadisticas</h1>
             <p className="text-gray-500 text-sm">Vistas consolidadas para gestion academica</p>
           </div>
-          <button
-            onClick={handleExport}
-            disabled={loading}
-            className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
-          >
-            <FileDown className="w-4 h-4" />
-            Descargar PDF
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportExcel}
+              disabled={loading || exportandoExcel}
+              className="border border-green-600 text-green-700 hover:bg-green-50 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+            >
+              {exportandoExcel ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
+              Excel
+            </button>
+            <button
+              onClick={handleExport}
+              disabled={loading}
+              className="bg-sena hover:bg-sena/90 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+            >
+              <FileDown className="w-4 h-4" />
+              PDF
+            </button>
+          </div>
         </div>
 
         {/* Tarjetas resumen */}

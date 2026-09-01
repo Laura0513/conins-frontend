@@ -431,6 +431,24 @@ export const api = {
         getOcupacionAmbientes() {
             return apiFetch('/consultas/ocupacion-ambientes')
         },
+        async descargarExcel(reporte: string, semana?: string) {
+            const params = new URLSearchParams({ reporte })
+            if (semana) params.append('semana', semana)
+            const token = localStorage.getItem('auth_token')
+            const res = await fetch(`${API_BASE_URL}/consultas/excel?${params}`, {
+                headers: { Authorization: `Bearer ${token || ''}` },
+            })
+            if (!res.ok) throw new Error('Error al descargar Excel')
+            const blob = await res.blob()
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `${reporte}.xlsx`
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+            URL.revokeObjectURL(url)
+        },
     },
 
     rapSeguimiento: {
@@ -467,6 +485,12 @@ export const api = {
         toggleActivo(id: number) {
             return apiFetch(`/rap-seguimiento/${id}/estado`, {
                 method: 'PATCH',
+            })
+        },
+        evaluarTodos(acId: number, estado_aprobacion: string) {
+            return apiFetch(`/rap-seguimiento/asignacion-competencia/${acId}/evaluar-todos`, {
+                method: 'PATCH',
+                body: JSON.stringify({ estado_aprobacion }),
             })
         },
     },
