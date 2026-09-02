@@ -356,6 +356,9 @@ export const api = {
         getTiposActividad() {
             return apiFetch('/catalogo/tipos-actividad')
         },
+        getEnlaces() {
+            return apiFetch('/catalogo/enlaces')
+        },
     },
 
     ambientes: {
@@ -431,6 +434,20 @@ export const api = {
         getOcupacionAmbientes() {
             return apiFetch('/consultas/ocupacion-ambientes')
         },
+        getCorrecciones() {
+            return apiFetch('/consultas/correcciones')
+        },
+        getCalendario(tipo: string, id: number, semana?: string) {
+            const params = new URLSearchParams({ tipo, id: String(id) })
+            if (semana) params.append('semana', semana)
+            return apiFetch(`/consultas/calendario?${params}`)
+        },
+        getRapAvance() {
+            return apiFetch('/consultas/rap-avance')
+        },
+        getRapAvanceFicha(fichaId: number) {
+            return apiFetch(`/consultas/rap-avance/${fichaId}`)
+        },
         async descargarExcel(reporte: string, semana?: string) {
             const params = new URLSearchParams({ reporte })
             if (semana) params.append('semana', semana)
@@ -496,6 +513,9 @@ export const api = {
     },
 
     importar: {
+        getHistorico() {
+            return apiFetch('/importar/historico')
+        },
         preview(archivo_base64: string, programa_codigo?: string) {
             return apiFetch('/importar/preview', {
                 method: 'POST',

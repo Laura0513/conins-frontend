@@ -17,6 +17,7 @@ import {
   Plus,
   FileUp,
   Search,
+  CheckCircle,
 } from "lucide-react"
 
 // --- Types ---
@@ -69,6 +70,17 @@ type HorarioInstructor = {
   horas: string
   estado: string
   activo: boolean
+}
+
+type RapAvance = {
+  ficha_id: number
+  ficha_numero: string
+  programa: string
+  total_raps: number
+  aprobados: number
+  pendientes: number
+  no_aprobados: number
+  porcentaje: number
 }
 
 // --- Helpers ---
@@ -140,6 +152,7 @@ export default function Home() {
   const [cargaHoraria, setCargaHoraria] = useState<CargaHoraria[]>([])
   const [ocupacion, setOcupacion] = useState<OcupacionAmbiente[]>([])
   const [horariosHoy, setHorariosHoy] = useState<HorarioItem[]>([])
+  const [rapAvance, setRapAvance] = useState<RapAvance[]>([])
 
   // Instructor stats
   const [misHorarios, setMisHorarios] = useState<HorarioInstructor[]>([])
@@ -172,7 +185,8 @@ export default function Home() {
       api.consultas.getCargaHoraria(),
       api.consultas.getOcupacionAmbientes(),
       api.horarios.getAll(),
-    ]).then(([instRes, fichasRes, asigRes, alertasRes, cargaRes, ocupRes, horariosRes]) => {
+      api.consultas.getRapAvance(),
+    ]).then(([instRes, fichasRes, asigRes, alertasRes, cargaRes, ocupRes, horariosRes, rapRes]) => {
       if (instRes.status === "fulfilled") {
         const activos = (instRes.value.data || []).filter((i: any) => i.activo !== false)
         setInstructorCount(activos.length)
@@ -205,6 +219,9 @@ export default function Home() {
           (h) => h.activo !== false && h.dia_semana === diaHoy
         )
         setHorariosHoy(hoy)
+      }
+      if (rapRes.status === "fulfilled") {
+        setRapAvance((rapRes.value.data || []) as RapAvance[])
       }
 
       setDataLoading(false)
@@ -496,6 +513,58 @@ export default function Home() {
             )}
           </div>
         </div>
+
+        {/* Avance de RAPs por grupo */}
+        {rapAvance.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-sena" />
+                <h2 className="text-base font-bold text-gray-900">Avance de RAPs por grupo</h2>
+              </div>
+              <button
+                onClick={() => router.push("/fichas")}
+                className="text-sm text-sena font-medium hover:underline"
+              >
+                Ver grupos
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {rapAvance
+                  .sort((a, b) => (b.porcentaje ?? 0) - (a.porcentaje ?? 0))
+                  .slice(0, 8)
+                  .map((g) => {
+                    const pct = g.total_raps > 0 ? Math.round((g.aprobados / g.total_raps) * 100) : 0
+                    return (
+                      <div key={g.ficha_id} className="flex items-center gap-4">
+                        <div className="w-28 shrink-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">{g.ficha_numero}</p>
+                          <p className="text-[10px] text-gray-400 truncate">{g.programa}</p>
+                        </div>
+                        <div className="flex-1">
+                          <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div
+                              className={`h-2.5 rounded-full transition-all ${
+                                pct === 100 ? "bg-green-500" : pct >= 50 ? "bg-sena" : "bg-yellow-500"
+                              }`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                        <div className="w-20 text-right shrink-0">
+                          <span className="text-sm font-semibold text-gray-900">{pct}%</span>
+                          <span className="text-[10px] text-gray-400 ml-1">
+                            ({g.aprobados}/{g.total_raps})
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Contenido inferior: Carga horaria + Ocupación + Alertas */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

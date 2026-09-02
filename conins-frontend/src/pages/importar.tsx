@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
+  History,
 } from "lucide-react"
 
 type ErrorFila = { fila: number; mensaje: string }
@@ -35,6 +36,15 @@ type PreviewData = {
 }
 
 type Programa = { id: number; nombre: string; codigo: string }
+
+type HistoricoItem = {
+  id: number
+  usuario_nombre: string | null
+  creados: number
+  omitidos: number
+  errores: number
+  created_at: string
+}
 
 export default function ImportarPage() {
   const { user, loading: authLoading } = useProtectedRoute()
@@ -65,6 +75,8 @@ export default function ImportarPage() {
     baja: true,
   })
 
+  const [historico, setHistorico] = useState<HistoricoItem[]>([])
+
   const rol = user?.roles?.[0]?.trim() || ""
   const esAdmin = ["Administrador", "Coordinadora Academica", "Asistente Coordinacion"].includes(rol)
 
@@ -75,6 +87,10 @@ export default function ImportarPage() {
         .then((res) => setProgramas(res.data || []))
         .catch(() => setProgramas([]))
         .finally(() => setLoadingProgramas(false))
+
+      api.importar.getHistorico()
+        .then((res) => setHistorico(res.data || []))
+        .catch(() => setHistorico([]))
     }
   }, [esAdmin])
 
@@ -502,6 +518,57 @@ export default function ImportarPage() {
               <button onClick={limpiar} className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                 Nueva importación
               </button>
+            </div>
+          </div>
+        )}
+        {/* Histórico de cargas */}
+        {historico.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+              <History className="w-5 h-5 text-sena" />
+              <h2 className="text-base font-bold text-gray-900">Histórico de importaciones</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 text-gray-500 bg-gray-50">
+                    <th className="text-left px-6 py-3 font-medium">Fecha</th>
+                    <th className="text-left px-6 py-3 font-medium">Usuario</th>
+                    <th className="text-center px-6 py-3 font-medium">Creados</th>
+                    <th className="text-center px-6 py-3 font-medium">Omitidos</th>
+                    <th className="text-center px-6 py-3 font-medium">Errores</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historico.slice(0, 10).map((h) => (
+                    <tr key={h.id} className="border-b border-gray-100 last:border-0">
+                      <td className="px-6 py-3 text-gray-700 whitespace-nowrap">
+                        {new Date(h.created_at).toLocaleString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                      <td className="px-6 py-3 text-gray-900 font-medium">{h.usuario_nombre || "—"}</td>
+                      <td className="px-6 py-3 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          {h.creados}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                          {h.omitidos}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-center">
+                        {h.errores > 0 ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                            {h.errores}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">0</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
