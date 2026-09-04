@@ -420,17 +420,6 @@ export default function HorariosPage() {
               selected={filtroJornada}
               onChange={setFiltroJornada}
             />
-            <MultiSelect
-              label="Estado"
-              allLabel="Todos"
-              options={[
-                { value: "Aprobado", label: "Aprobado" },
-                { value: "Pendiente", label: "Pendiente" },
-                { value: "Rechazado", label: "Rechazado" },
-              ]}
-              selected={filtroEstado}
-              onChange={setFiltroEstado}
-            />
           </div>
         </div>
 

@@ -339,6 +339,64 @@ async function persistirCorrecciones(
   }
 }
 
+// Recomputa al FINAL del import las alertas estructurales (co-docencia, RAP
+// compartido) y rellena los seguimientos de RAP. Necesario porque esas cosas se
+// generan al CREAR cada horario/asignacion; si venian existentes (reimport
+// idempotente -> "omitido") no se recalculan. Aditivo e idempotente: solo inserta
+// lo que falta, con guarda NOT EXISTS, sin borrar ni pisar lo ya atendido/evaluado.
+// (AMBIENTE_OCUPADO se cubre en la creacion del horario; no se recomputa aqui
+// porque su alerta no guarda ambiente/ficha para una guarda limpia.)
+async function recomputarEstructurales(): Promise<void> {
+  try {
+    // CO_DOCENCIA: 2+ instructores en el mismo grupo/dia/jornada/semana.
+    await pool.query(
+      `INSERT INTO alertas (instructor_id, tipo, mensaje, semana, ficha_id)
+       SELECT MIN(h.instructor_id), 'CO_DOCENCIA',
+         LEFT(CONCAT('Dos o mas instructores (',
+           (SELECT GROUP_CONCAT(DISTINCT u2.nombre SEPARATOR ' y ')
+              FROM horarios h2 JOIN instructores i2 ON h2.instructor_id=i2.id JOIN usuarios u2 ON i2.usuario_id=u2.id
+              WHERE h2.ficha_id=h.ficha_id AND h2.dia_semana=h.dia_semana AND h2.jornada_id=h.jornada_id AND h2.semana=h.semana AND h2.activo=TRUE),
+           ') quedaron asignados al mismo grupo ', f.numero_ficha,
+           ' el ', ELT(h.dia_semana,'lunes','martes','miercoles','jueves','viernes','sabado','domingo'),
+           ' en la jornada ', j.nombre, ' (semana ', DATE_FORMAT(h.semana,'%d/%m/%Y'),
+           '). Revisa si es co-docencia intencional o un cruce; la coordinacion decide.'), 255),
+         h.semana, h.ficha_id
+       FROM horarios h JOIN fichas f ON h.ficha_id=f.id JOIN jornadas j ON h.jornada_id=j.id
+       WHERE h.activo=TRUE
+         AND NOT EXISTS (SELECT 1 FROM alertas a WHERE a.tipo='CO_DOCENCIA' AND a.ficha_id=h.ficha_id AND a.semana=h.semana)
+       GROUP BY h.ficha_id, h.dia_semana, h.jornada_id, h.semana
+       HAVING COUNT(DISTINCT h.instructor_id) >= 2`,
+    );
+    // RAP_COMPARTIDO: mismo RAP a cargo de 2+ instructores en el grupo.
+    await pool.query(
+      `INSERT INTO alertas (instructor_id, tipo, mensaje, ficha_id, rap_id)
+       SELECT MIN(h.instructor_id), 'RAP_COMPARTIDO',
+         LEFT(CONCAT('El resultado de aprendizaje "', r.nombre, '" quedo a cargo de ',
+           (SELECT GROUP_CONCAT(DISTINCT u2.nombre SEPARATOR ' y ')
+              FROM horarios h2 JOIN instructores i2 ON h2.instructor_id=i2.id JOIN usuarios u2 ON i2.usuario_id=u2.id
+              WHERE h2.ficha_id=h.ficha_id AND h2.rap_id=h.rap_id AND h2.activo=TRUE),
+           ') en el grupo ', f.numero_ficha, '. Debe quedar con un solo instructor para poder evaluarlo.'), 255),
+         h.ficha_id, h.rap_id
+       FROM horarios h JOIN fichas f ON h.ficha_id=f.id JOIN raps r ON h.rap_id=r.id
+       WHERE h.activo=TRUE AND h.rap_id IS NOT NULL
+         AND NOT EXISTS (SELECT 1 FROM alertas a WHERE a.tipo='RAP_COMPARTIDO' AND a.ficha_id=h.ficha_id AND a.rap_id=h.rap_id)
+       GROUP BY h.ficha_id, h.rap_id
+       HAVING COUNT(DISTINCT h.instructor_id) >= 2`,
+    );
+    // Backfill de seguimientos de RAP: crea los faltantes de cada competencia asignada.
+    await pool.query(
+      `INSERT INTO rap_ficha_seguimiento (asignacion_competencia_id, rap_id)
+       SELECT ac.id, r.id
+       FROM asignacion_competencia ac
+       JOIN raps r ON r.competencia_id = ac.competencia_id AND r.activo = TRUE
+       WHERE ac.activo = TRUE
+         AND NOT EXISTS (SELECT 1 FROM rap_ficha_seguimiento s WHERE s.asignacion_competencia_id = ac.id AND s.rap_id = r.id)`,
+    );
+  } catch (err) {
+    console.error('[importar] no se pudo recomputar estructurales:', err);
+  }
+}
+
 export const ImportarService = {
   // Previsualiza SIN escribir: detecta formato, normaliza el crudo del lider
   // contra el catalogo vivo, y clasifica en resumen / nuevos / errores /
@@ -440,6 +498,11 @@ export const ImportarService = {
     if (resumen.length === 0) {
       throw new ValidationError('El archivo no contiene ninguna hoja valida (Instructores, Grupos, Asignaciones u Horarios)');
     }
+
+    // Recalcular alertas estructurales y rellenar seguimientos de RAP sobre el
+    // dataset completo, para que aparezcan aunque los horarios/asignaciones
+    // hayan sido omitidos por idempotencia (ya no hace falta el SQL manual).
+    await recomputarEstructurales();
 
     return { resumen };
   },

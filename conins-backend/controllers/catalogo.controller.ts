@@ -8,6 +8,12 @@ export const getProgramas = asyncHandler(async (_req: Request, res: Response) =>
   ApiResponse.success(res, rows);
 });
 
+// Enlaces externos (accesos directos a plataformas SENA), configurables en BD.
+export const getEnlaces = asyncHandler(async (_req: Request, res: Response) => {
+  const [rows] = await pool.query('SELECT id, nombre, url, orden FROM enlaces_externos WHERE activo = TRUE ORDER BY orden, nombre');
+  ApiResponse.success(res, rows);
+});
+
 export const getCompetencias = asyncHandler(async (req: Request, res: Response) => {
   const { programaId } = req.query;
   const query = programaId

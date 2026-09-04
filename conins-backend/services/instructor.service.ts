@@ -40,7 +40,7 @@ export const InstructorService = {
     return detalle;
   },
 
-  async update(id: number, tipo_area?: string) {
+  async update(id: number, tipo_area?: string, foto_url?: string | null) {
     const instructor = await InstructorModel.findById(id);
     if (!instructor) throw new NotFoundError('Instructor no encontrado');
 
@@ -51,7 +51,7 @@ export const InstructorService = {
       }
     }
 
-    await InstructorModel.update(id, tipo_area);
+    await InstructorModel.update(id, tipo_area, foto_url);
     return InstructorModel.findById(id);
   },
 

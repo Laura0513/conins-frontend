@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { ImportarService } from '../services/importar.service.js';
+import { ImportHistoricoModel } from '../models/import-historico.model.js';
 
 // POST /api/importar/preview
 // Body: { archivo_base64: string, programa_codigo?: string }
@@ -26,9 +27,27 @@ export const importar = asyncHandler(async (req: Request, res: Response) => {
   const totalOmitidos = resultado.resumen.reduce((s, h) => s + h.omitidos, 0);
   const totalErrores = resultado.resumen.reduce((s, h) => s + h.errores.length, 0);
 
+  // Registrar en el historico de cargas (best-effort: no debe tumbar la respuesta).
+  try {
+    const u = req.user as any;
+    await ImportHistoricoModel.crear({
+      usuario_id: u?.id ?? null,
+      usuario_nombre: u?.nombre ?? null,
+      creados: totalCreados, omitidos: totalOmitidos, errores: totalErrores,
+    });
+  } catch (err) {
+    console.error('[importar] no se pudo registrar el historico:', err);
+  }
+
   ApiResponse.success(
     res,
     resultado,
     `Importacion procesada: ${totalCreados} creados, ${totalOmitidos} omitidos (ya existian), ${totalErrores} con error`,
   );
+});
+
+// GET /api/importar/historico — cargas anteriores (fecha, usuario, resultado)
+export const getHistorico = asyncHandler(async (_req: Request, res: Response) => {
+  const historico = await ImportHistoricoModel.listar();
+  ApiResponse.success(res, historico);
 });

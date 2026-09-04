@@ -253,3 +253,76 @@ export const getExcel = asyncHandler(async (req: Request, res: Response) => {
   res.setHeader('Content-Disposition', `attachment; filename="${archivo}-${fecha}.xlsx"`);
   res.send(buffer);
 });
+
+// Avance de RAPs por GRUPO (control de coordinacion): cuantos RAPs tiene el grupo
+// en seguimiento y cuantos van evaluados / aprobados / no aprobados / faltantes.
+// GET /api/consultas/rap-avance
+export const getRapAvance = asyncHandler(async (_req: Request, res: Response) => {
+  const [rows] = await pool.query(`
+    SELECT
+      f.id AS ficha_id, f.numero_ficha, p.nombre AS programa,
+      COUNT(rfs.id) AS total,
+      SUM(rfs.estado_evaluacion = 'evaluado') AS evaluados,
+      SUM(rfs.estado_aprobacion = 'aprobado') AS aprobados,
+      SUM(rfs.estado_aprobacion = 'no_aprobado') AS no_aprobados,
+      SUM(rfs.estado_evaluacion = 'pendiente_por_evaluar') AS pendientes
+    FROM fichas f
+    JOIN programas p ON f.programa_id = p.id
+    JOIN asignacion a ON a.ficha_id = f.id AND a.activo = TRUE
+    JOIN asignacion_competencia ac ON ac.asignacion_id = a.id AND ac.activo = TRUE
+    JOIN rap_ficha_seguimiento rfs ON rfs.asignacion_competencia_id = ac.id AND rfs.activo = TRUE
+    WHERE f.activo = TRUE
+    GROUP BY f.id, f.numero_ficha, p.nombre
+    ORDER BY f.numero_ficha
+  `);
+  const data = (rows as any[]).map((r) => {
+    const total = Number(r.total), evaluados = Number(r.evaluados);
+    return {
+      ficha_id: r.ficha_id, numero_ficha: r.numero_ficha, programa: r.programa,
+      total, evaluados, aprobados: Number(r.aprobados), no_aprobados: Number(r.no_aprobados),
+      pendientes: Number(r.pendientes),
+      porcentaje_evaluado: total > 0 ? Math.round((evaluados / total) * 100) : 0,
+    };
+  });
+  ApiResponse.success(res, data);
+});
+
+// Detalle del avance de RAPs de UN grupo, desglosado por competencia (incluye el
+// asignacion_competencia_id para el boton "Aprobar todos"). GET /api/consultas/rap-avance/:fichaId
+export const getRapAvanceFicha = asyncHandler(async (req: Request, res: Response) => {
+  const fichaId = Number(req.params.fichaId);
+  if (!fichaId || Number.isNaN(fichaId)) throw new ValidationError('fichaId invalido');
+  const [rows] = await pool.query(`
+    SELECT
+      c.id AS competencia_id, c.nombre AS competencia, ac.id AS asignacion_competencia_id,
+      COUNT(rfs.id) AS total,
+      SUM(rfs.estado_evaluacion = 'evaluado') AS evaluados,
+      SUM(rfs.estado_aprobacion = 'aprobado') AS aprobados,
+      SUM(rfs.estado_aprobacion = 'no_aprobado') AS no_aprobados,
+      SUM(rfs.estado_evaluacion = 'pendiente_por_evaluar') AS pendientes
+    FROM rap_ficha_seguimiento rfs
+    JOIN asignacion_competencia ac ON rfs.asignacion_competencia_id = ac.id AND ac.activo = TRUE
+    JOIN asignacion a ON ac.asignacion_id = a.id AND a.activo = TRUE
+    JOIN raps r ON rfs.rap_id = r.id
+    JOIN competencias c ON r.competencia_id = c.id
+    WHERE a.ficha_id = ? AND rfs.activo = TRUE
+    GROUP BY c.id, c.nombre, ac.id
+    ORDER BY c.nombre
+  `, [fichaId]);
+  const porCompetencia = (rows as any[]).map((r) => {
+    const total = Number(r.total), evaluados = Number(r.evaluados);
+    return {
+      competencia_id: r.competencia_id, competencia: r.competencia,
+      asignacion_competencia_id: r.asignacion_competencia_id,
+      total, evaluados, aprobados: Number(r.aprobados), no_aprobados: Number(r.no_aprobados),
+      pendientes: Number(r.pendientes),
+      porcentaje_evaluado: total > 0 ? Math.round((evaluados / total) * 100) : 0,
+    };
+  });
+  const resumen = porCompetencia.reduce((acc, c) => ({
+    total: acc.total + c.total, evaluados: acc.evaluados + c.evaluados,
+    aprobados: acc.aprobados + c.aprobados, no_aprobados: acc.no_aprobados + c.no_aprobados,
+    pendientes: acc.pendientes + c.pendientes,
+  }), { total: 0, evaluados: 0, aprobados: 0, no_aprobados: 0, pendientes: 0 });
+  ApiResponse.success(res, { ficha_id: fichaId, resumen, por_competencia: porCompetencia });
+});

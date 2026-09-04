@@ -10,6 +10,7 @@ const router = Router();
 // Catalogo requiere autenticacion como el resto de la API (antes era publico).
 router.use(verifyToken);
 
+router.get('/enlaces', catalogoController.getEnlaces);
 router.get('/areas', asyncHandler(async (_req, res) => {
   const areas = await CatalogoService.getAreas();
   ApiResponse.success(res, areas);

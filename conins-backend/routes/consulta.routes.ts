@@ -16,5 +16,7 @@ router.get('/ocupacion-ambientes', consultaController.getOcupacionAmbientes);
 router.get('/correcciones', consultaController.getCorrecciones);
 router.get('/calendario', consultaController.getCalendario);
 router.get('/excel', consultaController.getExcel);
+router.get('/rap-avance', consultaController.getRapAvance);
+router.get('/rap-avance/:fichaId', consultaController.getRapAvanceFicha);
 
 export default router;

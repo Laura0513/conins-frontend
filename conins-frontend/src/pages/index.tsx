@@ -13,12 +13,12 @@ import {
   Bell,
   Building2,
   ArrowRight,
-  Clock,
   Plus,
   FileUp,
   Search,
   CheckCircle,
 } from "lucide-react"
+import GrillaHorarios from "@/components/horarios/GrillaHorarios"
 
 // --- Types ---
 type CargaHoraria = {
@@ -48,19 +48,6 @@ type OcupacionAmbiente = {
   porcentaje: number
 }
 
-type HorarioItem = {
-  id: number
-  instructor_nombre?: string
-  ficha_numero?: string
-  competencia_nombre?: string
-  ambiente_nombre?: string
-  dia_semana?: string
-  hora_inicio?: string
-  hora_fin?: string
-  jornada?: string
-  activo?: boolean
-}
-
 type HorarioInstructor = {
   id: number
   ficha_numero: string
@@ -84,12 +71,6 @@ type RapAvance = {
 }
 
 // --- Helpers ---
-const DIAS_SEMANA = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-
-function getDiaHoy() {
-  return DIAS_SEMANA[new Date().getDay()]
-}
-
 function getProgressColor(horas: number, limite: number) {
   if (horas > limite) return "bg-red-500"
   if (horas >= limite * 0.85) return "bg-yellow-500"
@@ -151,7 +132,8 @@ export default function Home() {
   const [alertas, setAlertas] = useState<Alerta[]>([])
   const [cargaHoraria, setCargaHoraria] = useState<CargaHoraria[]>([])
   const [ocupacion, setOcupacion] = useState<OcupacionAmbiente[]>([])
-  const [horariosHoy, setHorariosHoy] = useState<HorarioItem[]>([])
+  const [grillaHorarios, setGrillaHorarios] = useState<any[]>([])
+  const [grillaLoading, setGrillaLoading] = useState(false)
   const [rapAvance, setRapAvance] = useState<RapAvance[]>([])
 
   // Instructor stats
@@ -160,6 +142,9 @@ export default function Home() {
   const [notifCount, setNotifCount] = useState(0)
 
   const [dataLoading, setDataLoading] = useState(true)
+
+  const DIAS_ABREV_HOY = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
+  const diaHoyAbrev = DIAS_ABREV_HOY[new Date().getDay()]
 
   const rol = user?.roles?.[0]?.trim() || "admin"
   const esAdmin = rol !== "Instructor"
@@ -187,6 +172,7 @@ export default function Home() {
       api.horarios.getAll(),
       api.consultas.getRapAvance(),
     ]).then(([instRes, fichasRes, asigRes, alertasRes, cargaRes, ocupRes, horariosRes, rapRes]) => {
+
       if (instRes.status === "fulfilled") {
         const activos = (instRes.value.data || []).filter((i: any) => i.activo !== false)
         setInstructorCount(activos.length)
@@ -213,12 +199,8 @@ export default function Home() {
         setOcupacion(datos.sort((a, b) => b.porcentaje - a.porcentaje).slice(0, 5))
       }
       if (horariosRes.status === "fulfilled") {
-        const todos = (horariosRes.value.data || []) as HorarioItem[]
-        const diaHoy = getDiaHoy()
-        const hoy = todos.filter(
-          (h) => h.activo !== false && h.dia_semana === diaHoy
-        )
-        setHorariosHoy(hoy)
+        const todos = (horariosRes.value.data || []).filter((h: any) => h.activo !== false)
+        setGrillaHorarios(todos)
       }
       if (rapRes.status === "fulfilled") {
         setRapAvance((rapRes.value.data || []) as RapAvance[])
@@ -227,6 +209,21 @@ export default function Home() {
       setDataLoading(false)
     })
   }, [user, esAdmin])
+
+  // Recargar horarios cuando cambia la semana en la grilla
+  const handleSemanaChange = async (semana: string | undefined) => {
+    if (!user || !esAdmin) return
+    setGrillaLoading(true)
+    try {
+      const res = await api.horarios.getAll(semana)
+      const todos = (res.data || []).filter((h: any) => h.activo !== false)
+      setGrillaHorarios(todos)
+    } catch {
+      setGrillaHorarios([])
+    } finally {
+      setGrillaLoading(false)
+    }
+  }
 
   // Cargar datos instructor
   useEffect(() => {
@@ -368,6 +365,28 @@ export default function Home() {
           </p>
         </div>
 
+        {/* Grilla de horarios semanal — lo primero que ven los directivos */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-gray-900">
+              Horarios de hoy — {new Date().toLocaleDateString("es-CO", { weekday: "long" })}
+            </h2>
+            <button
+              onClick={() => router.push("/horarios")}
+              className="text-sm text-sena font-medium hover:underline"
+            >
+              Ir a horarios →
+            </button>
+          </div>
+          <GrillaHorarios
+            horarios={grillaHorarios}
+            onSemanaChange={handleSemanaChange}
+            loading={dataLoading || grillaLoading}
+            onClickHorario={(h) => router.push("/horarios")}
+            filterDia={diaHoyAbrev}
+          />
+        </div>
+
         {/* Tarjetas de resumen */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button
@@ -453,66 +472,6 @@ export default function Home() {
             </button>
           </div>
         )}
-
-        {/* Horarios de hoy */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-sena" />
-              <h2 className="text-base font-bold text-gray-900">Horarios de hoy — {getDiaHoy()}</h2>
-            </div>
-            <span className="text-sm text-gray-400">
-              {dataLoading ? "..." : `${horariosHoy.length} clases`}
-            </span>
-          </div>
-          <div className="p-6">
-            {dataLoading ? (
-              <div className="py-6 flex items-center justify-center text-gray-400">
-                <Loader2 className="w-6 h-6 animate-spin" />
-              </div>
-            ) : horariosHoy.length === 0 ? (
-              <p className="text-sm text-gray-500 py-4 text-center">No hay clases programadas para hoy.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200 text-gray-500">
-                      <th className="text-left py-2 font-medium">Hora</th>
-                      <th className="text-left py-2 font-medium">Instructor</th>
-                      <th className="text-left py-2 font-medium">Grupo</th>
-                      <th className="text-left py-2 font-medium">Competencia</th>
-                      <th className="text-left py-2 font-medium">Ambiente</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {horariosHoy
-                      .sort((a, b) => (a.hora_inicio || "").localeCompare(b.hora_inicio || ""))
-                      .slice(0, 10)
-                      .map((h) => (
-                        <tr key={h.id} className="border-b border-gray-50 last:border-0">
-                          <td className="py-2.5 font-mono text-xs text-sena font-medium whitespace-nowrap">
-                            {h.hora_inicio?.slice(0, 5)} - {h.hora_fin?.slice(0, 5)}
-                          </td>
-                          <td className="py-2.5 text-gray-900">{h.instructor_nombre || "—"}</td>
-                          <td className="py-2.5 text-gray-700">{h.ficha_numero || "—"}</td>
-                          <td className="py-2.5 text-gray-600 max-w-[200px] truncate">{h.competencia_nombre || "—"}</td>
-                          <td className="py-2.5 text-gray-600">{h.ambiente_nombre || "—"}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-                {horariosHoy.length > 10 && (
-                  <button
-                    onClick={() => router.push("/horarios")}
-                    className="mt-3 text-sm text-sena font-medium hover:underline"
-                  >
-                    Ver los {horariosHoy.length} horarios →
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Avance de RAPs por grupo */}
         {rapAvance.length > 0 && (

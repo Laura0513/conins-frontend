@@ -247,28 +247,28 @@ export default function Sidebar({ alertasViewed, isOpen, onClose, rol }: Sidebar
 
           return renderItem(entry as MenuItem)
         })}
-      </nav>
 
-      {/* Enlaces externos */}
-      {enlaces.length > 0 && (
-        <div className="p-4 border-t border-gray-200">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">Enlaces</p>
-          <div className="space-y-0.5">
-            {enlaces.map((e) => (
-              <a
-                key={e.id}
-                href={e.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>{e.nombre}</span>
-              </a>
-            ))}
+        {/* Enlaces externos */}
+        {enlaces.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">Enlaces</p>
+            <div className="space-y-0.5">
+              {enlaces.map((e) => (
+                <a
+                  key={e.id}
+                  href={e.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>{e.nombre}</span>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </nav>
     </aside>
   )
 }

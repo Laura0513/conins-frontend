@@ -58,9 +58,11 @@ type GrillaHorariosProps = {
   horarios: Horario[]
   onSemanaChange?: (semana: string | undefined) => void
   loading?: boolean
+  onClickHorario?: (horario: Horario) => void
+  filterDia?: string | null
 }
 
-export default function GrillaHorarios({ horarios, onSemanaChange, loading }: GrillaHorariosProps) {
+export default function GrillaHorarios({ horarios, onSemanaChange, loading, onClickHorario, filterDia }: GrillaHorariosProps) {
   const [semanaOffset, setSemanaOffset] = useState(0)
   const lunes = getLunes(semanaOffset)
 
@@ -97,13 +99,18 @@ export default function GrillaHorarios({ horarios, onSemanaChange, loading }: Gr
     return map
   }, [horarios])
 
+  const diasVisibles = filterDia ? DIAS.filter(d => d === filterDia) : DIAS
+
   const navegarSemana = (dir: number) => {
     setSemanaOffset((o) => o + dir)
   }
 
+  const hideNav = !!filterDia
+
   return (
     <div className="space-y-4">
       {/* Navegación semanal */}
+      {!hideNav && (
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => navegarSemana(-1)}
@@ -128,6 +135,7 @@ export default function GrillaHorarios({ horarios, onSemanaChange, loading }: Gr
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
+      )}
 
       {/* Grilla por jornadas */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
@@ -144,7 +152,7 @@ export default function GrillaHorarios({ horarios, onSemanaChange, loading }: Gr
                   <th className="px-3 py-3 font-medium text-gray-500 w-32 border-r border-gray-100 text-center">
                     Jornada
                   </th>
-                  {DIAS.map((dia) => (
+                  {diasVisibles.map((dia) => (
                     <th key={dia} className="px-3 py-3 font-medium text-gray-500 text-center min-w-[150px]">
                       {DIAS_LABEL[dia]}
                     </th>
@@ -160,7 +168,7 @@ export default function GrillaHorarios({ horarios, onSemanaChange, loading }: Gr
                         <p className="text-xs text-gray-400">{jornada.horario}</p>
                       </div>
                     </td>
-                    {DIAS.map((dia) => {
+                    {diasVisibles.map((dia) => {
                       const entries = grilla[jornada.key]?.[dia] || []
 
                       if (entries.length === 0) {
@@ -177,7 +185,8 @@ export default function GrillaHorarios({ horarios, onSemanaChange, loading }: Gr
                             {entries.map((h) => (
                               <div
                                 key={h.id}
-                                className={`${jornada.bg} ${jornada.border} border-l-2 rounded-r px-2 py-1.5 min-h-[60px]`}
+                                onClick={() => onClickHorario?.(h)}
+                                className={`${jornada.bg} ${jornada.border} border-l-2 rounded-r px-2 py-1.5 min-h-[60px] ${onClickHorario ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`}
                               >
                                 <div className={`${jornada.text} text-xs space-y-0.5`}>
                                   <p className="font-bold truncate">{h.ficha_numero}</p>
@@ -202,14 +211,16 @@ export default function GrillaHorarios({ horarios, onSemanaChange, loading }: Gr
       </div>
 
       {/* Leyenda */}
-      <div className="flex flex-wrap gap-4 px-2">
-        {JORNADAS.map((j) => (
-          <div key={j.key} className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded ${j.bg} ${j.border} border`} />
-            <span className="text-xs text-gray-500">{j.label}</span>
-          </div>
-        ))}
-      </div>
+      {!hideNav && (
+        <div className="flex flex-wrap gap-4 px-2">
+          {JORNADAS.map((j) => (
+            <div key={j.key} className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded ${j.bg} ${j.border} border`} />
+              <span className="text-xs text-gray-500">{j.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -59,8 +59,8 @@ export const getOwnProfile = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const update = asyncHandler(async (req: Request, res: Response) => {
-  const { tipo_area } = req.body;
-  const updated = await InstructorService.update(Number(req.params.id), tipo_area);
+  const { tipo_area, foto_url } = req.body;
+  const updated = await InstructorService.update(Number(req.params.id), tipo_area, foto_url);
   ApiResponse.success(res, updated, 'Instructor actualizado exitosamente');
 });
 

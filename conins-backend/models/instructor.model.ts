@@ -14,6 +14,7 @@ export interface InstructorDetail extends RowDataPacket {
   nombre: string;
   email: string;
   tipo_area: string;
+  foto_url: string | null;
   activo: boolean;
   roles: string | null;
   rol_ids: string | null;
@@ -22,7 +23,7 @@ export interface InstructorDetail extends RowDataPacket {
 export const InstructorModel = {
   async findAll(): Promise<InstructorDetail[]> {
     const [rows] = await pool.query<InstructorDetail[]>(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.foto_url, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles,
              GROUP_CONCAT(r.id ORDER BY r.nivel ASC SEPARATOR ',') AS rol_ids
       FROM instructores i
@@ -38,7 +39,7 @@ export const InstructorModel = {
 
   async findById(id: number): Promise<InstructorDetail | null> {
     const [rows] = await pool.query<InstructorDetail[]>(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.foto_url, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles,
              GROUP_CONCAT(r.id ORDER BY r.nivel ASC SEPARATOR ',') AS rol_ids
       FROM instructores i
@@ -66,13 +67,18 @@ export const InstructorModel = {
     );
   },
 
-  async update(id: number, tipo_area?: string): Promise<void> {
+  async update(id: number, tipo_area?: string, foto_url?: string | null): Promise<void> {
     const updates: string[] = [];
     const values: any[] = [];
 
     if (tipo_area) {
       updates.push('tipo_area = ?');
       values.push(tipo_area);
+    }
+    // foto_url: se permite setear una URL o limpiarla (null / cadena vacia -> NULL)
+    if (foto_url !== undefined) {
+      updates.push('foto_url = ?');
+      values.push(foto_url ? String(foto_url).trim() : null);
     }
 
     if (updates.length === 0) return;
@@ -188,7 +194,7 @@ export const InstructorModel = {
 
   async getDetalle(instructorId: number) {
     const [instructorRows] = await pool.query(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.foto_url, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles
       FROM instructores i
       JOIN usuarios u ON i.usuario_id = u.id

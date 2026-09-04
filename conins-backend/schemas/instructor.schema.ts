@@ -13,6 +13,7 @@ export const crearInstructorCompletoSchema = z.object({
 
 export const actualizarInstructorSchema = z.object({
   tipo_area: z.enum(['tecnica', 'transversal']).optional(),
+  foto_url: z.string().url().max(500).nullable().optional().or(z.literal('')),
 });
 
 export const registrarNovedadSchema = z.object({

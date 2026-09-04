@@ -145,6 +145,7 @@ CREATE TABLE IF NOT EXISTS instructores (
     id            INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id    INT NOT NULL UNIQUE,
     tipo_area     ENUM('transversal','tecnica')   NOT NULL,
+    foto_url      VARCHAR(500) NULL,
     activo        BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -1350,6 +1351,35 @@ CREATE TABLE IF NOT EXISTS import_correcciones (
     resuelta    BOOLEAN NOT NULL DEFAULT FALSE,
     created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
+-- Historico de cargas: una fila por cada importacion confirmada, para que la
+-- coordinacion vea las cargas anteriormente realizadas (quien, cuando, resultado).
+-- Sin FK a usuarios: usuario_id puede ser 0 (super-usuario break-glass del .env);
+-- se guarda usuario_nombre como snapshot.
+CREATE TABLE IF NOT EXISTS import_historico (
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id     INT NULL,
+    usuario_nombre VARCHAR(150) NULL,
+    creados        INT NOT NULL DEFAULT 0,
+    omitidos       INT NOT NULL DEFAULT 0,
+    errores        INT NOT NULL DEFAULT 0,
+    created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Enlaces externos (accesos directos a plataformas SENA). Configurable: la
+-- coordinacion puede ajustarlos sin tocar el frontend.
+CREATE TABLE IF NOT EXISTS enlaces_externos (
+    id      INT AUTO_INCREMENT PRIMARY KEY,
+    nombre  VARCHAR(100) NOT NULL,
+    url     VARCHAR(500) NOT NULL,
+    orden   INT NOT NULL DEFAULT 0,
+    activo  BOOLEAN NOT NULL DEFAULT TRUE
+) ENGINE=InnoDB;
+
+INSERT IGNORE INTO enlaces_externos (id, nombre, url, orden) VALUES
+  (1, 'Sofia Plus', 'https://oferta.senasofiaplus.edu.co/sofia-oferta/', 1),
+  (2, 'SENA', 'https://www.sena.edu.co/', 2),
+  (3, 'Zajuna', 'https://zajuna.sena.edu.co/', 3);
 
 -- ============================================================
 -- 25. UTF-8 COLLATION
