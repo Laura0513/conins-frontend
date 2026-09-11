@@ -60,17 +60,6 @@ type HorarioInstructor = {
   activo: boolean
 }
 
-type RapAvance = {
-  ficha_id: number
-  ficha_numero: string
-  programa: string
-  total_raps: number
-  aprobados: number
-  pendientes: number
-  no_aprobados: number
-  porcentaje: number
-}
-
 // --- Helpers ---
 function getProgressColor(horas: number, limite: number) {
   if (horas > limite) return "bg-red-500"

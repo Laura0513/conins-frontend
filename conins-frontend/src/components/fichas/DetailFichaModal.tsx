@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { X, BookOpen, Clock, MapPin, Users, Calendar, FileText, Loader2, Home, CheckCircle } from "lucide-react"
+import { X, BookOpen, Clock, MapPin, Users, Calendar, FileText, Loader2, Home } from "lucide-react"
 import { api } from "@/lib/api"
 import { formatJornada } from "@/lib/terminology"
 
@@ -42,7 +42,6 @@ type DetailFichaModalProps = {
 export default function DetailFichaModal({ isOpen, onClose, ficha, onInstructorClick }: DetailFichaModalProps) {
   const [detalle, setDetalle] = useState<Ficha | null>(null)
   const [instructores, setInstructores] = useState<InstructorAsignado[]>([])
-  const [rapAvance, setRapAvance] = useState<{ total_raps: number; aprobados: number; pendientes: number; no_aprobados: number } | null>(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -55,10 +54,9 @@ export default function DetailFichaModal({ isOpen, onClose, ficha, onInstructorC
     if (!ficha) return
     setLoading(true)
     try {
-      const [fichaRes, asigRes, rapRes] = await Promise.allSettled([
+      const [fichaRes, asigRes] = await Promise.allSettled([
         api.fichas.getById(ficha.id),
         api.assignments.getAll(),
-        api.consultas.getRapAvance(),
       ])
 
       if (fichaRes.status === "fulfilled") setDetalle(fichaRes.value.data || ficha)
@@ -78,13 +76,6 @@ export default function DetailFichaModal({ isOpen, onClose, ficha, onInstructorC
           es_lider: a.es_lider || false,
         }))
         setInstructores(mapped)
-      }
-
-      // Buscar avance de RAPs de este grupo
-      if (rapRes.status === "fulfilled") {
-        const todos = (rapRes.value.data || []) as any[]
-        const este = todos.find((r: any) => r.ficha_id === ficha.id)
-        setRapAvance(este || null)
       }
     } catch {
       setDetalle(ficha)
@@ -261,46 +252,6 @@ export default function DetailFichaModal({ isOpen, onClose, ficha, onInstructorC
               <p className="text-sm text-gray-500">Sin instructores asignados</p>
             )}
           </div>
-
-          {/* Avance de RAPs */}
-          {rapAvance && rapAvance.total_raps > 0 && (() => {
-            const pct = Math.round((rapAvance.aprobados / rapAvance.total_raps) * 100)
-            return (
-              <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-sena" />
-                  Avance de RAPs
-                </h4>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className={`h-3 rounded-full transition-all ${
-                          pct === 100 ? "bg-green-500" : pct >= 50 ? "bg-sena" : "bg-yellow-500"
-                        }`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-gray-900 whitespace-nowrap">{pct}%</span>
-                </div>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div>
-                    <p className="text-lg font-bold text-green-600">{rapAvance.aprobados}</p>
-                    <p className="text-[10px] text-gray-500">Aprobados</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-yellow-600">{rapAvance.pendientes}</p>
-                    <p className="text-[10px] text-gray-500">Pendientes</p>
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-red-600">{rapAvance.no_aprobados}</p>
-                    <p className="text-[10px] text-gray-500">No aprobados</p>
-                  </div>
-                </div>
-              </div>
-            )
-          })()}
 
           {/* Estado */}
           <div className="flex items-center gap-3 pt-2 border-t border-gray-100">

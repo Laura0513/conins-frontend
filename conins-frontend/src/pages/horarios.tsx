@@ -551,8 +551,8 @@ export default function HorariosPage() {
               onSemanaChange={handleSemanaChange}
               loading={loadingGrilla}
               filterDia={filtroVista === "dia" ? diaHoyAbrev : undefined}
-              onClickHorario={(h) => {
-                setVistaRapida({ isOpen: true, tipo: "instructor", valor: h.instructor_nombre, semana: semanaGrilla })
+              onClickEntidad={(tipo, valor) => {
+                setVistaRapida({ isOpen: true, tipo, valor, semana: semanaGrilla })
               }}
             />
           </div>

@@ -442,12 +442,6 @@ export const api = {
             if (semana) params.append('semana', semana)
             return apiFetch(`/consultas/calendario?${params}`)
         },
-        getRapAvance() {
-            return apiFetch('/consultas/rap-avance')
-        },
-        getRapAvanceFicha(fichaId: number) {
-            return apiFetch(`/consultas/rap-avance/${fichaId}`)
-        },
         async descargarExcel(reporte: string, semana?: string) {
             const params = new URLSearchParams({ reporte })
             if (semana) params.append('semana', semana)
@@ -465,50 +459,6 @@ export const api = {
             a.click()
             a.remove()
             URL.revokeObjectURL(url)
-        },
-    },
-
-    rapSeguimiento: {
-        getByFicha(fichaId: number) {
-            return apiFetch(`/rap-seguimiento/ficha/${fichaId}`)
-        },
-        getDisponibles(fichaId: number) {
-            return apiFetch(`/rap-seguimiento/ficha/${fichaId}/disponibles`)
-        },
-        getByAsignacionCompetencia(acId: number) {
-            return apiFetch(`/rap-seguimiento/asignacion-competencia/${acId}`)
-        },
-        getById(id: number) {
-            return apiFetch(`/rap-seguimiento/${id}`)
-        },
-        create(data: any) {
-            return apiFetch('/rap-seguimiento', {
-                method: 'POST',
-                body: JSON.stringify(data),
-            })
-        },
-        update(id: number, data: any) {
-            return apiFetch(`/rap-seguimiento/${id}`, {
-                method: 'PATCH',
-                body: JSON.stringify(data),
-            })
-        },
-        evaluar(id: number, estado_aprobacion: string) {
-            return apiFetch(`/rap-seguimiento/${id}/evaluar`, {
-                method: 'PATCH',
-                body: JSON.stringify({ estado_aprobacion }),
-            })
-        },
-        toggleActivo(id: number) {
-            return apiFetch(`/rap-seguimiento/${id}/estado`, {
-                method: 'PATCH',
-            })
-        },
-        evaluarTodos(acId: number, estado_aprobacion: string) {
-            return apiFetch(`/rap-seguimiento/asignacion-competencia/${acId}/evaluar-todos`, {
-                method: 'PATCH',
-                body: JSON.stringify({ estado_aprobacion }),
-            })
         },
     },
 

@@ -9,7 +9,6 @@ import { formatJornada } from "@/lib/terminology"
 import CrearFichaModal from "@/components/fichas/CrearFichaModal"
 import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import EditFichaModal from "@/components/fichas/EditFichaModal"
-import RapSeguimientoModal from "@/components/fichas/RapSeguimientoModal"
 import NovedadFichaModal from "@/components/fichas/NovedadFichaModal"
 import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
 import {
@@ -23,7 +22,6 @@ import {
   Loader2,
   AlertTriangle,
 
-  ClipboardList,
   FileWarning,
   BookOpen,
   FileDown,
@@ -56,7 +54,6 @@ export default function FichasPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [isRapModalOpen, setIsRapModalOpen] = useState(false)
   const [isNovedadModalOpen, setIsNovedadModalOpen] = useState(false)
   const [selectedFicha, setSelectedFicha] = useState<Ficha | null>(null)
   const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false)
@@ -179,11 +176,6 @@ export default function FichasPage() {
   const openEditModal = (ficha: Ficha) => {
     setSelectedFicha(ficha)
     setIsEditModalOpen(true)
-  }
-
-  const openRapModal = (ficha: Ficha) => {
-    setSelectedFicha(ficha)
-    setIsRapModalOpen(true)
   }
 
   const openNovedadModal = (ficha: Ficha) => {
@@ -420,13 +412,6 @@ export default function FichasPage() {
                               <FileDown className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => openRapModal(ficha)}
-                              className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                              title="Evaluación RAPs"
-                            >
-                              <ClipboardList className="w-4 h-4" />
-                            </button>
-                            <button
                               onClick={() => openNovedadModal(ficha)}
                               className="p-1.5 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded transition-colors"
                               title="Novedades"
@@ -463,13 +448,6 @@ export default function FichasPage() {
                               title="Descargar PDF"
                             >
                               <FileDown className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => openRapModal(ficha)}
-                              className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors"
-                              title="Evaluación RAPs"
-                            >
-                              <ClipboardList className="w-4 h-4" />
                             </button>
                           </div>
                         )}
@@ -551,15 +529,6 @@ export default function FichasPage() {
         onSubmit={handleEditFicha}
       />
 
-
-      <RapSeguimientoModal
-        isOpen={isRapModalOpen}
-        onClose={() => setIsRapModalOpen(false)}
-        fichaId={selectedFicha?.id ?? null}
-        fichaNumero={selectedFicha?.numero_ficha ?? ""}
-        puedeEditar={puedeEditar}
-        onToast={showToast}
-      />
 
       <NovedadFichaModal
         isOpen={isNovedadModalOpen}

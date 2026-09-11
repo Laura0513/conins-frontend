@@ -59,10 +59,11 @@ type GrillaHorariosProps = {
   onSemanaChange?: (semana: string | undefined) => void
   loading?: boolean
   onClickHorario?: (horario: Horario) => void
+  onClickEntidad?: (tipo: "instructor" | "grupo" | "ambiente", valor: string) => void
   filterDia?: string | null
 }
 
-export default function GrillaHorarios({ horarios, onSemanaChange, loading, onClickHorario, filterDia }: GrillaHorariosProps) {
+export default function GrillaHorarios({ horarios, onSemanaChange, loading, onClickHorario, onClickEntidad, filterDia }: GrillaHorariosProps) {
   const [semanaOffset, setSemanaOffset] = useState(0)
   const lunes = getLunes(semanaOffset)
 
@@ -185,14 +186,28 @@ export default function GrillaHorarios({ horarios, onSemanaChange, loading, onCl
                             {entries.map((h) => (
                               <div
                                 key={h.id}
-                                onClick={() => onClickHorario?.(h)}
-                                className={`${jornada.bg} ${jornada.border} border-l-2 rounded-r px-2 py-1.5 min-h-[60px] ${onClickHorario ? "cursor-pointer hover:opacity-80 transition-opacity" : ""}`}
+                                className={`${jornada.bg} ${jornada.border} border-l-2 rounded-r px-2 py-1.5 min-h-[60px]`}
                               >
                                 <div className={`${jornada.text} text-xs space-y-0.5`}>
-                                  <p className="font-bold truncate">{h.ficha_numero}</p>
-                                  <p className="truncate">{h.instructor_nombre.split(" ").slice(0, 2).join(" ")}</p>
+                                  <p
+                                    className={`font-bold truncate ${onClickEntidad ? "cursor-pointer hover:underline" : ""}`}
+                                    onClick={(e) => { e.stopPropagation(); onClickEntidad?.("grupo", h.ficha_numero) }}
+                                  >
+                                    {h.ficha_numero}
+                                  </p>
+                                  <p
+                                    className={`truncate ${onClickEntidad ? "cursor-pointer hover:underline" : ""}`}
+                                    onClick={(e) => { e.stopPropagation(); onClickEntidad?.("instructor", h.instructor_nombre) }}
+                                  >
+                                    {h.instructor_nombre.split(" ").slice(0, 2).join(" ")}
+                                  </p>
                                   {h.ambiente && (
-                                    <p className="truncate text-gray-500">{h.ambiente}</p>
+                                    <p
+                                      className={`truncate text-gray-500 ${onClickEntidad ? "cursor-pointer hover:underline" : ""}`}
+                                      onClick={(e) => { e.stopPropagation(); onClickEntidad?.("ambiente", h.ambiente) }}
+                                    >
+                                      {h.ambiente}
+                                    </p>
                                   )}
                                   <p className="text-gray-400">{h.horas}</p>
                                 </div>

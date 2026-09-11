@@ -201,7 +201,13 @@ export default function VistaRapidaHorarioModal({ isOpen, onClose, tipo, valor, 
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => exportarHorariosPDF(horarios, `Horarios — ${tituloTipo}: ${valor}`)}
+              onClick={() => {
+                const datos = soloHoy ? horariosHoy : horarios
+                const titulo = soloHoy
+                  ? `Horario de hoy — ${tituloTipo}: ${valor}`
+                  : `Horarios — ${tituloTipo}: ${valor}`
+                exportarHorariosPDF(datos, titulo)
+              }}
               className="flex items-center gap-1.5 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <FileDown className="w-4 h-4" />
