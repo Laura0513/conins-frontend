@@ -42,6 +42,7 @@ type HistoricoItem = {
   usuario_nombre: string | null
   creados: number
   omitidos: number
+  descartados: number
   errores: number
   created_at: string
 }
@@ -148,6 +149,11 @@ export default function ImportarPage() {
 
       const totalCreados = (res.data.resumen || []).reduce((s: number, h: ResumenHoja) => s + h.creados, 0)
       const totalErrores = (res.data.resumen || []).reduce((s: number, h: ResumenHoja) => s + h.errores.length, 0)
+
+      // Refrescar histórico
+      api.importar.getHistorico()
+        .then((res) => setHistorico(res.data || []))
+        .catch(() => {})
 
       if (totalErrores === 0) {
         showToast(`Importación exitosa: ${totalCreados} registros creados`, "success")
@@ -536,6 +542,7 @@ export default function ImportarPage() {
                     <th className="text-left px-6 py-3 font-medium">Usuario</th>
                     <th className="text-center px-6 py-3 font-medium">Creados</th>
                     <th className="text-center px-6 py-3 font-medium">Omitidos</th>
+                    <th className="text-center px-6 py-3 font-medium">Descartados</th>
                     <th className="text-center px-6 py-3 font-medium">Errores</th>
                   </tr>
                 </thead>
@@ -555,6 +562,15 @@ export default function ImportarPage() {
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                           {h.omitidos}
                         </span>
+                      </td>
+                      <td className="px-6 py-3 text-center">
+                        {h.descartados > 0 ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
+                            {h.descartados}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400">0</span>
+                        )}
                       </td>
                       <td className="px-6 py-3 text-center">
                         {h.errores > 0 ? (

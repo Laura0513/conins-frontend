@@ -4,6 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { ValidationError } from '../utils/errors.js';
 import pool from '../config/db.js';
+import { FestivoModel } from '../models/festivo.model.js';
 
 // Semana (lunes) a mostrar en los paneles: la pedida por query, o por defecto
 // la semana con mas horarios registrados (para que el panel salga poblado sin
@@ -29,12 +30,26 @@ export const getCargaHoraria = asyncHandler(async (req: Request, res: Response) 
 });
 
 // Datos crudos de carga horaria (reusados por el panel JSON y por el Excel).
+// Festivos: los bloques que caen en un dia festivo de la semana NO cuentan para las
+// horas reales (total_horas = horas efectivas). El estado (Sobrecarga/Bajo carga) se
+// evalua contra la PLANTILLA completa (total_horas_plantilla) para no marcar "Bajo
+// carga" solo porque hubo un festivo — evita la falsa alerta.
 async function dataCargaHoraria(semana: string | null) {
+  const festivos = semana ? await FestivoModel.deSemana(semana) : [];
+  const festivoDias = [...new Set(festivos.map((f) => f.dia_semana))];
+
+  // Expresion de horas efectivas: pone en 0 los minutos de los bloques en dia festivo.
+  const efectivaExpr = festivoDias.length
+    ? `SUM(CASE WHEN h.dia_semana IN (${festivoDias.map(() => '?').join(',')}) THEN 0
+               ELSE TIMESTAMPDIFF(MINUTE, h.hora_inicio, h.hora_fin) END) / 60`
+    : `SUM(TIMESTAMPDIFF(MINUTE, h.hora_inicio, h.hora_fin)) / 60`;
+
   const [rows] = await pool.query(`
     SELECT
       i.id AS instructor_id,
       u.nombre AS instructor_nombre,
-      COALESCE(SUM(TIMESTAMPDIFF(MINUTE, h.hora_inicio, h.hora_fin)) / 60, 0) AS total_horas,
+      COALESCE(${efectivaExpr}, 0) AS total_horas,
+      COALESCE(SUM(TIMESTAMPDIFF(MINUTE, h.hora_inicio, h.hora_fin)) / 60, 0) AS total_horas_plantilla,
       COUNT(DISTINCT h.ficha_id) AS fichas_count,
       COUNT(DISTINCT h.competencia_id) AS competencias_count,
       CASE
@@ -48,9 +63,16 @@ async function dataCargaHoraria(semana: string | null) {
       AND h.semana = ?
     WHERE i.activo = TRUE
     GROUP BY i.id, u.nombre
-    ORDER BY total_horas DESC
-  `, [semana]);
-  return (rows as any[]).map((r) => ({ ...r, total_horas: Number(r.total_horas) }));
+    ORDER BY total_horas_plantilla DESC
+  `, [...festivoDias, semana]);
+
+  const festivosInfo = festivos.map((f) => ({ fecha: f.fecha, descripcion: f.descripcion }));
+  return (rows as any[]).map((r) => ({
+    ...r,
+    total_horas: Number(r.total_horas),
+    total_horas_plantilla: Number(r.total_horas_plantilla),
+    festivos: festivosInfo, // festivos de la semana (para mostrar "incluye N festivo")
+  }));
 }
 
 export const getHorariosFicha = asyncHandler(async (_req: Request, res: Response) => {

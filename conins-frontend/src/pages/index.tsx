@@ -18,13 +18,14 @@ import {
   Search,
   CheckCircle,
 } from "lucide-react"
-import GrillaHorarios from "@/components/horarios/GrillaHorarios"
 
 // --- Types ---
 type CargaHoraria = {
   instructor_id: number
   instructor_nombre: string
   total_horas: number
+  total_horas_plantilla?: number
+  festivos?: { fecha: string; descripcion: string }[]
   fichas_count: number
   competencias_count: number
   estado: "Normal" | "Sobrecarga" | "Bajo carga"
@@ -132,9 +133,6 @@ export default function Home() {
   const [alertas, setAlertas] = useState<Alerta[]>([])
   const [cargaHoraria, setCargaHoraria] = useState<CargaHoraria[]>([])
   const [ocupacion, setOcupacion] = useState<OcupacionAmbiente[]>([])
-  const [grillaHorarios, setGrillaHorarios] = useState<any[]>([])
-  const [grillaLoading, setGrillaLoading] = useState(false)
-  const [rapAvance, setRapAvance] = useState<RapAvance[]>([])
 
   // Instructor stats
   const [misHorarios, setMisHorarios] = useState<HorarioInstructor[]>([])
@@ -143,8 +141,6 @@ export default function Home() {
 
   const [dataLoading, setDataLoading] = useState(true)
 
-  const DIAS_ABREV_HOY = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
-  const diaHoyAbrev = DIAS_ABREV_HOY[new Date().getDay()]
 
   const rol = user?.roles?.[0]?.trim() || "admin"
   const esAdmin = rol !== "Instructor"
@@ -169,9 +165,7 @@ export default function Home() {
       api.alertas.getAll(),
       api.consultas.getCargaHoraria(),
       api.consultas.getOcupacionAmbientes(),
-      api.horarios.getAll(),
-      api.consultas.getRapAvance(),
-    ]).then(([instRes, fichasRes, asigRes, alertasRes, cargaRes, ocupRes, horariosRes, rapRes]) => {
+    ]).then(([instRes, fichasRes, asigRes, alertasRes, cargaRes, ocupRes]) => {
 
       if (instRes.status === "fulfilled") {
         const activos = (instRes.value.data || []).filter((i: any) => i.activo !== false)
@@ -198,32 +192,9 @@ export default function Home() {
         const datos = (ocupRes.value.data || []) as OcupacionAmbiente[]
         setOcupacion(datos.sort((a, b) => b.porcentaje - a.porcentaje).slice(0, 5))
       }
-      if (horariosRes.status === "fulfilled") {
-        const todos = (horariosRes.value.data || []).filter((h: any) => h.activo !== false)
-        setGrillaHorarios(todos)
-      }
-      if (rapRes.status === "fulfilled") {
-        setRapAvance((rapRes.value.data || []) as RapAvance[])
-      }
-
       setDataLoading(false)
     })
   }, [user, esAdmin])
-
-  // Recargar horarios cuando cambia la semana en la grilla
-  const handleSemanaChange = async (semana: string | undefined) => {
-    if (!user || !esAdmin) return
-    setGrillaLoading(true)
-    try {
-      const res = await api.horarios.getAll(semana)
-      const todos = (res.data || []).filter((h: any) => h.activo !== false)
-      setGrillaHorarios(todos)
-    } catch {
-      setGrillaHorarios([])
-    } finally {
-      setGrillaLoading(false)
-    }
-  }
 
   // Cargar datos instructor
   useEffect(() => {
@@ -365,28 +336,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Grilla de horarios semanal — lo primero que ven los directivos */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-gray-900">
-              Horarios de hoy — {new Date().toLocaleDateString("es-CO", { weekday: "long" })}
-            </h2>
-            <button
-              onClick={() => router.push("/horarios")}
-              className="text-sm text-sena font-medium hover:underline"
-            >
-              Ir a horarios →
-            </button>
-          </div>
-          <GrillaHorarios
-            horarios={grillaHorarios}
-            onSemanaChange={handleSemanaChange}
-            loading={dataLoading || grillaLoading}
-            onClickHorario={(h) => router.push("/horarios")}
-            filterDia={diaHoyAbrev}
-          />
-        </div>
-
         {/* Tarjetas de resumen */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button
@@ -473,58 +422,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Avance de RAPs por grupo */}
-        {rapAvance.length > 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-sena" />
-                <h2 className="text-base font-bold text-gray-900">Avance de RAPs por grupo</h2>
-              </div>
-              <button
-                onClick={() => router.push("/fichas")}
-                className="text-sm text-sena font-medium hover:underline"
-              >
-                Ver grupos
-              </button>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {rapAvance
-                  .sort((a, b) => (b.porcentaje ?? 0) - (a.porcentaje ?? 0))
-                  .slice(0, 8)
-                  .map((g) => {
-                    const pct = g.total_raps > 0 ? Math.round((g.aprobados / g.total_raps) * 100) : 0
-                    return (
-                      <div key={g.ficha_id} className="flex items-center gap-4">
-                        <div className="w-28 shrink-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{g.ficha_numero}</p>
-                          <p className="text-[10px] text-gray-400 truncate">{g.programa}</p>
-                        </div>
-                        <div className="flex-1">
-                          <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <div
-                              className={`h-2.5 rounded-full transition-all ${
-                                pct === 100 ? "bg-green-500" : pct >= 50 ? "bg-sena" : "bg-yellow-500"
-                              }`}
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                        </div>
-                        <div className="w-20 text-right shrink-0">
-                          <span className="text-sm font-semibold text-gray-900">{pct}%</span>
-                          <span className="text-[10px] text-gray-400 ml-1">
-                            ({g.aprobados}/{g.total_raps})
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  })}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Contenido inferior: Carga horaria + Ocupación + Alertas */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Tabla de carga horaria */}
@@ -569,7 +466,13 @@ export default function Home() {
                             {row.instructor_nombre}
                           </td>
                           <td className="py-3 text-center text-gray-700">
-                            {Number(row.total_horas).toFixed(0)}
+                            <span>{Number(row.total_horas).toFixed(0)} h</span>
+                            {row.total_horas_plantilla && row.total_horas_plantilla !== row.total_horas && (
+                              <span className="block text-[10px] text-gray-400">
+                                plantilla {Number(row.total_horas_plantilla).toFixed(0)} h
+                                {row.festivos && row.festivos.length > 0 && ` · ${row.festivos.length} festivo${row.festivos.length > 1 ? "s" : ""}`}
+                              </span>
+                            )}
                           </td>
                           <td className="py-3 text-center text-gray-500">40</td>
                           <td className="py-3">

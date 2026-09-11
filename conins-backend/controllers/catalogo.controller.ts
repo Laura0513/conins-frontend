@@ -68,3 +68,10 @@ export const getTiposActividad = asyncHandler(async (_req: Request, res: Respons
   );
   ApiResponse.success(res, rows);
 });
+
+export const getFestivos = asyncHandler(async (_req: Request, res: Response) => {
+  const [rows] = await pool.query(
+    "SELECT DATE_FORMAT(fecha, '%Y-%m-%d') AS fecha, descripcion FROM festivos WHERE activo = TRUE ORDER BY fecha",
+  );
+  ApiResponse.success(res, rows);
+});

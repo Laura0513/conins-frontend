@@ -299,6 +299,7 @@ CREATE TABLE IF NOT EXISTS asignacion (
     motivo_provisional  TEXT NULL,
     fecha_asignacion    DATE NULL,
     activo              BOOLEAN NOT NULL DEFAULT TRUE,
+    motivo_baja         VARCHAR(80) NULL COMMENT 'Causa de la baja en cascada (para reactivar con precision)',
     UNIQUE KEY uq_instructor_ficha (instructor_id, ficha_id),
     FOREIGN KEY (instructor_id)     REFERENCES instructores(id) ON DELETE RESTRICT,
     FOREIGN KEY (ficha_id)          REFERENCES fichas(id)       ON DELETE CASCADE,
@@ -323,6 +324,7 @@ CREATE TABLE IF NOT EXISTS asignacion_competencia (
     ambiente_excepcion_id INT NULL,
     observacion           TEXT NULL,
     activo                BOOLEAN NOT NULL DEFAULT TRUE,
+    motivo_baja           VARCHAR(80) NULL COMMENT 'Causa de la baja en cascada (para reactivar con precision)',
     UNIQUE KEY uq_asignacion_competencia (asignacion_id, competencia_id),
     FOREIGN KEY (asignacion_id)          REFERENCES asignacion(id)   ON DELETE CASCADE,
     FOREIGN KEY (competencia_id)         REFERENCES competencias(id) ON DELETE RESTRICT,
@@ -344,6 +346,7 @@ CREATE TABLE IF NOT EXISTS asignacion_rap (
     instructor_anterior_id    INT NULL COMMENT 'Trazabilidad RN-16 al reasignar el RAP',
     fecha_cambio              DATETIME NULL,
     activo                    BOOLEAN NOT NULL DEFAULT TRUE,
+    motivo_baja               VARCHAR(80) NULL COMMENT 'Causa de la baja en cascada (para reactivar con precision)',
     created_at                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uq_asignacion_competencia_rap (asignacion_competencia_id, rap_id),
     FOREIGN KEY (asignacion_competencia_id) REFERENCES asignacion_competencia(id) ON DELETE CASCADE,
@@ -369,6 +372,7 @@ CREATE TABLE IF NOT EXISTS rap_ficha_seguimiento (
     estado_aprobacion         ENUM('aprobado','no_aprobado') NULL
                                 COMMENT 'Solo aplica si estado_evaluacion = evaluado',
     activo                    BOOLEAN NOT NULL DEFAULT TRUE,
+    motivo_baja               VARCHAR(80) NULL COMMENT 'Causa de la baja en cascada (para reactivar con precision)',
     FOREIGN KEY (asignacion_competencia_id)
         REFERENCES asignacion_competencia(id) ON DELETE CASCADE,
     FOREIGN KEY (rap_id)
@@ -1363,6 +1367,7 @@ CREATE TABLE IF NOT EXISTS import_historico (
     creados        INT NOT NULL DEFAULT 0,
     omitidos       INT NOT NULL DEFAULT 0,
     errores        INT NOT NULL DEFAULT 0,
+    descartados    INT NOT NULL DEFAULT 0 COMMENT 'Filas caidas en el preview (fuera de rango, sin catalogo, ...)',
     created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -1380,6 +1385,54 @@ INSERT IGNORE INTO enlaces_externos (id, nombre, url, orden) VALUES
   (1, 'Sofia Plus', 'https://oferta.senasofiaplus.edu.co/sofia-oferta/', 1),
   (2, 'SENA', 'https://www.sena.edu.co/', 2),
   (3, 'Zajuna', 'https://zajuna.sena.edu.co/', 3);
+
+-- Festivos: un dia festivo dentro de una semana reduce la carga horaria real de
+-- esa semana (se descuentan los bloques que caen en ese dia). La coordinacion
+-- puede agregar dias no laborales institucionales o ajustar excepciones.
+-- Seed: festivos nacionales de Colombia (Ley 51/1983 - Ley Emiliani + Pascua).
+CREATE TABLE IF NOT EXISTS festivos (
+    fecha       DATE PRIMARY KEY,
+    descripcion VARCHAR(120) NOT NULL,
+    activo      BOOLEAN NOT NULL DEFAULT TRUE
+) ENGINE=InnoDB;
+
+INSERT IGNORE INTO festivos (fecha, descripcion) VALUES
+  ('2026-01-01', 'Ano Nuevo'),
+  ('2026-01-12', 'Reyes Magos'),
+  ('2026-03-23', 'San Jose'),
+  ('2026-04-02', 'Jueves Santo'),
+  ('2026-04-03', 'Viernes Santo'),
+  ('2026-05-01', 'Dia del Trabajo'),
+  ('2026-05-18', 'Ascension del Senor'),
+  ('2026-06-08', 'Corpus Christi'),
+  ('2026-06-15', 'Sagrado Corazon'),
+  ('2026-06-29', 'San Pedro y San Pablo'),
+  ('2026-07-20', 'Independencia de Colombia'),
+  ('2026-08-07', 'Batalla de Boyaca'),
+  ('2026-08-17', 'Asuncion de la Virgen'),
+  ('2026-10-12', 'Dia de la Raza'),
+  ('2026-11-02', 'Todos los Santos'),
+  ('2026-11-16', 'Independencia de Cartagena'),
+  ('2026-12-08', 'Inmaculada Concepcion'),
+  ('2026-12-25', 'Navidad'),
+  ('2027-01-01', 'Ano Nuevo'),
+  ('2027-01-11', 'Reyes Magos'),
+  ('2027-03-22', 'San Jose'),
+  ('2027-03-25', 'Jueves Santo'),
+  ('2027-03-26', 'Viernes Santo'),
+  ('2027-05-01', 'Dia del Trabajo'),
+  ('2027-05-10', 'Ascension del Senor'),
+  ('2027-05-31', 'Corpus Christi'),
+  ('2027-06-07', 'Sagrado Corazon'),
+  ('2027-07-05', 'San Pedro y San Pablo'),
+  ('2027-07-20', 'Independencia de Colombia'),
+  ('2027-08-07', 'Batalla de Boyaca'),
+  ('2027-08-16', 'Asuncion de la Virgen'),
+  ('2027-10-18', 'Dia de la Raza'),
+  ('2027-11-01', 'Todos los Santos'),
+  ('2027-11-15', 'Independencia de Cartagena'),
+  ('2027-12-08', 'Inmaculada Concepcion'),
+  ('2027-12-25', 'Navidad');
 
 -- ============================================================
 -- 25. UTF-8 COLLATION

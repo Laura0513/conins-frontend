@@ -73,15 +73,18 @@ export const HorarioService = {
 
     const semana = data.semana ?? getLunesSemanaActual();
 
-    const hasOverlap = await HorarioModel.hasOverlap(
+    const conflicto = await HorarioModel.findConflicto(
       data.instructor_id,
       data.dia_semana,
       data.hora_inicio,
       data.hora_fin,
       semana,
     );
-    if (hasOverlap) {
-      throw new ConflictError('El instructor ya tiene otra clase ese dia a esa hora (los horarios se cruzan)');
+    if (conflicto) {
+      const diaNombre = DIA_ES[data.dia_semana] ?? `dia ${data.dia_semana}`;
+      throw new ConflictError(
+        `El instructor ya tiene otra clase el ${diaNombre} a esa hora (se cruza con el grupo ${conflicto.grupo}, ${conflicto.hora_inicio}-${conflicto.hora_fin}).`,
+      );
     }
 
     // Conflictos que en ACCION INTERACTIVA (boton del sistema) se BLOQUEAN, pero
@@ -235,7 +238,7 @@ export const HorarioService = {
 
     // RN-04: solapamiento del instructor (hard block)
     if (data.dia_semana !== undefined || data.hora_inicio !== undefined || data.hora_fin !== undefined) {
-      const hasOverlap = await HorarioModel.hasOverlap(
+      const conflicto = await HorarioModel.findConflicto(
         existing.instructor_id,
         finalDia,
         finalHoraInicio,
@@ -243,8 +246,11 @@ export const HorarioService = {
         semana,
         id,
       );
-      if (hasOverlap) {
-        throw new ConflictError('El instructor ya tiene otra clase ese dia a esa hora (los horarios se cruzan)');
+      if (conflicto) {
+        const diaNombre = DIA_ES[finalDia] ?? `dia ${finalDia}`;
+        throw new ConflictError(
+          `El instructor ya tiene otra clase el ${diaNombre} a esa hora (se cruza con el grupo ${conflicto.grupo}, ${conflicto.hora_inicio}-${conflicto.hora_fin}).`,
+        );
       }
     }
 

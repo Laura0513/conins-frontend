@@ -98,9 +98,70 @@ export default function HorariosPage() {
   const [filtroEstado, setFiltroEstado] = useState<string[]>([])
   const [vistaGrilla, setVistaGrilla] = useState(true)
   const [mostrarInactivos, setMostrarInactivos] = useState(false)
-  const [semanaGrilla, setSemanaGrilla] = useState<string | undefined>(undefined)
+  const [filtroVista, setFiltroVista] = useState<"semana" | "dia" | "mes">("semana")
+  const [exportandoMes, setExportandoMes] = useState(false)
+
+  // Semana actual por defecto (lunes de esta semana en formato ISO)
+  const getLunesActual = () => {
+    const now = new Date()
+    const day = now.getDay()
+    const diff = day === 0 ? -6 : 1 - day
+    const lunes = new Date(now)
+    lunes.setDate(now.getDate() + diff)
+    return lunes.toISOString().split("T")[0]
+  }
+  const [semanaGrilla, setSemanaGrilla] = useState<string | undefined>(getLunesActual)
   const [horariosGrilla, setHorariosGrilla] = useState<Horario[]>([])
   const [loadingGrilla, setLoadingGrilla] = useState(false)
+
+  const DIAS_ABREV_HOY = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
+  const diaHoyAbrev = DIAS_ABREV_HOY[new Date().getDay()]
+
+  // Obtener todos los lunes del mes actual
+  const getLunesDelMes = () => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth()
+    const lunes: string[] = []
+    const d = new Date(year, month, 1)
+    // Ir al primer lunes del mes (o antes si el mes empieza después del lunes)
+    while (d.getDay() !== 1) d.setDate(d.getDate() - 1)
+    // Recorrer semana a semana hasta salir del mes
+    while (d.getMonth() <= month || (d.getMonth() === 0 && month === 11)) {
+      lunes.push(d.toISOString().split("T")[0])
+      d.setDate(d.getDate() + 7)
+      if (d.getFullYear() > year || (d.getFullYear() === year && d.getMonth() > month)) {
+        // Incluir la última semana si arranca en el mes
+        break
+      }
+    }
+    return lunes
+  }
+
+  const exportarMesPDF = async () => {
+    setExportandoMes(true)
+    try {
+      const semanas = getLunesDelMes()
+      const todas: Horario[] = []
+      const idsVistos = new Set<number>()
+      for (const sem of semanas) {
+        const res = await api.horarios.getAll(sem)
+        const data = (res.data || []) as Horario[]
+        for (const h of data) {
+          if (!idsVistos.has(h.id) && h.activo) {
+            idsVistos.add(h.id)
+            todas.push(h)
+          }
+        }
+      }
+      const mesLabel = new Date().toLocaleDateString("es-CO", { month: "long", year: "numeric" })
+      exportarHorariosPDF(aplicarFiltros(todas), `Horarios del mes — ${mesLabel}`)
+    } catch {
+      showToast("Error al exportar horarios del mes", "error")
+    } finally {
+      setExportandoMes(false)
+    }
+  }
 
   const rol = user?.roles?.[0]?.trim() || ""
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
@@ -112,7 +173,7 @@ export default function HorariosPage() {
   const cargarHorarios = async () => {
     setLoading(true)
     try {
-      const res = await api.horarios.getAll()
+      const res = await api.horarios.getAll(getLunesActual())
       setHorarios(res.data || [])
     } catch (err) {
       console.warn("Error cargando horarios:", err)
@@ -356,11 +417,27 @@ export default function HorariosPage() {
               {vistaGrilla ? "Ver tabla" : "Ver horario"}
             </button>
             <button
-              onClick={() => exportarHorariosPDF(listaFiltrada)}
-              className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+              onClick={() => {
+                if (filtroVista === "mes") {
+                  exportarMesPDF()
+                  return
+                }
+                let datos = vistaGrilla ? horariosGrillaFiltrados : listaFiltrada
+                let label = "Malla de Horarios Semanal"
+                if (vistaGrilla && filtroVista === "dia") {
+                  datos = datos.filter((h: any) => {
+                    const dias = Array.isArray(h.dias) ? h.dias : []
+                    return dias.includes(diaHoyAbrev)
+                  })
+                  label = `Horarios del día — ${new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" })}`
+                }
+                exportarHorariosPDF(datos, label)
+              }}
+              disabled={exportandoMes}
+              className={`border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm ${exportandoMes ? "opacity-50 cursor-wait" : ""}`}
             >
-              <FileDown className="w-4 h-4" />
-              Exportar PDF
+              {exportandoMes ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+              {exportandoMes ? "Exportando..." : "Exportar PDF"}
             </button>
             {puedeEditar && (
               <button
@@ -439,7 +516,30 @@ export default function HorariosPage() {
         )}
 
         {vistaGrilla ? (
-          <GrillaHorarios horarios={horariosGrillaFiltrados} onSemanaChange={handleSemanaChange} loading={loadingGrilla} />
+          <div className="space-y-4">
+            {/* Toggle día / semana / mes */}
+            <div className="flex items-center gap-2">
+              {(["dia", "semana", "mes"] as const).map((vista) => (
+                <button
+                  key={vista}
+                  onClick={() => setFiltroVista(vista)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    filtroVista === vista
+                      ? "bg-sena text-white"
+                      : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {vista === "dia" ? "Día" : vista === "semana" ? "Semana" : "Mes"}
+                </button>
+              ))}
+            </div>
+            <GrillaHorarios
+              horarios={horariosGrillaFiltrados}
+              onSemanaChange={handleSemanaChange}
+              loading={loadingGrilla}
+              filterDia={filtroVista === "dia" ? diaHoyAbrev : undefined}
+            />
+          </div>
         ) : (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (

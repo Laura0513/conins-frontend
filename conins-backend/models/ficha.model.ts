@@ -1,5 +1,6 @@
 import pool from '../config/db.js';
 import { RowDataPacket } from 'mysql2';
+import { CascadaModel } from './cascada.model.js';
 
 export interface FichaRecord extends RowDataPacket {
   id: number;
@@ -231,6 +232,14 @@ export const FichaModel = {
     const current = (rows as any[])[0]?.activo ?? true;
     const nuevo = !current;
     await pool.query('UPDATE fichas SET activo = ? WHERE id = ?', [nuevo, id]);
+
+    // Cascada completa (asignaciones -> competencias -> RAPs -> seguimientos + horarios
+    // + alertas). Reversible: reactivar el grupo revive solo lo apagado por esta causa.
+    if (!nuevo) {
+      await CascadaModel.grupoOff(id);
+    } else {
+      await CascadaModel.grupoOn(id);
+    }
     return nuevo;
   },
 

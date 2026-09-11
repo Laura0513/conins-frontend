@@ -47,5 +47,6 @@ router.get('/tipos-novedad-instructor', catalogoController.getTiposNovedadInstru
 router.get('/tipos-novedad-ambiente', catalogoController.getTiposNovedadAmbiente);
 router.get('/tipos-novedad-ficha', catalogoController.getTiposNovedadFicha);
 router.get('/tipos-actividad', catalogoController.getTiposActividad);
+router.get('/festivos', catalogoController.getFestivos);
 
 export default router;

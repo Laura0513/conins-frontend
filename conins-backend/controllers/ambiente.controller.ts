@@ -3,6 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { NotFoundError, ValidationError } from '../utils/errors.js';
 import pool from '../config/db.js';
+import { CascadaModel } from '../models/cascada.model.js';
 
 export const getAll = asyncHandler(async (_req: Request, res: Response) => {
   const [rows] = await pool.query('SELECT id, nombre, tipo, capacidad, area_id, sede_id, activo FROM ambientes WHERE activo = TRUE ORDER BY nombre');
@@ -63,6 +64,17 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
 
   values.push(id);
   await pool.query(`UPDATE ambientes SET ${updates.join(', ')} WHERE id = ?`, values);
+
+  // Cascada a horarios: si el ambiente se desactiva, se apagan sus horarios (dejan de
+  // aparecer en la grilla); si se reactiva, se reviven los que se apagaron por esta
+  // causa y cuyos demas actores sigan activos. Idempotente si activo no cambio.
+  if (activo !== undefined) {
+    if (!activo) {
+      await CascadaModel.ambienteOff(id);
+    } else {
+      await CascadaModel.ambienteOn(id);
+    }
+  }
 
   const [row] = await pool.query('SELECT id, nombre, tipo, capacidad, area_id, sede_id, activo FROM ambientes WHERE id = ?', [id]);
   ApiResponse.success(res, (row as any[])[0], 'Ambiente actualizado exitosamente');

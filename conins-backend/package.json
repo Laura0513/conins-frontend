@@ -10,7 +10,9 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "db:backup": "cd scripts && db-backup.bat",
-    "db:restore": "cd scripts && db-restore.bat"
+    "db:restore": "cd scripts && db-restore.bat",
+    "db:setup": "node scripts/db-setup.mjs setup",
+    "db:reset": "node scripts/db-setup.mjs reset"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

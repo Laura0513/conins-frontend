@@ -4,6 +4,7 @@ import { ApiResponse } from '../utils/response.js';
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors.js';
 import pool from '../config/db.js';
 import { AsignacionRapModel } from '../models/asignacion-rap.model.js';
+import { CascadaModel } from '../models/cascada.model.js';
 
 // ============================================================
 // COMPETENCIAS — RF-25, RF-26 (RN-25)
@@ -117,6 +118,15 @@ export const toggleEstado = asyncHandler(async (req: Request, res: Response) => 
   const nuevoEstado = !(existing as any[])[0].activo;
   await pool.query('UPDATE competencias SET activo = ? WHERE id = ?', [nuevoEstado, id]);
 
+  // Cascada: al desactivar la competencia se apagan sus asignacion_competencia, los RAPs
+  // asignados, seguimientos y horarios de esa competencia; al reactivar se reviven solo
+  // los apagados por esta causa (no toca la asignacion, que puede tener otras competencias).
+  if (!nuevoEstado) {
+    await CascadaModel.competenciaOff(id);
+  } else {
+    await CascadaModel.competenciaOn(id);
+  }
+
   const message = nuevoEstado ? 'Competencia activada' : 'Competencia desactivada';
   ApiResponse.success(res, { id, activo: nuevoEstado }, message);
 });
@@ -219,6 +229,14 @@ export const toggleRapEstado = asyncHandler(async (req: Request, res: Response) 
   }
 
   await pool.query('UPDATE raps SET activo = ? WHERE id = ?', [nuevoEstado, rapId]);
+
+  // Cascada: al desactivar el RAP se apagan sus asignaciones de RAP, seguimientos y
+  // horarios (+ alertas); al reactivar se reviven solo los apagados por esta causa.
+  if (!nuevoEstado) {
+    await CascadaModel.rapOff(rapId);
+  } else {
+    await CascadaModel.rapOn(rapId);
+  }
 
   const message = nuevoEstado ? 'RAP activado' : 'RAP desactivado';
   ApiResponse.success(res, { id: rapId, activo: nuevoEstado }, message);

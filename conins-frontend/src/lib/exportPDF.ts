@@ -125,44 +125,32 @@ type Horario = {
 }
 
 export function exportarHorariosPDF(horarios: Horario[], titulo: string = "Malla de Horarios") {
-  const doc = new jsPDF()
-  addHeader(doc, titulo, `${horarios.length} registros`)
+  const doc = new jsPDF("landscape")
+  addHeader(doc, titulo, `${horarios.length} registros`, "landscape")
 
   autoTable(doc, {
     startY: 46,
-    head: [["Grupo", "Instructor", "Competencia", "Ambiente", "Jornada", "Actividad", "Días", "Horas", "Estado"]],
+    head: [["Grupo", "Instructor", "Competencia", "Ambiente", "Jornada", "Días", "Horas"]],
     body: horarios.map((h) => [
       h.ficha_numero,
       h.instructor_nombre,
       h.competencia,
       h.ambiente || "—",
       formatJornada(h.jornada),
-      h.tipo_actividad || "—",
       h.dias.join(", "),
       h.horas,
-      h.estado || "—",
     ]),
     ...tableDefaults,
-    headStyles: { ...tableDefaults.headStyles, fontSize: 7, halign: "center" },
-    bodyStyles: { ...tableDefaults.bodyStyles, fontSize: 7 },
+    headStyles: { ...tableDefaults.headStyles, fontSize: 8, halign: "center" },
+    bodyStyles: { ...tableDefaults.bodyStyles, fontSize: 8 },
     columnStyles: {
-      0: { cellWidth: 18, halign: "center" },
-      1: { cellWidth: 28 },
-      2: { cellWidth: 28 },
-      3: { cellWidth: 18 },
-      4: { cellWidth: 16, halign: "center" },
-      5: { cellWidth: 20 },
-      6: { cellWidth: 25 },
-      7: { cellWidth: 16, halign: "center" },
-      8: { cellWidth: 18, halign: "center" },
-    },
-    didParseCell: (d: any) => {
-      if (d.column.index === 8 && d.section === "body") {
-        const v = d.cell.raw
-        if (v === "Aprobado") { d.cell.styles.textColor = COLOR_OK; d.cell.styles.fontStyle = "bold" }
-        else if (v === "Pendiente") d.cell.styles.textColor = COLOR_WARN
-        else if (v === "Rechazado") d.cell.styles.textColor = COLOR_DANGER
-      }
+      0: { cellWidth: 25, halign: "center" },
+      1: { cellWidth: 45 },
+      2: { cellWidth: 55 },
+      3: { cellWidth: 35 },
+      4: { cellWidth: 25, halign: "center" },
+      5: { cellWidth: 35, halign: "center" },
+      6: { cellWidth: 25, halign: "center" },
     },
   })
 
@@ -842,10 +830,8 @@ export function exportarHorarioIndividualPDF(horario: HorarioIndividualData) {
     { label: "RAP", value: horario.rap_codigo ? `${horario.rap_codigo} — ${horario.rap_descripcion || ""}` : "—" },
     { label: "Ambiente", value: horario.ambiente || "—" },
     { label: "Jornada", value: formatJornada(horario.jornada) },
-    { label: "Tipo actividad", value: horario.tipo_actividad || "—" },
     { label: "Días", value: horario.dias.join(", ") },
     { label: "Horas", value: horario.horas },
-    { label: "Estado", value: horario.estado },
   ], 46)
 
   addFooter(doc)

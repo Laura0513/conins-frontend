@@ -1,5 +1,6 @@
 import pool from '../config/db.js';
 import { RowDataPacket } from 'mysql2';
+import { CascadaModel } from './cascada.model.js';
 
 export interface InstructorRecord extends RowDataPacket {
   id: number;
@@ -95,6 +96,14 @@ export const InstructorModel = {
     const current = (rows as any[])[0]?.activo ?? true;
     const nuevo = !current;
     await pool.query('UPDATE instructores SET activo = ? WHERE id = ?', [nuevo, id]);
+
+    // Cascada completa (asignaciones -> competencias -> RAPs -> seguimientos + horarios
+    // + alertas). Reversible: reactivar el instructor revive solo lo apagado por esta causa.
+    if (!nuevo) {
+      await CascadaModel.instructorOff(id);
+    } else {
+      await CascadaModel.instructorOn(id);
+    }
     return nuevo;
   },
 

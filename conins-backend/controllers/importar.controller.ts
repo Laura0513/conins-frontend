@@ -3,6 +3,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/response.js';
 import { ImportarService } from '../services/importar.service.js';
 import { ImportHistoricoModel } from '../models/import-historico.model.js';
+import pool from '../config/db.js';
+import { RowDataPacket } from 'mysql2';
 
 // POST /api/importar/preview
 // Body: { archivo_base64: string, programa_codigo?: string }
@@ -27,13 +29,22 @@ export const importar = asyncHandler(async (req: Request, res: Response) => {
   const totalOmitidos = resultado.resumen.reduce((s, h) => s + h.omitidos, 0);
   const totalErrores = resultado.resumen.reduce((s, h) => s + h.errores.length, 0);
 
+  // Filas descartadas en el preview (fuera de rango, sin coincidencia en catalogo, ...):
+  // se guardan en import_correcciones al previsualizar. Se cuentan aparte de los errores
+  // del confirm (RN-04, etc.) para que el historico refleje TODO lo que no se cargo.
+  let descartados = 0;
+  try {
+    const [r] = await pool.query<RowDataPacket[]>('SELECT COUNT(*) AS n FROM import_correcciones');
+    descartados = Number((r as any[])[0]?.n ?? 0);
+  } catch { /* si no existe la tabla, se ignora */ }
+
   // Registrar en el historico de cargas (best-effort: no debe tumbar la respuesta).
   try {
     const u = req.user as any;
     await ImportHistoricoModel.crear({
       usuario_id: u?.id ?? null,
       usuario_nombre: u?.nombre ?? null,
-      creados: totalCreados, omitidos: totalOmitidos, errores: totalErrores,
+      creados: totalCreados, omitidos: totalOmitidos, errores: totalErrores, descartados,
     });
   } catch (err) {
     console.error('[importar] no se pudo registrar el historico:', err);

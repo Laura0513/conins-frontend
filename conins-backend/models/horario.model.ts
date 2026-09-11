@@ -335,6 +335,33 @@ export const HorarioModel = {
     return (rows as any[]).length > 0;
   },
 
+  // Devuelve el horario que se cruza (grupo + franja) para armar un mensaje ubicable,
+  // o null si no hay cruce. Mismo criterio que hasOverlap.
+  async findConflicto(
+    instructorId: number,
+    diaSemana: number,
+    horaInicio: string,
+    horaFin: string,
+    semana: string,
+    excludeId?: number,
+  ): Promise<{ grupo: string; hora_inicio: string; hora_fin: string } | null> {
+    const query = `
+      SELECT f.numero_ficha AS grupo,
+             TIME_FORMAT(h.hora_inicio, '%H:%i') AS hora_inicio,
+             TIME_FORMAT(h.hora_fin, '%H:%i') AS hora_fin
+      FROM horarios h JOIN fichas f ON f.id = h.ficha_id
+      WHERE h.instructor_id = ? AND h.dia_semana = ? AND h.semana = ? AND h.activo = TRUE
+        AND h.hora_inicio < ? AND h.hora_fin > ?
+      ${excludeId ? 'AND h.id != ?' : ''}
+      LIMIT 1
+    `;
+    const params = excludeId
+      ? [instructorId, diaSemana, semana, horaFin, horaInicio, excludeId]
+      : [instructorId, diaSemana, semana, horaFin, horaInicio];
+    const [rows] = await pool.query(query, params);
+    return (rows as any[])[0] ?? null;
+  },
+
   // Idempotencia del importador: TRUE si ya existe un horario identico (mismo
   // instructor, grupo, competencia, dia, franja y semana). Permite re-subir el
   // Excel corregido sin duplicar ni marcar como error lo que ya estaba.
