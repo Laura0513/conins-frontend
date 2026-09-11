@@ -11,6 +11,7 @@ import CrearHorarioModal from "@/components/horarios/CrearHorarioModal"
 import CrearBloqueHorarioModal from "@/components/horarios/CrearBloqueHorarioModal"
 import EditarHorarioModal from "@/components/horarios/EditarHorarioModal"
 import GrillaHorarios from "@/components/horarios/GrillaHorarios"
+import VistaRapidaHorarioModal from "@/components/horarios/VistaRapidaHorarioModal"
 import DetailInstructorModal from "@/components/instructores/DetailInstructorModal"
 import DetailFichaModal from "@/components/fichas/DetailFichaModal"
 import VerAgendaAmbienteModal from "@/components/ambientes/VerAgendaAmbienteModal"
@@ -78,6 +79,11 @@ export default function HorariosPage() {
   const [selectedFicha, setSelectedFicha] = useState<any>(null)
   const [isAmbienteModalOpen, setIsAmbienteModalOpen] = useState(false)
   const [selectedAmbiente, setSelectedAmbiente] = useState<any>(null)
+
+  // Vista rápida de horarios
+  const [vistaRapida, setVistaRapida] = useState<{ isOpen: boolean; tipo: "instructor" | "grupo" | "ambiente"; valor: string; semana?: string; vista?: "dia" | "semana" }>({
+    isOpen: false, tipo: "instructor", valor: "",
+  })
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean
@@ -173,7 +179,7 @@ export default function HorariosPage() {
   const cargarHorarios = async () => {
     setLoading(true)
     try {
-      const res = await api.horarios.getAll(getLunesActual())
+      const res = await api.horarios.getAll()
       setHorarios(res.data || [])
     } catch (err) {
       console.warn("Error cargando horarios:", err)
@@ -464,27 +470,34 @@ export default function HorariosPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 w-full md:flex md:flex-wrap md:w-auto">
-            <MultiSelect
-              label="Grupo"
-              allLabel="Todos"
-              options={[...new Set(horarios.map((h) => h.ficha_numero))].sort().map((f) => ({ value: f, label: f }))}
-              selected={filtroFicha}
-              onChange={setFiltroFicha}
-            />
-            <MultiSelect
-              label="Instructor"
-              allLabel="Todos"
-              options={[...new Set(horarios.map((h) => h.instructor_nombre))].sort().map((i) => ({ value: i, label: i }))}
-              selected={filtroInstructor}
-              onChange={setFiltroInstructor}
-            />
-            <MultiSelect
-              label="Ambiente"
-              allLabel="Todos"
-              options={[...new Set(horarios.map((h) => h.ambiente).filter(Boolean))].sort().map((a) => ({ value: a, label: a }))}
-              selected={filtroAmbiente}
-              onChange={setFiltroAmbiente}
-            />
+            {(() => {
+              const fuente = vistaGrilla ? horariosGrilla : horarios
+              return (
+                <>
+                <MultiSelect
+                  label="Grupo"
+                  allLabel="Todos"
+                  options={[...new Set(fuente.map((h) => h.ficha_numero))].sort().map((f) => ({ value: f, label: f }))}
+                  selected={filtroFicha}
+                  onChange={setFiltroFicha}
+                />
+                <MultiSelect
+                  label="Instructor"
+                  allLabel="Todos"
+                  options={[...new Set(fuente.map((h) => h.instructor_nombre))].sort().map((i) => ({ value: i, label: i }))}
+                  selected={filtroInstructor}
+                  onChange={setFiltroInstructor}
+                />
+                <MultiSelect
+                  label="Ambiente"
+                  allLabel="Todos"
+                  options={[...new Set(fuente.map((h) => h.ambiente).filter(Boolean))].sort().map((a) => ({ value: a, label: a }))}
+                  selected={filtroAmbiente}
+                  onChange={setFiltroAmbiente}
+                />
+                </>
+              )
+            })()}
             <MultiSelect
               label="Jornada"
               allLabel="Todas"
@@ -538,6 +551,9 @@ export default function HorariosPage() {
               onSemanaChange={handleSemanaChange}
               loading={loadingGrilla}
               filterDia={filtroVista === "dia" ? diaHoyAbrev : undefined}
+              onClickHorario={(h) => {
+                setVistaRapida({ isOpen: true, tipo: "instructor", valor: h.instructor_nombre, semana: semanaGrilla })
+              }}
             />
           </div>
         ) : (
@@ -567,19 +583,19 @@ export default function HorariosPage() {
                   {listaPaginada.map((h) => (
                     <tr key={h.id} className={`hover:bg-gray-50/50 transition-colors ${!h.activo ? "opacity-50 bg-gray-50" : ""}`}>
                       <td className="px-3 py-3 md:px-6 md:py-4 font-medium text-gray-900">
-                        <button onClick={() => openFichaDetail(h)} className="hover:text-sena hover:underline transition-colors text-left">
+                        <button onClick={() => setVistaRapida({ isOpen: true, tipo: "grupo", valor: h.ficha_numero })} className="hover:text-sena hover:underline transition-colors text-left">
                           {h.ficha_numero}
                         </button>
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-700">
-                        <button onClick={() => openInstructorDetail(h)} className="hover:text-sena hover:underline transition-colors text-left">
+                        <button onClick={() => setVistaRapida({ isOpen: true, tipo: "instructor", valor: h.instructor_nombre })} className="hover:text-sena hover:underline transition-colors text-left">
                           {h.instructor_nombre}
                         </button>
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">{h.competencia}</td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
                         {h.ambiente ? (
-                          <button onClick={() => openAmbienteDetail(h)} className="hover:text-sena hover:underline transition-colors text-left">
+                          <button onClick={() => setVistaRapida({ isOpen: true, tipo: "ambiente", valor: h.ambiente })} className="hover:text-sena hover:underline transition-colors text-left">
                             {h.ambiente}
                           </button>
                         ) : <span className="text-gray-300">—</span>}
@@ -746,6 +762,15 @@ export default function HorariosPage() {
         isOpen={isAmbienteModalOpen}
         onClose={() => setIsAmbienteModalOpen(false)}
         ambiente={selectedAmbiente}
+      />
+
+      <VistaRapidaHorarioModal
+        isOpen={vistaRapida.isOpen}
+        onClose={() => setVistaRapida({ ...vistaRapida, isOpen: false })}
+        tipo={vistaRapida.tipo}
+        valor={vistaRapida.valor}
+        semanaInicial={vistaRapida.semana}
+        soloHoy={filtroVista === "dia"}
       />
 
     </DashboardLayout>
