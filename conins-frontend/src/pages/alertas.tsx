@@ -299,7 +299,7 @@ export default function AlertasPage() {
                       </div>
                     </div>
 
-                    {!alerta.atendida && (
+                    {!alerta.atendida && esAdmin && (
                       <button
                         onClick={() => handleMarcarAtendida(alerta)}
                         className="shrink-0 p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"

@@ -9,10 +9,12 @@ export const crearInstructorCompletoSchema = z.object({
   nombre: z.string().min(2).max(100),
   email: z.string().email().max(100),
   tipo_area: z.enum(['tecnica', 'transversal']),
+  tipo_vinculacion: z.enum(['contrato', 'planta']).optional(),
 });
 
 export const actualizarInstructorSchema = z.object({
   tipo_area: z.enum(['tecnica', 'transversal']).optional(),
+  tipo_vinculacion: z.enum(['contrato', 'planta']).optional(),
   foto_url: z.string().url().max(500).nullable().optional().or(z.literal('')),
 });
 

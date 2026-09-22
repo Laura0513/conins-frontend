@@ -144,18 +144,27 @@ export const getCalendario = asyncHandler(async (req: Request, res: Response) =>
      FROM jornadas ORDER BY id`,
   );
 
+  // LEFT JOIN a fichas/competencias: la formacion complementaria no tiene grupo ni
+  // competencia (ficha_id/competencia_id NULL) y va atada a un programa. Se rotula
+  // igual que en la grilla principal (grupo = "Compl. <codigo>", competencia = nombre
+  // del programa) y se marca es_complementaria para que el frontend la distinga.
   const [celdasRaw] = await pool.query(
     `SELECT h.id AS horario_id, h.dia_semana, h.jornada_id,
-            f.numero_ficha AS grupo, u.nombre AS instructor,
-            c.nombre AS competencia, a.nombre AS ambiente,
+            COALESCE(f.numero_ficha, CONCAT('Compl. ', COALESCE(pr.codigo, ''))) AS grupo,
+            u.nombre AS instructor,
+            COALESCE(c.nombre, pr.nombre, 'Formacion complementaria') AS competencia,
+            a.nombre AS ambiente,
+            (h.programa_id IS NOT NULL) AS es_complementaria,
+            pr.codigo AS programa_codigo, pr.nombre AS programa, h.modalidad,
             TIME_FORMAT(h.hora_inicio,'%H:%i') AS hora_inicio,
             TIME_FORMAT(h.hora_fin,'%H:%i')    AS hora_fin,
             h.estado
      FROM horarios h
-     JOIN fichas f       ON h.ficha_id = f.id
      JOIN instructores i ON h.instructor_id = i.id
      JOIN usuarios u     ON i.usuario_id = u.id
+     LEFT JOIN fichas f       ON h.ficha_id = f.id
      LEFT JOIN competencias c ON h.competencia_id = c.id
+     LEFT JOIN programas pr   ON h.programa_id = pr.id
      LEFT JOIN ambientes a    ON h.ambiente_id = a.id
      WHERE ${cfg.col} = ? AND h.semana = ? AND h.activo = TRUE
      ORDER BY h.dia_semana, h.jornada_id, h.hora_inicio`,

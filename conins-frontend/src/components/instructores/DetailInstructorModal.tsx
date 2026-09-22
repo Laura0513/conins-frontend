@@ -22,6 +22,7 @@ type Instructor = {
   nombre: string
   email: string
   tipo_area: string
+  tipo_vinculacion?: string
   activo: boolean
   roles: string
   horas_semana?: number
@@ -155,7 +156,7 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor, pue
   )
 
   const horas = instructor.horas_semana ?? 0
-  const limite = 40
+  const limite = instructor.tipo_vinculacion === "planta" ? 32.5 : 40
   const porcentaje = Math.min((horas / limite) * 100, 100)
   let colorBarra = "bg-sena"
   let colorTexto = "text-sena"
@@ -204,6 +205,13 @@ export default function DetailInstructorModal({ isOpen, onClose, instructor, pue
               <div>
                 <p className="text-xs text-gray-500">Área</p>
                 <p className="text-sm text-gray-900 capitalize">{instructor.tipo_area}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <Layers className="w-5 h-5 text-gray-400 mt-0.5" />
+              <div>
+                <p className="text-xs text-gray-500">Vinculación</p>
+                <p className="text-sm text-gray-900 capitalize">{instructor.tipo_vinculacion || "contrato"}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">

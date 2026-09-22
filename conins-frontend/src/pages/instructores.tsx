@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useRouter } from "next/router"
 import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
@@ -31,6 +32,7 @@ type Instructor = {
   nombre: string
   email: string
   tipo_area: string
+  tipo_vinculacion?: string
   activo: boolean
   roles: string
   horas_semana?: number
@@ -38,6 +40,7 @@ type Instructor = {
 }
 
 export default function InstructoresPage() {
+  const router = useRouter()
   const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [instructores, setInstructores] = useState<Instructor[]>([])
@@ -70,9 +73,16 @@ export default function InstructoresPage() {
   const esSubdirector = rol === "Subdirector"
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
 
+  // Instructores no tienen acceso a esta página — redirigir a su perfil
   useEffect(() => {
-    cargarInstructores()
-  }, [])
+    if (!authLoading && rol === "Instructor") {
+      router.replace("/perfil")
+    }
+  }, [authLoading, rol])
+
+  useEffect(() => {
+    if (rol !== "Instructor") cargarInstructores()
+  }, [rol])
 
   const cargarInstructores = async () => {
     setLoading(true)
@@ -86,7 +96,7 @@ export default function InstructoresPage() {
     }
   }
 
-  const handleCreateInstructor = async (data: { nombre: string; email: string; tipo_area: string }) => {
+  const handleCreateInstructor = async (data: { nombre: string; email: string; tipo_area: string; tipo_vinculacion: string }) => {
     await api.instructors.create(data)
     showToast("Instructor registrado exitosamente", "success")
     setIsCreateModalOpen(false)

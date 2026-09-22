@@ -5,7 +5,7 @@ import FormField, { inputClass, selectClass } from "@/components/ui/FormField"
 type CreateInstructorModalProps = {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: { nombre: string; email: string; tipo_area: string }) => Promise<void>
+  onSubmit: (data: { nombre: string; email: string; tipo_area: string; tipo_vinculacion: string }) => Promise<void>
 }
 
 export default function CreateInstructorModal({ isOpen, onClose, onSubmit }: CreateInstructorModalProps) {
@@ -15,6 +15,7 @@ export default function CreateInstructorModal({ isOpen, onClose, onSubmit }: Cre
     nombre: "",
     email: "",
     tipo_area: "tecnica",
+    tipo_vinculacion: "contrato",
   })
 
   if (!isOpen) return null
@@ -37,7 +38,7 @@ export default function CreateInstructorModal({ isOpen, onClose, onSubmit }: Cre
     setSubmitting(true)
     try {
       await onSubmit(formData)
-      setFormData({ nombre: "", email: "", tipo_area: "tecnica" })
+      setFormData({ nombre: "", email: "", tipo_area: "tecnica", tipo_vinculacion: "contrato" })
       setTouched({})
     } finally {
       setSubmitting(false)
@@ -100,6 +101,18 @@ export default function CreateInstructorModal({ isOpen, onClose, onSubmit }: Cre
             >
               <option value="tecnica">Técnica</option>
               <option value="transversal">Transversal</option>
+            </select>
+          </FormField>
+
+          <FormField label="Tipo de vinculación" hint="Contrato: máx 40h/sem · Planta: máx 32.5h/sem">
+            <select
+              name="tipo_vinculacion"
+              value={formData.tipo_vinculacion}
+              onChange={handleChange}
+              className={selectClass()}
+            >
+              <option value="contrato">Contrato</option>
+              <option value="planta">Planta</option>
             </select>
           </FormField>
 

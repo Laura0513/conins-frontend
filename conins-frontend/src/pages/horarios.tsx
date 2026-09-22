@@ -59,6 +59,12 @@ type Horario = {
   rap_id?: number | null
   rap_codigo?: string | null
   rap_descripcion?: string | null
+  es_complementaria?: number | boolean
+  programa?: string
+  programa_codigo?: string
+  modalidad?: string
+  fecha_inicio?: string
+  fecha_fin?: string | null
 }
 
 
@@ -71,6 +77,7 @@ export default function HorariosPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedHorario, setSelectedHorario] = useState<Horario | null>(null)
+  const [createPrefill, setCreatePrefill] = useState<{ jornadaKey?: string; dia?: number } | undefined>(undefined)
 
   // Accesos directos — modales de detalle
   const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false)
@@ -102,6 +109,7 @@ export default function HorariosPage() {
   const [filtroJornada, setFiltroJornada] = useState<string[]>([])
   const [filtroAmbiente, setFiltroAmbiente] = useState<string[]>([])
   const [filtroEstado, setFiltroEstado] = useState<string[]>([])
+  const [filtroFormacion, setFiltroFormacion] = useState<"todas" | "regular" | "complementaria">("todas")
   const [vistaGrilla, setVistaGrilla] = useState(true)
   const [mostrarInactivos, setMostrarInactivos] = useState(false)
   const [filtroVista, setFiltroVista] = useState<"semana" | "dia" | "mes">("semana")
@@ -227,7 +235,9 @@ export default function HorariosPage() {
     const coincideAmbiente = filtroAmbiente.length === 0 || filtroAmbiente.includes(h.ambiente || "")
     const coincideJornada = filtroJornada.length === 0 || filtroJornada.includes(h.jornada)
     const coincideEstado = filtroEstado.length === 0 || filtroEstado.includes(h.estado)
-    return coincideBusqueda && coincideFicha && coincideInstructor && coincideAmbiente && coincideJornada && coincideEstado
+    const esCompl = h.es_complementaria === 1 || h.es_complementaria === true
+    const coincideFormacion = filtroFormacion === "todas" || (filtroFormacion === "complementaria" ? esCompl : !esCompl)
+    return coincideBusqueda && coincideFicha && coincideInstructor && coincideAmbiente && coincideJornada && coincideEstado && coincideFormacion
   })
 
   const horariosGrillaFiltrados = aplicarFiltros(horariosGrilla)
@@ -245,14 +255,16 @@ export default function HorariosPage() {
     const coincideAmbiente = filtroAmbiente.length === 0 || filtroAmbiente.includes(h.ambiente || "")
     const coincideJornada = filtroJornada.length === 0 || filtroJornada.includes(h.jornada)
     const coincideEstado = filtroEstado.length === 0 || filtroEstado.includes(h.estado)
+    const esCompl = h.es_complementaria === 1 || h.es_complementaria === true
+    const coincideFormacion = filtroFormacion === "todas" || (filtroFormacion === "complementaria" ? esCompl : !esCompl)
 
-    return coincideBusqueda && coincideFicha && coincideInstructor && coincideAmbiente && coincideJornada && coincideEstado
+    return coincideBusqueda && coincideFicha && coincideInstructor && coincideAmbiente && coincideJornada && coincideEstado && coincideFormacion
   })
 
   const totalPaginas = Math.ceil(listaFiltrada.length / porPagina)
   const listaPaginada = listaFiltrada.slice((paginaActual - 1) * porPagina, paginaActual * porPagina)
 
-  useEffect(() => { setPaginaActual(1) }, [search, filtroFicha, filtroInstructor, filtroAmbiente, filtroJornada, filtroEstado])
+  useEffect(() => { setPaginaActual(1) }, [search, filtroFicha, filtroInstructor, filtroAmbiente, filtroJornada, filtroEstado, filtroFormacion])
 
   // ─── Accesos directos ───
   const openInstructorDetail = async (h: Horario) => {
@@ -317,23 +329,43 @@ export default function HorariosPage() {
       const semana = lunes.toISOString().split('T')[0]
 
       const dias = data.dias || [data.dia_semana] // Fallback for single day
-      
+
       for (const dia of dias) {
-        const payload = {
-          ficha_id: data.ficha_id,
-          instructor_id: data.instructor_id,
-          competencia_id: data.competencia_id,
-          dia_semana: Number(dia),
-          hora_inicio: data.hora_inicio,
-          hora_fin: data.hora_fin,
-          jornada_id: data.jornada_id,
-          ambiente_id: data.ambiente_id,
-          tipo_actividad_id: data.tipo_actividad_id ?? null,
-          semana,
+        if (data.es_complementaria) {
+          // Modo complementaria — usa fecha_inicio/fecha_fin, no semana
+          const payload = {
+            es_complementaria: true,
+            instructor_id: data.instructor_id,
+            programa_id: data.programa_id,
+            modalidad: data.modalidad,
+            observaciones: data.observaciones || undefined,
+            fecha_inicio: data.fecha_inicio,
+            fecha_fin: data.fecha_fin || null,
+            dia_semana: Number(dia),
+            hora_inicio: data.hora_inicio,
+            hora_fin: data.hora_fin,
+            jornada_id: data.jornada_id,
+            ambiente_id: data.ambiente_id || undefined,
+          }
+          await api.horarios.create(payload)
+        } else {
+          // Modo normal
+          const payload = {
+            ficha_id: data.ficha_id,
+            instructor_id: data.instructor_id,
+            competencia_id: data.competencia_id,
+            dia_semana: Number(dia),
+            hora_inicio: data.hora_inicio,
+            hora_fin: data.hora_fin,
+            jornada_id: data.jornada_id,
+            ambiente_id: data.ambiente_id,
+            tipo_actividad_id: data.tipo_actividad_id ?? null,
+            semana,
+          }
+          await api.horarios.create(payload)
         }
-        await api.horarios.create(payload)
       }
-      
+
       showToast("Horario registrado exitosamente", "success")
       setIsCreateModalOpen(false)
       cargarHorarios()
@@ -481,6 +513,7 @@ export default function HorariosPage() {
                   selected={filtroFicha}
                   onChange={setFiltroFicha}
                 />
+                {rol !== "Instructor" && (
                 <MultiSelect
                   label="Instructor"
                   allLabel="Todos"
@@ -488,6 +521,8 @@ export default function HorariosPage() {
                   selected={filtroInstructor}
                   onChange={setFiltroInstructor}
                 />
+                )}
+                {rol !== "Instructor" && (
                 <MultiSelect
                   label="Ambiente"
                   allLabel="Todos"
@@ -495,6 +530,7 @@ export default function HorariosPage() {
                   selected={filtroAmbiente}
                   onChange={setFiltroAmbiente}
                 />
+                )}
                 </>
               )
             })()}
@@ -510,6 +546,15 @@ export default function HorariosPage() {
               selected={filtroJornada}
               onChange={setFiltroJornada}
             />
+            <select
+              value={filtroFormacion}
+              onChange={(e) => setFiltroFormacion(e.target.value as any)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+            >
+              <option value="todas">Formación: Todas</option>
+              <option value="regular">Regular</option>
+              <option value="complementaria">Complementaria</option>
+            </select>
           </div>
         </div>
 
@@ -553,6 +598,15 @@ export default function HorariosPage() {
               filterDia={filtroVista === "dia" ? diaHoyAbrev : undefined}
               onClickEntidad={(tipo, valor) => {
                 setVistaRapida({ isOpen: true, tipo, valor, semana: semanaGrilla })
+              }}
+              onClickEmpty={(dia, jornadaKey) => {
+                const diaMap: Record<string, number> = { Lun: 1, Mar: 2, Mie: 3, Jue: 4, Vie: 5, Sab: 6 }
+                setCreatePrefill({ jornadaKey, dia: diaMap[dia] })
+                setIsCreateModalOpen(true)
+              }}
+              onClickHorario={(h) => {
+                setSelectedHorario(h as any)
+                setIsEditModalOpen(true)
               }}
             />
           </div>
@@ -715,8 +769,9 @@ export default function HorariosPage() {
 
       <CrearHorarioModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        onClose={() => { setIsCreateModalOpen(false); setCreatePrefill(undefined) }}
         onSubmit={handleCreate}
+        prefill={createPrefill}
       />
 
       <EditarHorarioModal
@@ -771,6 +826,7 @@ export default function HorariosPage() {
         valor={vistaRapida.valor}
         semanaInicial={vistaRapida.semana}
         soloHoy={filtroVista === "dia"}
+        ocultarDisponibilidad={rol === "Instructor"}
       />
 
     </DashboardLayout>

@@ -131,11 +131,32 @@ export const marcarLeida = asyncHandler(async (req: Request, res: Response) => {
     return res.status(404).json({ success: false, message: 'Alerta no encontrada' });
   }
 
-  await pool.query('UPDATE alertas SET leida = TRUE WHERE id = ?', [id]);
+  // Alcance: admin marca cualquiera; un instructor solo las suyas.
+  const userRoles = req.user?.roles_globales ?? [];
+  const esAdmin = userRoles.some((r) => (ROLES_ADMIN as readonly string[]).includes(r));
+  if (esAdmin) {
+    await pool.query('UPDATE alertas SET leida = TRUE WHERE id = ?', [id]);
+  } else {
+    const instructor = req.user?.id ? await InstructorModel.findByUsuarioId(req.user.id) : null;
+    if (!instructor) {
+      return res.status(403).json({ success: false, message: 'No tiene permiso sobre esta alerta' });
+    }
+    await pool.query('UPDATE alertas SET leida = TRUE WHERE id = ? AND instructor_id = ?', [id, instructor.id]);
+  }
   ApiResponse.success(res, { id, leida: true }, 'Alerta marcada como leida');
 });
 
-export const marcarTodasLeidas = asyncHandler(async (_req: Request, res: Response) => {
-  await pool.query('UPDATE alertas SET leida = TRUE WHERE leida = FALSE');
+export const marcarTodasLeidas = asyncHandler(async (req: Request, res: Response) => {
+  // Alcance: admin marca todas; un instructor solo las suyas.
+  const userRoles = req.user?.roles_globales ?? [];
+  const esAdmin = userRoles.some((r) => (ROLES_ADMIN as readonly string[]).includes(r));
+  if (esAdmin) {
+    await pool.query('UPDATE alertas SET leida = TRUE WHERE leida = FALSE');
+  } else {
+    const instructor = req.user?.id ? await InstructorModel.findByUsuarioId(req.user.id) : null;
+    if (instructor) {
+      await pool.query('UPDATE alertas SET leida = TRUE WHERE leida = FALSE AND instructor_id = ?', [instructor.id]);
+    }
+  }
   ApiResponse.success(res, {}, 'Todas las alertas marcadas como leidas');
 });

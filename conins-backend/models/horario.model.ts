@@ -45,8 +45,9 @@ const DIAS_MAP: Record<number, string> = {
 export const HorarioModel = {
   async findAll(semana?: string): Promise<HorarioDetail[]> {
     const [rows] = await pool.query<HorarioDetail[]>(`
-      SELECT MIN(h.id) AS id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
-             c.nombre AS competencia,
+      SELECT MIN(h.id) AS id, COALESCE(f.numero_ficha, CONCAT('Compl. ', COALESCE(pr.codigo, ''))) AS ficha_numero, u.nombre AS instructor_nombre,
+             COALESCE(c.nombre, pr.nombre, 'Formacion complementaria') AS competencia,
+             (h.programa_id IS NOT NULL) AS es_complementaria, pr.codigo AS programa_codigo, pr.nombre AS programa, h.modalidad,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
              j.nombre AS jornada,
              ta.nombre AS tipo_actividad,
@@ -61,15 +62,17 @@ export const HorarioModel = {
              h.motivo_rechazo,
              h.activo
       FROM horarios h
-      JOIN fichas f ON h.ficha_id = f.id
+      LEFT JOIN fichas f ON h.ficha_id = f.id
       JOIN instructores i ON h.instructor_id = i.id
       JOIN usuarios u ON i.usuario_id = u.id
-      JOIN competencias c ON h.competencia_id = c.id
+      LEFT JOIN competencias c ON h.competencia_id = c.id
+      LEFT JOIN programas pr ON h.programa_id = pr.id
       LEFT JOIN ambientes ab ON h.ambiente_id = ab.id
       JOIN jornadas j ON h.jornada_id = j.id
       LEFT JOIN tipos_actividad ta ON h.tipo_actividad_id = ta.id
       ${semana ? 'WHERE h.semana = ?' : ''}
-      GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.ambiente_id, h.jornada_id,
+      GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.programa_id, h.modalidad,
+               pr.codigo, pr.nombre, h.ambiente_id, h.jornada_id,
                h.tipo_actividad_id, h.hora_inicio, h.hora_fin, h.estado, h.motivo_rechazo, h.activo
       ORDER BY MIN(h.id)
     `, semana ? [semana] : []);
@@ -84,8 +87,9 @@ export const HorarioModel = {
 
   async findAllByInstructorId(instructorId: number, semana?: string): Promise<HorarioDetail[]> {
     const [rows] = await pool.query<HorarioDetail[]>(`
-      SELECT MIN(h.id) AS id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
-             c.nombre AS competencia,
+      SELECT MIN(h.id) AS id, COALESCE(f.numero_ficha, CONCAT('Compl. ', COALESCE(pr.codigo, ''))) AS ficha_numero, u.nombre AS instructor_nombre,
+             COALESCE(c.nombre, pr.nombre, 'Formacion complementaria') AS competencia,
+             (h.programa_id IS NOT NULL) AS es_complementaria, pr.codigo AS programa_codigo, pr.nombre AS programa, h.modalidad,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
              j.nombre AS jornada,
              ta.nombre AS tipo_actividad,
@@ -100,15 +104,17 @@ export const HorarioModel = {
              h.motivo_rechazo,
              h.activo
       FROM horarios h
-      JOIN fichas f ON h.ficha_id = f.id
+      LEFT JOIN fichas f ON h.ficha_id = f.id
       JOIN instructores i ON h.instructor_id = i.id
       JOIN usuarios u ON i.usuario_id = u.id
-      JOIN competencias c ON h.competencia_id = c.id
+      LEFT JOIN competencias c ON h.competencia_id = c.id
+      LEFT JOIN programas pr ON h.programa_id = pr.id
       LEFT JOIN ambientes ab ON h.ambiente_id = ab.id
       JOIN jornadas j ON h.jornada_id = j.id
       LEFT JOIN tipos_actividad ta ON h.tipo_actividad_id = ta.id
       WHERE h.instructor_id = ? ${semana ? 'AND h.semana = ?' : ''}
-      GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.ambiente_id, h.jornada_id,
+      GROUP BY h.ficha_id, h.instructor_id, h.competencia_id, h.programa_id, h.modalidad,
+               pr.codigo, pr.nombre, h.ambiente_id, h.jornada_id,
                h.tipo_actividad_id, h.hora_inicio, h.hora_fin, h.estado, h.motivo_rechazo, h.activo
       ORDER BY MIN(h.id)
     `, semana ? [instructorId, semana] : [instructorId]);
@@ -123,8 +129,9 @@ export const HorarioModel = {
 
   async findById(id: number): Promise<HorarioDetail | null> {
     const [rows] = await pool.query<HorarioDetail[]>(`
-      SELECT h.id, f.numero_ficha AS ficha_numero, u.nombre AS instructor_nombre,
-             c.nombre AS competencia,
+      SELECT h.id, COALESCE(f.numero_ficha, CONCAT('Compl. ', COALESCE(pr.codigo, ''))) AS ficha_numero, u.nombre AS instructor_nombre,
+             COALESCE(c.nombre, pr.nombre, 'Formacion complementaria') AS competencia,
+             (h.programa_id IS NOT NULL) AS es_complementaria, pr.codigo AS programa_codigo, pr.nombre AS programa, h.modalidad,
              h.rap_id, r.codigo AS rap_codigo, r.nombre AS rap_descripcion,
              COALESCE(ab.nombre, 'Sin asignar') AS ambiente,
              j.nombre AS jornada,
@@ -140,10 +147,11 @@ export const HorarioModel = {
              h.motivo_rechazo,
              h.activo
       FROM horarios h
-      JOIN fichas f ON h.ficha_id = f.id
+      LEFT JOIN fichas f ON h.ficha_id = f.id
       JOIN instructores i ON h.instructor_id = i.id
       JOIN usuarios u ON i.usuario_id = u.id
-      JOIN competencias c ON h.competencia_id = c.id
+      LEFT JOIN competencias c ON h.competencia_id = c.id
+      LEFT JOIN programas pr ON h.programa_id = pr.id
       LEFT JOIN raps r ON h.rap_id = r.id
       LEFT JOIN ambientes ab ON h.ambiente_id = ab.id
       JOIN jornadas j ON h.jornada_id = j.id
@@ -156,9 +164,12 @@ export const HorarioModel = {
   },
 
   async create(data: {
-    ficha_id: number;
+    ficha_id?: number | null;
     instructor_id: number;
-    competencia_id: number;
+    competencia_id?: number | null;
+    programa_id?: number | null;
+    modalidad?: 'presencial' | 'virtual' | null;
+    observaciones?: string | null;
     rap_id?: number | null;
     ambiente_id?: number | null;
     dia_semana: number;
@@ -170,14 +181,19 @@ export const HorarioModel = {
   }): Promise<number> {
     // estado 'aprobado' por defecto: Leidy eliminó el flujo de aprobacion manual
     // de horarios (feedback 31/07/2026). Se crean ya aprobados.
+    // ficha_id/competencia_id van NULL en formacion complementaria (sin grupo).
     const [result] = await pool.query(
-      `INSERT INTO horarios (ficha_id, instructor_id, competencia_id, rap_id, ambiente_id,
-        dia_semana, hora_inicio, hora_fin, tipo_actividad_id, jornada_id, semana, estado)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprobado')`,
+      `INSERT INTO horarios (ficha_id, instructor_id, competencia_id, programa_id, modalidad,
+        observaciones, rap_id, ambiente_id, dia_semana, hora_inicio, hora_fin,
+        tipo_actividad_id, jornada_id, semana, estado)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprobado')`,
       [
-        data.ficha_id,
+        data.ficha_id ?? null,
         data.instructor_id,
-        data.competencia_id,
+        data.competencia_id ?? null,
+        data.programa_id ?? null,
+        data.modalidad ?? null,
+        data.observaciones ?? null,
         data.rap_id ?? null,
         data.ambiente_id ?? null,
         data.dia_semana,
@@ -435,8 +451,12 @@ export const HorarioModel = {
 
   // tipo_contrato se eliminó el 14/07/2026 — RN-03 (jornada restringida) aplica
   // a TODOS los instructores. Se conserva la firma para no romper llamadas.
-  async isInstructorDePlanta(_instructorId: number): Promise<boolean> {
-    return true;
+  async isInstructorDePlanta(instructorId: number): Promise<boolean> {
+    const [rows] = await pool.query(
+      "SELECT 1 FROM instructores WHERE id = ? AND tipo_vinculacion = 'planta' LIMIT 1",
+      [instructorId],
+    );
+    return (rows as any[]).length > 0;
   },
 
   async isJornadaNocturnaOFinDeSemana(jornadaId: number, diaSemana: number): Promise<boolean> {

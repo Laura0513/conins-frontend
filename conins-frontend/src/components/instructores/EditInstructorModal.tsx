@@ -6,6 +6,7 @@ type Instructor = {
   nombre: string
   email: string
   tipo_area: string
+  tipo_vinculacion?: string
   activo: boolean
   roles: string
   horas_semana?: number
@@ -25,6 +26,7 @@ export default function EditInstructorModal({ isOpen, onClose, instructor, onSub
     nombre: "",
     email: "",
     tipo_area: "tecnica",
+    tipo_vinculacion: "contrato",
   })
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function EditInstructorModal({ isOpen, onClose, instructor, onSub
         nombre: instructor.nombre,
         email: instructor.email,
         tipo_area: instructor.tipo_area,
+        tipo_vinculacion: instructor.tipo_vinculacion || "contrato",
       })
     }
   }, [instructor])
@@ -87,14 +90,26 @@ export default function EditInstructorModal({ isOpen, onClose, instructor, onSub
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de area</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de área</label>
             <select
               value={formData.tipo_area}
               onChange={(e) => handleChange("tipo_area", e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
             >
-              <option value="tecnica">Tecnica</option>
+              <option value="tecnica">Técnica</option>
               <option value="transversal">Transversal</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de vinculación</label>
+            <select
+              value={formData.tipo_vinculacion}
+              onChange={(e) => handleChange("tipo_vinculacion", e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+            >
+              <option value="contrato">Contrato (máx 40h/sem)</option>
+              <option value="planta">Planta (máx 32.5h/sem)</option>
             </select>
           </div>
 

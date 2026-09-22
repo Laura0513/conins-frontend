@@ -36,8 +36,12 @@ export const NotificacionModel = {
     return rows;
   },
 
-  async marcarLeida(id: number): Promise<void> {
-    await pool.query('UPDATE notificaciones SET leida = TRUE WHERE id = ?', [id]);
+  async marcarLeida(id: number, usuarioId: number): Promise<void> {
+    // Acotado al dueño: un usuario no puede marcar la notificacion de otro.
+    await pool.query(
+      'UPDATE notificaciones SET leida = TRUE WHERE id = ? AND usuario_id = ?',
+      [id, usuarioId],
+    );
   },
 
   async marcarTodasLeidas(usuarioId: number): Promise<void> {

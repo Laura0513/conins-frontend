@@ -15,6 +15,7 @@ export interface InstructorDetail extends RowDataPacket {
   nombre: string;
   email: string;
   tipo_area: string;
+  tipo_vinculacion: string;
   foto_url: string | null;
   activo: boolean;
   roles: string | null;
@@ -24,7 +25,7 @@ export interface InstructorDetail extends RowDataPacket {
 export const InstructorModel = {
   async findAll(): Promise<InstructorDetail[]> {
     const [rows] = await pool.query<InstructorDetail[]>(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.foto_url, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.tipo_vinculacion, i.foto_url, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles,
              GROUP_CONCAT(r.id ORDER BY r.nivel ASC SEPARATOR ',') AS rol_ids
       FROM instructores i
@@ -40,7 +41,7 @@ export const InstructorModel = {
 
   async findById(id: number): Promise<InstructorDetail | null> {
     const [rows] = await pool.query<InstructorDetail[]>(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.foto_url, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.tipo_vinculacion, i.foto_url, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles,
              GROUP_CONCAT(r.id ORDER BY r.nivel ASC SEPARATOR ',') AS rol_ids
       FROM instructores i
@@ -61,20 +62,24 @@ export const InstructorModel = {
     return (rows as any[])[0] ?? null;
   },
 
-  async create(usuarioId: number, tipo_area: string): Promise<void> {
+  async create(usuarioId: number, tipo_area: string, tipo_vinculacion = 'contrato'): Promise<void> {
     await pool.query(
-      'INSERT INTO instructores (usuario_id, tipo_area) VALUES (?, ?)',
-      [usuarioId, tipo_area],
+      'INSERT INTO instructores (usuario_id, tipo_area, tipo_vinculacion) VALUES (?, ?, ?)',
+      [usuarioId, tipo_area, tipo_vinculacion],
     );
   },
 
-  async update(id: number, tipo_area?: string, foto_url?: string | null): Promise<void> {
+  async update(id: number, tipo_area?: string, foto_url?: string | null, tipo_vinculacion?: string): Promise<void> {
     const updates: string[] = [];
     const values: any[] = [];
 
     if (tipo_area) {
       updates.push('tipo_area = ?');
       values.push(tipo_area);
+    }
+    if (tipo_vinculacion) {
+      updates.push('tipo_vinculacion = ?');
+      values.push(tipo_vinculacion);
     }
     // foto_url: se permite setear una URL o limpiarla (null / cadena vacia -> NULL)
     if (foto_url !== undefined) {
@@ -203,7 +208,7 @@ export const InstructorModel = {
 
   async getDetalle(instructorId: number) {
     const [instructorRows] = await pool.query(`
-      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.foto_url, i.activo,
+      SELECT i.id, i.usuario_id, u.nombre, u.email, i.tipo_area, i.tipo_vinculacion, i.foto_url, i.activo,
              GROUP_CONCAT(r.nombre ORDER BY r.nivel ASC SEPARATOR ', ') AS roles
       FROM instructores i
       JOIN usuarios u ON i.usuario_id = u.id

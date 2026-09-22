@@ -16,7 +16,7 @@ export const getNoLeidasCount = asyncHandler(async (req: Request, res: Response)
 });
 
 export const marcarLeida = asyncHandler(async (req: Request, res: Response) => {
-  await NotificacionModel.marcarLeida(Number(req.params.id));
+  await NotificacionModel.marcarLeida(Number(req.params.id), req.user.id);
   ApiResponse.success(res, null, 'Notificacion marcada como leida');
 });
 

@@ -28,6 +28,7 @@ type VistaRapidaHorarioModalProps = {
   valor: string
   semanaInicial?: string // ISO del lunes, ej: "2026-08-25"
   soloHoy?: boolean // true cuando el filtro "Día" está activo
+  ocultarDisponibilidad?: boolean // true para instructores — no deben ver disponibilidad de ambientes
 }
 
 const DIAS_SEMANA = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
@@ -65,7 +66,7 @@ function formatFechaSemana(offset: number): string {
   return `${lunes.toLocaleDateString("es-CO", opts)} — ${sabado.toLocaleDateString("es-CO", opts)}, ${lunes.getFullYear()}`
 }
 
-export default function VistaRapidaHorarioModal({ isOpen, onClose, tipo, valor, semanaInicial, soloHoy }: VistaRapidaHorarioModalProps) {
+export default function VistaRapidaHorarioModal({ isOpen, onClose, tipo, valor, semanaInicial, soloHoy, ocultarDisponibilidad }: VistaRapidaHorarioModalProps) {
   const [horarios, setHorarios] = useState<Horario[]>([])
   const [loading, setLoading] = useState(false)
   const [semanaOffset, setSemanaOffset] = useState(0)
@@ -347,8 +348,8 @@ export default function VistaRapidaHorarioModal({ isOpen, onClose, tipo, valor, 
                 </div>
               </div>}
 
-              {/* ═══ DISPONIBILIDAD DEL AMBIENTE ═══ */}
-              {!soloHoy && tipo === "ambiente" && disponibilidad && (
+              {/* ═══ DISPONIBILIDAD DEL AMBIENTE (oculto para instructores) ═══ */}
+              {!soloHoy && !ocultarDisponibilidad && tipo === "ambiente" && disponibilidad && (
                 <div>
                   <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />

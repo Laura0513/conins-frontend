@@ -152,6 +152,49 @@ export default function AsignacionesPage() {
 
   const handleCreate = async (data: any) => {
     try {
+      // Calcular semana actual (lunes)
+      const now = new Date()
+      const day = now.getDay()
+      const diff = day === 0 ? -6 : 1 - day
+      const lunes = new Date(now)
+      lunes.setDate(now.getDate() + diff)
+      const semana = lunes.toISOString().split("T")[0]
+
+      // ─── Modo complementaria ───
+      if (data.es_complementaria) {
+        const { horario } = data
+        let todosOk = true
+        for (const dia of horario.dias) {
+          const payload = {
+            es_complementaria: true,
+            instructor_id: Number(data.instructor_id),
+            programa_id: Number(data.programa_id),
+            modalidad: data.modalidad,
+            observaciones: data.observaciones || null,
+            fecha_inicio: data.fecha_inicio,
+            fecha_fin: data.fecha_fin || null,
+            dia_semana: Number(dia),
+            hora_inicio: horario.hora_inicio,
+            hora_fin: horario.hora_fin,
+            jornada_id: Number(horario.jornada_id),
+            ambiente_id: horario.ambiente_id ? Number(horario.ambiente_id) : null,
+          }
+          try {
+            await api.horarios.create(payload)
+          } catch (horErr: any) {
+            todosOk = false
+            showToast(`Error horario: ${horErr.message}`, "error")
+          }
+        }
+        if (todosOk) {
+          showToast("Formación complementaria y horario registrados", "success")
+        }
+        setIsCreateModalOpen(false)
+        cargarAsignaciones()
+        return
+      }
+
+      // ─── Modo regular ───
       const { rapsSeleccionados, horario, ...asignacionData } = data
       const res = await api.assignments.create(asignacionData)
       const asignacionId = res.data?.id
@@ -173,23 +216,15 @@ export default function AsignacionesPage() {
 
       if (rapError) {
         cargarAsignaciones()
-        return // No cerrar modal — el usuario debe corregir los RAPs
+        return
       }
 
-      // Crear horario si se proporcionó
+      // Crear horario
       let horarioCreado = false
       if (horario && horario.dias && horario.dias.length > 0) {
         try {
-          const now = new Date()
-          const day = now.getDay()
-          const diff = day === 0 ? -6 : 1 - day
-          const lunes = new Date(now)
-          lunes.setDate(now.getDate() + diff)
-          const semana = lunes.toISOString().split("T")[0]
-
           const compId = Number(asignacionData.competencia_ids?.[0])
           if (!compId || isNaN(compId)) {
-            console.error("competencia_id inválido:", asignacionData.competencia_ids)
             showToast("No se pudo crear horario: competencia no válida", "error")
           } else {
             let todosOk = true
@@ -207,13 +242,10 @@ export default function AsignacionesPage() {
                 rap_id: null,
                 semana,
               }
-              console.log("Enviando horario:", JSON.stringify(horarioPayload))
               try {
                 await api.horarios.create(horarioPayload)
-                console.log("Horario creado OK para día", dia)
               } catch (horErr: any) {
                 todosOk = false
-                console.error("Error creando horario día", dia, ":", horErr.message)
                 showToast(`Error horario: ${horErr.message}`, "error")
               }
             }
@@ -227,13 +259,13 @@ export default function AsignacionesPage() {
       showToast(
         horarioCreado
           ? "Asignación y horario registrados exitosamente"
-          : "Asignación registrada" + (horario ? " (horario pendiente — puede agregarlo desde el detalle)" : ""),
-        horarioCreado ? "success" : (horario ? "info" : "success")
+          : "Asignación registrada",
+        horarioCreado ? "success" : "success"
       )
       setIsCreateModalOpen(false)
       cargarAsignaciones()
     } catch (err: any) {
-      showToast(err.message || "Error al registrar asignación", "error")
+      showToast(err.message || "Error al registrar", "error")
     }
   }
 

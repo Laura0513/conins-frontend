@@ -14,6 +14,7 @@ import {
   Check,
   Clock,
   Calendar,
+  GraduationCap,
 } from "lucide-react"
 import { api } from "@/lib/api"
 import { formatJornada } from "@/lib/terminology"
@@ -39,6 +40,7 @@ type Ambiente = { id: number; nombre: string }
 type Competencia = { id: number; nombre: string; codigo?: string }
 type Rap = { rap_id?: number; id?: number; codigo: string; descripcion: string; activo: boolean }
 type TipoActividad = { id: number; nombre: string }
+type Programa = { id: number; nombre: string; codigo: string; tipo_formacion?: string }
 
 const DIAS_SEMANA = [
   { id: 1, nombre: "Lun" },
@@ -49,9 +51,21 @@ const DIAS_SEMANA = [
   { id: 6, nombre: "Sáb" },
 ]
 
-const STEPS = [
+const JORNADAS = [
+  { id: "1", nombre: "Mañana" },
+  { id: "2", nombre: "Mixta" },
+  { id: "3", nombre: "Noche" },
+  { id: "4", nombre: "Virtual" },
+]
+
+const STEPS_REGULAR = [
   { label: "Instructor y Grupo", icon: User },
   { label: "Competencias y RAPs", icon: Layers },
+  { label: "Resumen", icon: Check },
+]
+
+const STEPS_COMPL = [
+  { label: "Instructor y Programa", icon: GraduationCap },
   { label: "Resumen", icon: Check },
 ]
 
@@ -59,7 +73,12 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
   const { showToast } = useToast()
   const [submitting, setSubmitting] = useState(false)
   const [step, setStep] = useState(0)
+  const [modo, setModo] = useState<"regular" | "complementaria">("regular")
   const [habilitandoCompId, setHabilitandoCompId] = useState<number | null>(null)
+
+  const esCompl = modo === "complementaria"
+  const STEPS = esCompl ? STEPS_COMPL : STEPS_REGULAR
+  const lastStep = STEPS.length - 1
 
   // Data
   const [instructores, setInstructores] = useState<Instructor[]>([])
@@ -70,6 +89,7 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
   const [loadingComps, setLoadingComps] = useState(false)
   const [loading, setLoading] = useState(false)
   const [tiposActividad, setTiposActividad] = useState<TipoActividad[]>([])
+  const [programasCompl, setProgramasCompl] = useState<Programa[]>([])
 
   // Competencias que el instructor puede dictar Y pertenecen al programa
   const competencias = competenciasPrograma.filter(
@@ -85,7 +105,7 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
   const [loadingRaps, setLoadingRaps] = useState<Record<number, boolean>>({})
   const [expandedComps, setExpandedComps] = useState<Record<number, boolean>>({})
 
-  // Form
+  // Form — regular
   const [formData, setFormData] = useState({
     instructor_id: "",
     ficha_id: "",
@@ -93,39 +113,60 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
     jornada_id: "",
     competencia_ids: [] as number[],
     es_lider_ficha: false,
-    // Horario
     horario_dias: [] as number[],
     horario_inicio: "",
     horario_fin: "",
     horario_tipo_actividad_id: "",
   })
 
+  // Form — complementaria
+  const [formCompl, setFormCompl] = useState({
+    instructor_id: "",
+    programa_id: "",
+    modalidad: "presencial" as "presencial" | "virtual",
+    observaciones: "",
+    ambiente_id: "",
+    jornada_id: "",
+    horario_dias: [] as number[],
+    horario_inicio: "",
+    horario_fin: "",
+    fecha_inicio: "",
+    fecha_fin: "",
+  })
+
   // Derived
   const selectedFicha = fichas.find((f) => f.id === Number(formData.ficha_id)) || null
-  const selectedInstructor = instructores.find((i) => i.id === Number(formData.instructor_id)) || null
-  const selectedAmbiente = ambientes.find((a) => a.id === Number(formData.ambiente_id)) || null
-  const JORNADAS = [
-    { id: "1", nombre: "Mañana" },
-    { id: "2", nombre: "Mixta" },
-    { id: "3", nombre: "Noche" },
-    { id: "4", nombre: "Virtual" },
-  ]
-  const selectedJornada = JORNADAS.find((j) => j.id === formData.jornada_id) || null
+  const selectedInstructor = esCompl
+    ? instructores.find((i) => i.id === Number(formCompl.instructor_id)) || null
+    : instructores.find((i) => i.id === Number(formData.instructor_id)) || null
+  const selectedAmbiente = esCompl
+    ? ambientes.find((a) => a.id === Number(formCompl.ambiente_id)) || null
+    : ambientes.find((a) => a.id === Number(formData.ambiente_id)) || null
+  const selectedJornada = esCompl
+    ? JORNADAS.find((j) => j.id === formCompl.jornada_id) || null
+    : JORNADAS.find((j) => j.id === formData.jornada_id) || null
+  const selectedPrograma = programasCompl.find((p) => p.id === Number(formCompl.programa_id)) || null
 
   // Load initial data
   useEffect(() => {
     if (isOpen) {
       setLoading(true)
       setStep(0)
+      setModo("regular")
       Promise.all([
         api.instructors.getAll().then((res) => setInstructores(res.data || [])).catch(() => setInstructores([])),
         api.fichas.getAll().then((res) => setFichas(res.data || [])).catch(() => setFichas([])),
         api.ambientes.getAll().then((res) => setAmbientes(res.data || [])).catch(() => setAmbientes([])),
         api.catalogo.getTiposActividad().then((res) => setTiposActividad(res.data || [])).catch(() => setTiposActividad([])),
+        api.programs.getAll().then((res) => {
+          const all = res.data || []
+          setProgramasCompl(all)
+        }).catch(() => setProgramasCompl([])),
       ]).finally(() => setLoading(false))
 
-      // Reset form
+      // Reset forms
       setFormData({ instructor_id: "", ficha_id: "", ambiente_id: "", jornada_id: "", competencia_ids: [], es_lider_ficha: false, horario_dias: [], horario_inicio: "", horario_fin: "", horario_tipo_actividad_id: "" })
+      setFormCompl({ instructor_id: "", programa_id: "", modalidad: "presencial", observaciones: "", ambiente_id: "", jornada_id: "", horario_dias: [], horario_inicio: "", horario_fin: "", fecha_inicio: "", fecha_fin: "" })
       setCompetenciasPrograma([])
       setCompetenciasInstructor([])
       setRapsDisponibles({})
@@ -134,9 +175,9 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
     }
   }, [isOpen])
 
-  // Load instructor competencias when instructor changes
+  // Load instructor competencias when instructor changes (regular only)
   useEffect(() => {
-    if (formData.instructor_id) {
+    if (formData.instructor_id && !esCompl) {
       api.instructors.getCompetencias(Number(formData.instructor_id))
         .then((res) => {
           const ids = (res.data || []).map((c: any) => c.competencia_id || c.id)
@@ -146,7 +187,6 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
     } else {
       setCompetenciasInstructor([])
     }
-    // Reset selections when instructor changes
     setFormData((prev) => ({ ...prev, competencia_ids: [] }))
     setRapsDisponibles({})
     setRapsSeleccionados({})
@@ -170,7 +210,6 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
           .catch(() => setCompetenciasPrograma([]))
           .finally(() => setLoadingComps(false))
 
-        // Pre-fill ambiente and jornada from ficha
         setFormData((prev) => ({
           ...prev,
           ambiente_id: ficha.ambiente_id ? String(ficha.ambiente_id) : "",
@@ -204,17 +243,11 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
   const toggleCompetencia = (id: number) => {
     const yaIncluida = formData.competencia_ids.includes(id)
     if (yaIncluida) {
-      setFormData((prev) => ({
-        ...prev,
-        competencia_ids: prev.competencia_ids.filter((c) => c !== id),
-      }))
+      setFormData((prev) => ({ ...prev, competencia_ids: prev.competencia_ids.filter((c) => c !== id) }))
       setRapsSeleccionados((prev) => { const n = { ...prev }; delete n[id]; return n })
       setExpandedComps((prev) => ({ ...prev, [id]: false }))
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        competencia_ids: [...prev.competencia_ids, id],
-      }))
+      setFormData((prev) => ({ ...prev, competencia_ids: [...prev.competencia_ids, id] }))
       cargarRaps(id)
       setExpandedComps((prev) => ({ ...prev, [id]: true }))
     }
@@ -239,6 +272,10 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  const handleChangeCompl = (field: string, value: any) => {
+    setFormCompl((prev) => ({ ...prev, [field]: value }))
+  }
+
   // Habilitar competencia al instructor desde el wizard
   const habilitarCompetencia = async (competenciaId: number) => {
     if (!formData.instructor_id) return
@@ -254,9 +291,28 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
     }
   }
 
+  // Switch mode
+  const switchModo = (nuevoModo: "regular" | "complementaria") => {
+    setModo(nuevoModo)
+    setStep(0)
+  }
+
   // Validation per step
   const canAdvance = () => {
-    if (step === 0) return !!formData.instructor_id && !!formData.ficha_id
+    if (esCompl) {
+      if (step === 0) {
+        const fechaOk = !!formCompl.fecha_inicio && (!formCompl.fecha_fin || formCompl.fecha_fin >= formCompl.fecha_inicio)
+        return !!formCompl.instructor_id && !!formCompl.programa_id && !!formCompl.jornada_id
+          && formCompl.horario_dias.length > 0 && !!formCompl.horario_inicio && !!formCompl.horario_fin
+          && fechaOk
+      }
+      return true
+    }
+    // Regular
+    if (step === 0) {
+      return !!formData.instructor_id && !!formData.ficha_id && !!formData.jornada_id
+        && formData.horario_dias.length > 0 && !!formData.horario_inicio && !!formData.horario_fin
+    }
     if (step === 1) return formData.competencia_ids.length > 0
     return true
   }
@@ -264,15 +320,33 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
   const handleSubmit = async () => {
     setSubmitting(true)
     try {
-      const tieneHorario = formData.horario_dias.length > 0 && formData.horario_inicio && formData.horario_fin
-      const payload = {
-        instructor_id: Number(formData.instructor_id),
-        ficha_id: Number(formData.ficha_id),
-        competencia_ids: formData.competencia_ids,
-        es_lider_ficha: formData.es_lider_ficha,
-        rapsSeleccionados,
-        // Datos de horario (opcionales)
-        ...(tieneHorario ? {
+      if (esCompl) {
+        // Complementaria — envía directamente como horario
+        const payload = {
+          es_complementaria: true,
+          instructor_id: Number(formCompl.instructor_id),
+          programa_id: Number(formCompl.programa_id),
+          modalidad: formCompl.modalidad,
+          observaciones: formCompl.observaciones || undefined,
+          fecha_inicio: formCompl.fecha_inicio,
+          fecha_fin: formCompl.fecha_fin || null,
+          horario: {
+            dias: formCompl.horario_dias,
+            hora_inicio: formCompl.horario_inicio,
+            hora_fin: formCompl.horario_fin,
+            jornada_id: Number(formCompl.jornada_id),
+            ambiente_id: formCompl.ambiente_id ? Number(formCompl.ambiente_id) : null,
+          },
+        }
+        await onSubmit(payload)
+      } else {
+        // Regular
+        const payload = {
+          instructor_id: Number(formData.instructor_id),
+          ficha_id: Number(formData.ficha_id),
+          competencia_ids: formData.competencia_ids,
+          es_lider_ficha: formData.es_lider_ficha,
+          rapsSeleccionados,
           horario: {
             dias: formData.horario_dias,
             hora_inicio: formData.horario_inicio,
@@ -281,9 +355,9 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
             ambiente_id: formData.ambiente_id ? Number(formData.ambiente_id) : null,
             tipo_actividad_id: formData.horario_tipo_actividad_id ? Number(formData.horario_tipo_actividad_id) : null,
           },
-        } : {}),
+        }
+        await onSubmit(payload)
       }
-      await onSubmit(payload)
       onClose()
     } finally {
       setSubmitting(false)
@@ -292,25 +366,134 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
 
   if (!isOpen) return null
 
-  // Count total RAPs selected
   const totalRaps = Object.values(rapsSeleccionados).reduce((sum, arr) => sum + arr.length, 0)
+
+  // ─── Shared horario fields component ───
+  const HorarioFields = ({ form, onChange }: { form: { jornada_id: string; horario_dias: number[]; horario_inicio: string; horario_fin: string }; onChange: (field: string, value: any) => void }) => (
+    <>
+      {/* Jornada */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Jornada <span className="text-red-500">*</span></label>
+        <div className="flex flex-wrap gap-2">
+          {JORNADAS.map((j) => (
+            <button
+              key={j.id}
+              type="button"
+              onClick={() => onChange("jornada_id", j.id)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                form.jornada_id === j.id
+                  ? esCompl ? "bg-sena text-white border-sena" : "bg-sena text-white border-sena"
+                  : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              {j.nombre}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Horario block — aparece al elegir jornada */}
+      {form.jornada_id && (
+        <div className={`p-4 rounded-xl border space-y-4 ${esCompl ? "bg-emerald-50/50 border-emerald-200/50" : "bg-blue-50/50 border-blue-200/50"}`}>
+          <div className="flex items-center gap-2">
+            <Calendar className={`w-4 h-4 ${esCompl ? "text-sena" : "text-sena"}`} />
+            <span className="text-sm font-semibold text-gray-700">Horario</span>
+            <span className="text-xs text-red-500">*</span>
+          </div>
+
+          {/* Días */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5">Días de la semana</label>
+            <div className="flex flex-wrap gap-1.5">
+              {DIAS_SEMANA.map((d) => (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => {
+                    const nuevosDias = form.horario_dias.includes(d.id)
+                      ? form.horario_dias.filter((x) => x !== d.id)
+                      : [...form.horario_dias, d.id]
+                    onChange("horario_dias", nuevosDias)
+                  }}
+                  className={`px-2.5 py-1 rounded text-xs font-medium transition-colors border ${
+                    form.horario_dias.includes(d.id)
+                      ? "bg-gray-800 text-white border-gray-800"
+                      : "bg-white text-gray-500 border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  {d.nombre}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Horas */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Hora inicio</label>
+              <input
+                type="time"
+                value={form.horario_inicio}
+                onChange={(e) => onChange("horario_inicio", e.target.value)}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 ${esCompl ? "focus:ring-sena/50" : "focus:ring-sena/50"}`}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Hora fin</label>
+              <input
+                type="time"
+                value={form.horario_fin}
+                onChange={(e) => onChange("horario_fin", e.target.value)}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 ${esCompl ? "focus:ring-sena/50" : "focus:ring-sena/50"}`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
-          <h2 className="text-lg font-bold text-gray-900">Nueva asignación</h2>
+          <h2 className="text-lg font-bold text-gray-900">
+            {esCompl ? "Formación complementaria" : "Nueva asignación"}
+          </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
 
+        {/* Toggle modo */}
+        <div className="px-6 pt-4 shrink-0">
+          <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => switchModo("regular")}
+              className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
+                !esCompl ? "bg-sena text-white" : "bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              Formación regular
+            </button>
+            <button
+              type="button"
+              onClick={() => switchModo("complementaria")}
+              className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
+                esCompl ? "bg-sena text-white" : "bg-white text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              F. Complementaria
+            </button>
+          </div>
+        </div>
+
         {/* Stepper */}
-        <div className="px-6 pt-4 pb-2 shrink-0">
+        <div className="px-6 pt-3 pb-2 shrink-0">
           <div className="flex items-center gap-1">
             {STEPS.map((s, i) => {
-              const StepIcon = s.icon
               const isActive = i === step
               const isDone = i < step
               return (
@@ -319,9 +502,9 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
                         isDone
-                          ? "bg-sena text-white"
+                          ? esCompl ? "bg-sena text-white" : "bg-sena text-white"
                           : isActive
-                          ? "bg-sena/10 text-sena border-2 border-sena"
+                          ? esCompl ? "bg-sena/10 text-sena border-2 border-sena" : "bg-sena/10 text-sena border-2 border-sena"
                           : "bg-gray-100 text-gray-400"
                       }`}
                     >
@@ -329,14 +512,16 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                     </div>
                     <span
                       className={`text-xs font-medium hidden sm:block ${
-                        isActive ? "text-sena" : isDone ? "text-gray-700" : "text-gray-400"
+                        isActive
+                          ? esCompl ? "text-sena" : "text-sena"
+                          : isDone ? "text-gray-700" : "text-gray-400"
                       }`}
                     >
                       {s.label}
                     </span>
                   </div>
                   {i < STEPS.length - 1 && (
-                    <div className={`h-px flex-1 mx-2 ${i < step ? "bg-sena" : "bg-gray-200"}`} />
+                    <div className={`h-px flex-1 mx-2 ${i < step ? (esCompl ? "bg-sena" : "bg-sena") : "bg-gray-200"}`} />
                   )}
                 </div>
               )
@@ -353,8 +538,207 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
             </div>
           ) : (
             <>
-              {/* ─── PASO 1: Instructor + Grupo + Ambiente ─── */}
-              {step === 0 && (
+              {/* ═══════════════════════════════════════════ */}
+              {/* MODO COMPLEMENTARIA                        */}
+              {/* ═══════════════════════════════════════════ */}
+              {esCompl && step === 0 && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Instructor <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formCompl.instructor_id}
+                      onChange={(e) => handleChangeCompl("instructor_id", e.target.value)}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                    >
+                      <option value="">Seleccionar instructor</option>
+                      {instructores.map((i) => (
+                        <option key={i.id} value={i.id}>{i.nombre}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Programa complementario <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formCompl.programa_id}
+                      onChange={(e) => handleChangeCompl("programa_id", e.target.value)}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                    >
+                      <option value="">Seleccionar programa</option>
+                      {programasCompl.map((p) => (
+                        <option key={p.id} value={p.id}>{p.codigo} — {p.nombre}</option>
+                      ))}
+                    </select>
+                    {programasCompl.length === 0 && (
+                      <p className="text-xs text-amber-600 mt-1">No hay programas registrados.</p>
+                    )}
+                  </div>
+
+                  {/* Modalidad */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Modalidad <span className="text-red-500">*</span></label>
+                    <div className="flex gap-2">
+                      {(["presencial", "virtual"] as const).map((m) => (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => handleChangeCompl("modalidad", m)}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors border capitalize ${
+                            formCompl.modalidad === m
+                              ? "bg-sena text-white border-sena"
+                              : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
+                          }`}
+                        >
+                          {m}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Fechas de vigencia */}
+                  <div className="p-4 bg-emerald-50/50 rounded-xl border border-emerald-200/50 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-sena" />
+                      <span className="text-sm font-semibold text-gray-700">Vigencia</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Fecha inicio <span className="text-red-500">*</span></label>
+                        <input
+                          type="date"
+                          value={formCompl.fecha_inicio}
+                          onChange={(e) => handleChangeCompl("fecha_inicio", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Fecha fin</label>
+                        <input
+                          type="date"
+                          value={formCompl.fecha_fin}
+                          min={formCompl.fecha_inicio || undefined}
+                          onChange={(e) => handleChangeCompl("fecha_fin", e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500">Vacío en fecha fin = una sola semana.</p>
+                    {formCompl.fecha_fin && formCompl.fecha_inicio && formCompl.fecha_fin < formCompl.fecha_inicio && (
+                      <p className="text-xs text-red-500">La fecha fin debe ser igual o posterior a la fecha de inicio.</p>
+                    )}
+                  </div>
+
+                  {/* Observaciones */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                    <textarea
+                      value={formCompl.observaciones}
+                      onChange={(e) => handleChangeCompl("observaciones", e.target.value)}
+                      rows={2}
+                      placeholder="Ej: Refuerzo de inglés básico"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 resize-none"
+                    />
+                  </div>
+
+                  <HorarioFields form={formCompl} onChange={handleChangeCompl} />
+
+                  {/* Ambiente */}
+                  {formCompl.jornada_id && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Ambiente</label>
+                      <select
+                        value={formCompl.ambiente_id}
+                        onChange={(e) => handleChangeCompl("ambiente_id", e.target.value)}
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                      >
+                        <option value="">Sin asignar</option>
+                        {ambientes.map((a) => (
+                          <option key={a.id} value={a.id}>{a.nombre}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Resumen complementaria */}
+              {esCompl && step === 1 && (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-500">Revisa los datos antes de confirmar:</p>
+                  <div className="divide-y divide-gray-100 border border-emerald-200 rounded-lg overflow-hidden">
+                    <div className="flex items-center gap-3 p-3 bg-white">
+                      <User className="w-5 h-5 text-sena shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">Instructor</p>
+                        <p className="text-sm font-medium text-gray-900">{selectedInstructor?.nombre}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-white">
+                      <GraduationCap className="w-5 h-5 text-sena shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">Programa complementario</p>
+                        <p className="text-sm font-medium text-gray-900">{selectedPrograma?.codigo} — {selectedPrograma?.nombre}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-white">
+                      <BookOpen className="w-5 h-5 text-sena shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">Modalidad</p>
+                        <p className="text-sm font-medium text-gray-900 capitalize">{formCompl.modalidad}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-white">
+                      <Calendar className="w-5 h-5 text-sena shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">Vigencia</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {formCompl.fecha_inicio}{formCompl.fecha_fin ? ` → ${formCompl.fecha_fin}` : " (una semana)"}
+                        </p>
+                      </div>
+                    </div>
+                    {formCompl.observaciones && (
+                      <div className="p-3 bg-white">
+                        <p className="text-xs text-gray-500 mb-0.5">Observaciones</p>
+                        <p className="text-sm text-gray-700">{formCompl.observaciones}</p>
+                      </div>
+                    )}
+                    {selectedJornada && (
+                      <div className="flex items-center gap-3 p-3 bg-white">
+                        <Sun className="w-5 h-5 text-sena shrink-0" />
+                        <div>
+                          <p className="text-xs text-gray-500">Jornada</p>
+                          <p className="text-sm font-medium text-gray-900">{selectedJornada.nombre}</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 p-3 bg-white">
+                      <Clock className="w-5 h-5 text-sena shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">Horario</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {formCompl.horario_dias.map((d) => DIAS_SEMANA.find((ds) => ds.id === d)?.nombre).join(", ")} · {formCompl.horario_inicio} - {formCompl.horario_fin}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-white">
+                      <Building2 className="w-5 h-5 text-sena shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">Ambiente</p>
+                        <p className="text-sm font-medium text-gray-900">{selectedAmbiente?.nombre || "Sin asignar"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ═══════════════════════════════════════════ */}
+              {/* MODO REGULAR                               */}
+              {/* ═══════════════════════════════════════════ */}
+              {!esCompl && step === 0 && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -400,100 +784,23 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                   )}
 
                   {selectedFicha && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Jornada <span className="text-red-500">*</span></label>
-                      <div className="flex flex-wrap gap-2">
-                        {JORNADAS.map((j) => (
-                          <button
-                            key={j.id}
-                            type="button"
-                            onClick={() => handleChange("jornada_id", j.id)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-                              formData.jornada_id === j.id
-                                ? "bg-sena text-white border-sena"
-                                : "bg-white text-gray-600 border-gray-300 hover:bg-gray-50"
-                            }`}
-                          >
-                            {j.nombre}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                    <HorarioFields form={formData} onChange={handleChange} />
                   )}
 
-                  {/* Horario — aparece al elegir jornada */}
-                  {formData.jornada_id && selectedFicha && (
-                    <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-200/50 space-y-4">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-sena" />
-                        <span className="text-sm font-semibold text-gray-700">Horario</span>
-                        <span className="text-xs text-gray-400">(opcional)</span>
-                      </div>
-
-                      {/* Días */}
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1.5">Días de la semana</label>
-                        <div className="flex flex-wrap gap-1.5">
-                          {DIAS_SEMANA.map((d) => (
-                            <button
-                              key={d.id}
-                              type="button"
-                              onClick={() => {
-                                const nuevosDias = formData.horario_dias.includes(d.id)
-                                  ? formData.horario_dias.filter((x) => x !== d.id)
-                                  : [...formData.horario_dias, d.id]
-                                handleChange("horario_dias", nuevosDias)
-                              }}
-                              className={`px-2.5 py-1 rounded text-xs font-medium transition-colors border ${
-                                formData.horario_dias.includes(d.id)
-                                  ? "bg-gray-800 text-white border-gray-800"
-                                  : "bg-white text-gray-500 border-gray-300 hover:bg-gray-50"
-                              }`}
-                            >
-                              {d.nombre}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Horas */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Hora inicio</label>
-                          <input
-                            type="time"
-                            value={formData.horario_inicio}
-                            onChange={(e) => handleChange("horario_inicio", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Hora fin</label>
-                          <input
-                            type="time"
-                            value={formData.horario_fin}
-                            onChange={(e) => handleChange("horario_fin", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Tipo actividad */}
-                      {tiposActividad.length > 0 && (
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de actividad</label>
-                          <select
-                            value={formData.horario_tipo_actividad_id}
-                            onChange={(e) => handleChange("horario_tipo_actividad_id", e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
-                          >
-                            <option value="">Sin clasificar</option>
-                            {tiposActividad.map((t) => (
-                              <option key={t.id} value={t.id}>{t.nombre}</option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
+                  {/* Tipo actividad — solo regular */}
+                  {formData.jornada_id && selectedFicha && tiposActividad.length > 0 && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de actividad</label>
+                      <select
+                        value={formData.horario_tipo_actividad_id}
+                        onChange={(e) => handleChange("horario_tipo_actividad_id", e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sena/50 bg-white"
+                      >
+                        <option value="">Sin clasificar</option>
+                        {tiposActividad.map((t) => (
+                          <option key={t.id} value={t.id}>{t.nombre}</option>
+                        ))}
+                      </select>
                     </div>
                   )}
 
@@ -536,10 +843,9 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                 </>
               )}
 
-              {/* ─── PASO 2: Competencias y RAPs ─── */}
-              {step === 1 && (
+              {/* ─── PASO 2 regular: Competencias y RAPs ─── */}
+              {!esCompl && step === 1 && (
                 <>
-                  {/* Context card */}
                   <div className="p-3 bg-sena/5 rounded-lg border border-sena/20 flex items-center gap-3">
                     <User className="w-5 h-5 text-sena shrink-0" />
                     <div className="text-sm">
@@ -641,7 +947,6 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                     </div>
                   ) : null}
 
-                  {/* Competencias del programa que el instructor NO tiene habilitadas */}
                   {competenciasNoHabilitadas.length > 0 && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -675,13 +980,12 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                 </>
               )}
 
-              {/* ─── PASO 3: Resumen ─── */}
-              {step === 2 && (
+              {/* ─── PASO 3 regular: Resumen ─── */}
+              {!esCompl && step === 2 && (
                 <div className="space-y-4">
                   <p className="text-sm text-gray-500">Revisa los datos antes de confirmar:</p>
 
                   <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden">
-                    {/* Instructor */}
                     <div className="flex items-center gap-3 p-3 bg-white">
                       <User className="w-5 h-5 text-sena shrink-0" />
                       <div>
@@ -690,7 +994,6 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                       </div>
                     </div>
 
-                    {/* Grupo */}
                     <div className="flex items-center gap-3 p-3 bg-white">
                       <BookOpen className="w-5 h-5 text-sena shrink-0" />
                       <div>
@@ -701,7 +1004,6 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                       </div>
                     </div>
 
-                    {/* Jornada */}
                     {selectedJornada && (
                       <div className="flex items-center gap-3 p-3 bg-white">
                         <Sun className="w-5 h-5 text-sena shrink-0" />
@@ -712,7 +1014,6 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                       </div>
                     )}
 
-                    {/* Ambiente */}
                     <div className="flex items-center gap-3 p-3 bg-white">
                       <Building2 className="w-5 h-5 text-sena shrink-0" />
                       <div>
@@ -723,7 +1024,6 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                       </div>
                     </div>
 
-                    {/* Competencias */}
                     <div className="p-3 bg-white">
                       <div className="flex items-center gap-3 mb-2">
                         <Layers className="w-5 h-5 text-sena shrink-0" />
@@ -754,25 +1054,16 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
                       </div>
                     </div>
 
-                    {/* Horario */}
-                    {formData.horario_dias.length > 0 && formData.horario_inicio && formData.horario_fin ? (
-                      <div className="flex items-center gap-3 p-3 bg-white">
-                        <Clock className="w-5 h-5 text-sena shrink-0" />
-                        <div>
-                          <p className="text-xs text-gray-500">Horario</p>
-                          <p className="text-sm font-medium text-gray-900">
-                            {formData.horario_dias.map((d) => DIAS_SEMANA.find((ds) => ds.id === d)?.nombre).join(", ")} · {formData.horario_inicio} - {formData.horario_fin}
-                          </p>
-                        </div>
+                    <div className="flex items-center gap-3 p-3 bg-white">
+                      <Clock className="w-5 h-5 text-sena shrink-0" />
+                      <div>
+                        <p className="text-xs text-gray-500">Horario</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {formData.horario_dias.map((d) => DIAS_SEMANA.find((ds) => ds.id === d)?.nombre).join(", ")} · {formData.horario_inicio} - {formData.horario_fin}
+                        </p>
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-3 p-3 bg-gray-50">
-                        <Clock className="w-5 h-5 text-gray-300 shrink-0" />
-                        <p className="text-sm text-gray-400">Sin horario — se puede asignar después</p>
-                      </div>
-                    )}
+                    </div>
 
-                    {/* Líder */}
                     {formData.es_lider_ficha && (
                       <div className="flex items-center gap-3 p-3 bg-sena/5">
                         <Check className="w-5 h-5 text-sena shrink-0" />
@@ -803,12 +1094,14 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
             )}
           </button>
 
-          {step < 2 ? (
+          {step < lastStep ? (
             <button
               type="button"
               onClick={() => setStep(step + 1)}
               disabled={!canAdvance()}
-              className="px-4 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              className={`px-4 py-2.5 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2 ${
+                esCompl ? "bg-sena hover:bg-sena/90" : "bg-sena hover:bg-sena/90"
+              }`}
             >
               Siguiente
               <ChevronRight className="w-4 h-4" />
@@ -818,10 +1111,12 @@ export default function CrearAsignacionModal({ isOpen, onClose, onSubmit }: Crea
               type="button"
               onClick={handleSubmit}
               disabled={submitting}
-              className="px-5 py-2.5 bg-sena hover:bg-sena/90 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              className={`px-5 py-2.5 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 flex items-center gap-2 ${
+                esCompl ? "bg-sena hover:bg-sena/90" : "bg-sena hover:bg-sena/90"
+              }`}
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-              Confirmar asignación
+              {esCompl ? "Confirmar complementaria" : "Confirmar asignación"}
             </button>
           )}
         </div>

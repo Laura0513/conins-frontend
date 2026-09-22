@@ -462,6 +462,18 @@ export const api = {
         },
     },
 
+    rapSeguimiento: {
+        getByFicha(fichaId: number) {
+            return apiFetch(`/rap-seguimiento/ficha/${fichaId}`)
+        },
+        evaluar(seguimientoId: number, estado: string) {
+            return apiFetch(`/rap-seguimiento/${seguimientoId}/evaluar`, {
+                method: 'PATCH',
+                body: JSON.stringify({ estado }),
+            })
+        },
+    },
+
     importar: {
         getHistorico() {
             return apiFetch('/importar/historico')

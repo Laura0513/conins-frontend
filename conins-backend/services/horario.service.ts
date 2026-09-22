@@ -5,6 +5,7 @@ import { AmbienteModel } from '../models/ambiente.model.js';
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors.js';
 import { getLunesSemanaActual, rangoSemana } from '../utils/date.js';
 import { ROLES, RoleKey } from '../constants/roles.js';
+import { limitesDe } from '../constants/horario.js';
 import { AlertaService, TIPOS_ALERTA } from './alerta.service.js';
 import pool from '../config/db.js';
 
@@ -37,9 +38,9 @@ export const HorarioService = {
   },
 
   async create(data: {
-    ficha_id: number;
+    ficha_id?: number | null;
     instructor_id: number;
-    competencia_id: number;
+    competencia_id?: number | null;
     rap_id?: number | null;
     ambiente_id?: number | null;
     dia_semana: number;
@@ -48,16 +49,27 @@ export const HorarioService = {
     tipo_actividad_id?: number | null;
     jornada_id: number;
     semana?: string;
+    // Formacion complementaria (RF feedback 16/09): bloque sin grupo ni competencia/RAP,
+    // atado a un programa complementario. Llena carga baja.
+    es_complementaria?: boolean;
+    programa_id?: number | null;
+    modalidad?: 'presencial' | 'virtual' | null;
+    observaciones?: string | null;
   }, origin: 'import' | 'ui' = 'ui') {
+    if (data.es_complementaria) {
+      return crearComplementaria(data);
+    }
+
+    const fichaId = data.ficha_id as number;
     const instructor = await InstructorModel.findById(data.instructor_id);
     if (!instructor) throw new NotFoundError('Instructor no encontrado');
 
-    const ficha = await FichaModel.findById(data.ficha_id);
+    const ficha = await FichaModel.findById(fichaId);
     if (!ficha) throw new NotFoundError('Ficha no encontrada');
 
     // RN-27: el RAP debe pertenecer al programa del grupo
     if (data.rap_id) {
-      const rapOk = await HorarioModel.rapPerteneceAlProgramaDeFicha(data.rap_id, data.ficha_id);
+      const rapOk = await HorarioModel.rapPerteneceAlProgramaDeFicha(data.rap_id, fichaId);
       if (!rapOk) {
         throw new ValidationError('El RAP no pertenece al programa del grupo (RN-27)');
       }
@@ -103,15 +115,15 @@ export const HorarioService = {
         data.dia_semana,
         data.jornada_id,
         semana,
-        data.ficha_id,
+        fichaId,
       );
       if (ambienteOcupado) {
         const ambNombre = await nombreDe('ambientes', data.ambiente_id);
         const jorNombre = await nombreDe('jornadas', data.jornada_id);
         const diaNombre = DIA_ES[data.dia_semana] ?? `dia ${data.dia_semana}`;
         // Nombra los grupos que comparten el ambiente (los OTROS ya cargados + el actual).
-        const otros = await HorarioModel.gruposEnAmbiente(data.ambiente_id, data.dia_semana, data.jornada_id, semana, data.ficha_id);
-        const grupoActual = String((ficha as any).numero_ficha ?? data.ficha_id);
+        const otros = await HorarioModel.gruposEnAmbiente(data.ambiente_id, data.dia_semana, data.jornada_id, semana, fichaId);
+        const grupoActual = String((ficha as any).numero_ficha ?? fichaId);
         const grupos = [...new Set([grupoActual, ...otros])];
         conflictos.push({ tipo: TIPOS_ALERTA.AMBIENTE_OCUPADO,
           mensaje: `Dos o mas grupos (${grupos.join(' y ')}) tienen asignado el mismo ambiente (${ambNombre}) el ${diaNombre} en la jornada ${jorNombre} (semana ${rangoSemana(semana)}). Revisa el cruce de ambiente.` });
@@ -123,30 +135,32 @@ export const HorarioService = {
     // provisional (eso es area mismatch) ni ambiente ocupado (eso excluye el
     // mismo grupo). Nunca bloquea, ni en UI ni en import; solo alerta.
     const coDocentes = await HorarioModel.coDocentesEnGrupo(
-      data.ficha_id, data.dia_semana, data.jornada_id, semana, data.instructor_id,
+      fichaId, data.dia_semana, data.jornada_id, semana, data.instructor_id,
     );
     let coDocenciaMsg: string | null = null;
     if (coDocentes.length > 0) {
       const diaNombre = DIA_ES[data.dia_semana] ?? `dia ${data.dia_semana}`;
       const jorNombre = await nombreDe('jornadas', data.jornada_id);
-      const grupo = String((ficha as any).numero_ficha ?? data.ficha_id);
+      const grupo = String((ficha as any).numero_ficha ?? fichaId);
       const todos = [...new Set([instructor.nombre, ...coDocentes])];
       coDocenciaMsg = `Dos o mas instructores (${todos.join(' y ')}) quedaron asignados al mismo grupo ${grupo} el ${diaNombre} en la jornada ${jorNombre} (semana ${rangoSemana(semana)}). Revisa si es co-docencia intencional o un cruce; la coordinacion decide.`;
     }
 
     let rapCompartido = false;
     if (data.rap_id) {
-      rapCompartido = await HorarioModel.rapAsignadoAOtroEnFicha(data.ficha_id, data.rap_id, data.instructor_id);
+      rapCompartido = await HorarioModel.rapAsignadoAOtroEnFicha(fichaId, data.rap_id, data.instructor_id);
       if (rapCompartido) {
         conflictos.push({ tipo: TIPOS_ALERTA.RAP_COMPARTIDO, mensaje: 'Este resultado de aprendizaje ya esta a cargo de otro instructor en el grupo. Debe quedar con uno solo; reasignelo antes de continuar.' });
       }
     }
 
+    // Limite semanal segun la vinculacion del instructor: contrato=40h, planta=32.5h.
+    const { min: minHoras, max: maxHoras } = limitesDe((instructor as any).tipo_vinculacion);
     const horasActuales = await HorarioModel.getHorasPorInstructor(data.instructor_id, semana);
     const nuevasHoras = ((new Date(`2000-01-01T${data.hora_fin}`).getTime() - new Date(`2000-01-01T${data.hora_inicio}`).getTime()) / (1000 * 60 * 60));
     const totalHoras = horasActuales + nuevasHoras;
-    if (totalHoras > 40) {
-      conflictos.push({ tipo: TIPOS_ALERTA.HORAS_EXCEDIDAS, mensaje: `La carga del instructor ${instructor.nombre} supera las 40 horas en la semana ${rangoSemana(semana)} (carga actual de la semana: ${totalHoras}h). Revisa su horario.` });
+    if (totalHoras > maxHoras) {
+      conflictos.push({ tipo: TIPOS_ALERTA.HORAS_EXCEDIDAS, mensaje: `La carga del instructor ${instructor.nombre} supera las ${maxHoras} horas autorizadas (${(instructor as any).tipo_vinculacion === 'planta' ? 'planta' : 'contrato'}) en la semana ${rangoSemana(semana)} (carga actual de la semana: ${totalHoras}h). Revisa su horario.` });
     }
 
     let alertaJornadaRestringida = false;
@@ -167,23 +181,23 @@ export const HorarioService = {
     // Persistir alertas (llega aca en carga masiva, o en UI sin conflictos).
     for (const c of conflictos) {
       if (c.tipo === TIPOS_ALERTA.RAP_COMPARTIDO && data.rap_id) {
-        await AlertaService.rapCompartido(data.instructor_id, data.ficha_id, data.rap_id);
+        await AlertaService.rapCompartido(data.instructor_id, fichaId, data.rap_id);
       } else {
         await AlertaService.crear({ instructor_id: data.instructor_id, tipo: c.tipo, mensaje: c.mensaje, semana, total_horas: totalHoras });
       }
     }
     if (alertaJornadaRestringida) {
       await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.JORNADA_RESTRINGIDA, semana, total_horas: totalHoras,
-        mensaje: `El instructor de planta ${instructor.nombre} quedo programado en jornada nocturna o fin de semana (grupo ${(ficha as any).numero_ficha ?? data.ficha_id}, semana ${rangoSemana(semana)}).` });
+        mensaje: `El instructor de planta ${instructor.nombre} quedo programado en jornada nocturna o fin de semana (grupo ${(ficha as any).numero_ficha ?? fichaId}, semana ${rangoSemana(semana)}).` });
     }
     // Co-docencia: alerta soft (nunca bloquea). Se persiste aparte de `conflictos`
     // para que ni en UI se rechace la creacion.
     if (coDocenciaMsg) {
-      await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.CO_DOCENCIA, semana, ficha_id: data.ficha_id, mensaje: coDocenciaMsg });
+      await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.CO_DOCENCIA, semana, ficha_id: fichaId, mensaje: coDocenciaMsg });
     }
-    if (totalHoras < 20) {
+    if (totalHoras < minHoras) {
       await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.HORAS_INSUFICIENTES, semana, total_horas: totalHoras,
-        mensaje: `La carga del instructor ${instructor.nombre} esta por debajo de 20 horas en la semana ${rangoSemana(semana)} (carga actual de la semana: ${totalHoras}h).` });
+        mensaje: `La carga del instructor ${instructor.nombre} esta por debajo de ${minHoras} horas en la semana ${rangoSemana(semana)} (carga actual de la semana: ${totalHoras}h).` });
     }
 
     return {
@@ -424,3 +438,71 @@ export const HorarioService = {
     return HorarioModel.findById(id);
   },
 };
+
+// Formacion complementaria: bloque de horario SIN grupo ni competencia/RAP, atado a un
+// programa complementario. Llena carga baja; suma a la carga y respeta el solape (RN-04),
+// pero no valida competencia/RAP/ambiente-ocupado/co-docencia (no aplica sin grupo).
+async function crearComplementaria(data: {
+  instructor_id: number;
+  programa_id?: number | null;
+  modalidad?: 'presencial' | 'virtual' | null;
+  observaciones?: string | null;
+  ambiente_id?: number | null;
+  dia_semana: number;
+  hora_inicio: string;
+  hora_fin: string;
+  jornada_id: number;
+  semana?: string;
+}) {
+  const instructor = await InstructorModel.findById(data.instructor_id);
+  if (!instructor) throw new NotFoundError('Instructor no encontrado');
+  if (!data.programa_id) throw new ValidationError('La formacion complementaria requiere un programa');
+  if (!data.modalidad) throw new ValidationError('La formacion complementaria requiere modalidad (presencial/virtual)');
+  if (new Date(`2000-01-01T${data.hora_fin}`).getTime() <= new Date(`2000-01-01T${data.hora_inicio}`).getTime()) {
+    throw new ValidationError('La hora de fin debe ser posterior a la hora de inicio');
+  }
+
+  const semana = data.semana ?? getLunesSemanaActual();
+
+  const conflicto = await HorarioModel.findConflicto(
+    data.instructor_id, data.dia_semana, data.hora_inicio, data.hora_fin, semana,
+  );
+  if (conflicto) {
+    const diaNombre = DIA_ES[data.dia_semana] ?? `dia ${data.dia_semana}`;
+    throw new ConflictError(
+      `El instructor ya tiene otra clase el ${diaNombre} a esa hora (se cruza con el grupo ${conflicto.grupo}, ${conflicto.hora_inicio}-${conflicto.hora_fin}).`,
+    );
+  }
+
+  // tipo_actividad Complementaria: suma carga y permite filtrar por tipo de formacion.
+  const [taRows] = await pool.query("SELECT id FROM tipos_actividad WHERE nombre = 'Complementaria' AND activo = TRUE LIMIT 1");
+  const tipoActividadId = (taRows as any[])[0]?.id ?? null;
+
+  const id = await HorarioModel.create({
+    ficha_id: null,
+    instructor_id: data.instructor_id,
+    competencia_id: null,
+    programa_id: data.programa_id,
+    modalidad: data.modalidad,
+    observaciones: data.observaciones ?? null,
+    ambiente_id: data.ambiente_id ?? null,
+    dia_semana: data.dia_semana,
+    hora_inicio: data.hora_inicio,
+    hora_fin: data.hora_fin,
+    tipo_actividad_id: tipoActividadId,
+    jornada_id: data.jornada_id,
+    semana,
+  });
+
+  // Alerta de carga baja (usa el minimo segun vinculacion). La complementaria suma.
+  const { min: minHoras } = limitesDe((instructor as any).tipo_vinculacion);
+  const horas = await HorarioModel.getHorasPorInstructor(data.instructor_id, semana);
+  if (horas < minHoras) {
+    await AlertaService.crear({
+      instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.HORAS_INSUFICIENTES, semana, total_horas: horas,
+      mensaje: `La carga del instructor ${instructor.nombre} esta por debajo de ${minHoras} horas en la semana ${rangoSemana(semana)} (carga actual: ${horas}h).`,
+    });
+  }
+
+  return (await HorarioModel.findById(id))!;
+}

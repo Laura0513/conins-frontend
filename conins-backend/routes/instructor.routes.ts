@@ -24,12 +24,14 @@ router.get('/perfil', instructorController.getOwnProfile);
 router.get('/historico', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.getHistorico);
 router.post('/:id/baja', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), validate(bajaInstructorSchema), instructorController.registrarBaja);
 
-router.get('/:id', instructorController.getById);
-router.get('/:id/detalle', instructorController.getDetalle);
+// Detalle de un instructor ajeno: solo administración (RN-18). El instructor
+// consulta lo suyo por /instructores/perfil, no por /:id.
+router.get('/:id', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.getById);
+router.get('/:id/detalle', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.getDetalle);
 
 router.patch('/:id', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), validate(actualizarInstructorSchema), instructorController.update);
 
-router.get('/:id/competencias', instructorController.getCompetenciasHabilitadas);
+router.get('/:id/competencias', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), instructorController.getCompetenciasHabilitadas);
 
 router.post('/:id/competencias', requireRole([ROLES.SUBDIRECTOR, ROLES.COORDINADORA_ACADEMICA, ROLES.ASISTENTE_COORDINACION]), validate(addCompetenciaSchema), instructorController.addCompetencia);
 
