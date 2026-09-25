@@ -599,15 +599,15 @@ export default function HorariosPage() {
               onClickEntidad={(tipo, valor) => {
                 setVistaRapida({ isOpen: true, tipo, valor, semana: semanaGrilla })
               }}
-              onClickEmpty={(dia, jornadaKey) => {
+              onClickEmpty={puedeEditar ? (dia, jornadaKey) => {
                 const diaMap: Record<string, number> = { Lun: 1, Mar: 2, Mie: 3, Jue: 4, Vie: 5, Sab: 6 }
                 setCreatePrefill({ jornadaKey, dia: diaMap[dia] })
                 setIsCreateModalOpen(true)
-              }}
-              onClickHorario={(h) => {
+              } : undefined}
+              onClickHorario={puedeEditar ? (h) => {
                 setSelectedHorario(h as any)
                 setIsEditModalOpen(true)
-              }}
+              } : undefined}
             />
           </div>
         ) : (

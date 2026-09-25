@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useRouter } from "next/router"
 import { useDebounce } from "@/lib/useDebounce"
 import DashboardLayout from "@/layouts/DashboardLayout"
 import { api } from "@/lib/api"
@@ -38,6 +39,7 @@ type Programa = {
 }
 
 export default function GestionCompetenciasPage() {
+  const router = useRouter()
   const { user, loading: authLoading } = useProtectedRoute()
   const { showToast } = useToast()
   const [competencias, setCompetencias] = useState<Competencia[]>([])
@@ -65,6 +67,13 @@ export default function GestionCompetenciasPage() {
 
   const rol = user?.roles?.[0]?.trim() || ""
   const puedeEditar = !["Instructor", "Subdirector"].includes(rol)
+
+  // Instructor no tiene acceso a gestión de competencias — redirigir a su vista propia
+  useEffect(() => {
+    if (rol === "Instructor") {
+      router.replace("/competencias")
+    }
+  }, [rol])
 
   useEffect(() => {
     cargarDatos()

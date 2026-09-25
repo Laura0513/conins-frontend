@@ -530,6 +530,7 @@ export default function AsignacionesPage() {
                         </button>
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
+                        {puedeEditar ? (
                         <button
                           onClick={() => router.push("/gestion-competencias")}
                           className="text-left hover:text-sena hover:underline transition-colors"
@@ -537,6 +538,9 @@ export default function AsignacionesPage() {
                         >
                           {asig.competencia}
                         </button>
+                        ) : (
+                          <span>{asig.competencia}</span>
+                        )}
                       </td>
                       <td className="px-3 py-3 md:px-6 md:py-4 text-gray-500">
                         {asig.ambiente ? (

@@ -1,0 +1,550 @@
+import { HorarioModel } from '../models/horario.model.js';
+import { InstructorModel } from '../models/instructor.model.js';
+import { FichaModel } from '../models/ficha.model.js';
+import { AmbienteModel } from '../models/ambiente.model.js';
+import { NotFoundError, ValidationError, ConflictError } from '../utils/errors.js';
+import { getLunesSemanaActual, rangoSemana } from '../utils/date.js';
+import { ROLES, RoleKey } from '../constants/roles.js';
+import { limitesDe } from '../constants/horario.js';
+import { AlertaService, TIPOS_ALERTA } from './alerta.service.js';
+import pool from '../config/db.js';
+
+const DIA_ES: Record<number, string> = {
+  1: 'lunes', 2: 'martes', 3: 'miercoles', 4: 'jueves', 5: 'viernes', 6: 'sabado', 7: 'domingo',
+};
+
+// Nombre legible de un ambiente o jornada por id (para mensajes de alerta).
+async function nombreDe(tabla: 'ambientes' | 'jornadas', id: number | null | undefined): Promise<string> {
+  if (!id) return '';
+  const [r] = await pool.query(`SELECT nombre FROM ${tabla} WHERE id = ? LIMIT 1`, [id]);
+  return (r as any[])[0]?.nombre ?? String(id);
+}
+
+export const HorarioService = {
+  async getAll(userId?: number, roles?: RoleKey[], semana?: string) {
+    // P22: instructor solo ve sus propios horarios
+    if (userId && roles && roles.length === 1 && roles[0] === ROLES.INSTRUCTOR) {
+      const instructor = await InstructorModel.findByUsuarioId(userId);
+      if (!instructor) return [];
+      return HorarioModel.findAllByInstructorId(instructor.id, semana);
+    }
+    return HorarioModel.findAll(semana);
+  },
+
+  async getById(id: number) {
+    const horario = await HorarioModel.findById(id);
+    if (!horario) throw new NotFoundError('Horario no encontrado');
+    return horario;
+  },
+
+  async create(data: {
+    ficha_id?: number | null;
+    instructor_id: number;
+    competencia_id?: number | null;
+    rap_id?: number | null;
+    ambiente_id?: number | null;
+    dia_semana: number;
+    hora_inicio: string;
+    hora_fin: string;
+    tipo_actividad_id?: number | null;
+    jornada_id: number;
+    semana?: string;
+    // Formacion complementaria (RF feedback 16/09): bloque sin grupo ni competencia/RAP,
+    // atado a un programa complementario. Llena carga baja.
+    es_complementaria?: boolean;
+    programa_id?: number | null;
+    modalidad?: 'presencial' | 'virtual' | null;
+    observaciones?: string | null;
+    fecha_inicio?: string | null;
+    fecha_fin?: string | null;
+  }, origin: 'import' | 'ui' = 'ui') {
+    if (data.es_complementaria) {
+      return crearComplementaria(data);
+    }
+
+    const fichaId = data.ficha_id as number;
+    const instructor = await InstructorModel.findById(data.instructor_id);
+    if (!instructor) throw new NotFoundError('Instructor no encontrado');
+
+    const ficha = await FichaModel.findById(fichaId);
+    if (!ficha) throw new NotFoundError('Ficha no encontrada');
+
+    // RN-27: el RAP debe pertenecer al programa del grupo
+    if (data.rap_id) {
+      const rapOk = await HorarioModel.rapPerteneceAlProgramaDeFicha(data.rap_id, fichaId);
+      if (!rapOk) {
+        throw new ValidationError('El RAP no pertenece al programa del grupo (RN-27)');
+      }
+    }
+
+    if (new Date(`2000-01-01T${data.hora_fin}`).getTime() <= new Date(`2000-01-01T${data.hora_inicio}`).getTime()) {
+      throw new ValidationError('La hora de fin debe ser posterior a la hora de inicio');
+    }
+
+    if (ficha.modalidad !== 'virtual' && !data.ambiente_id) {
+      throw new ValidationError('Las fichas presenciales requieren un ambiente asignado');
+    }
+
+    const semana = data.semana ?? getLunesSemanaActual();
+
+    const conflicto = await HorarioModel.findConflicto(
+      data.instructor_id,
+      data.dia_semana,
+      data.hora_inicio,
+      data.hora_fin,
+      semana,
+    );
+    if (conflicto) {
+      const diaNombre = DIA_ES[data.dia_semana] ?? `dia ${data.dia_semana}`;
+      throw new ConflictError(
+        `El instructor ya tiene otra clase el ${diaNombre} a esa hora (se cruza con el grupo ${conflicto.grupo}, ${conflicto.hora_inicio}-${conflicto.hora_fin}).`,
+      );
+    }
+
+    // Conflictos que en ACCION INTERACTIVA (boton del sistema) se BLOQUEAN, pero
+    // en carga masiva por Excel solo generan ALERTA (permisivo para no rechazar
+    // el archivo real): RN-05 (ambiente ocupado), RN-06 (RAP compartido), carga >40h.
+    const conflictos: { tipo: string; mensaje: string }[] = [];
+
+    let ambienteOcupado = false;
+    if (data.ambiente_id) {
+      const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(data.ambiente_id, semana);
+      if (tieneBloqueo) {
+        throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+      }
+      ambienteOcupado = await HorarioModel.hasAmbienteOcupado(
+        data.ambiente_id,
+        data.dia_semana,
+        data.jornada_id,
+        semana,
+        fichaId,
+      );
+      if (ambienteOcupado) {
+        const ambNombre = await nombreDe('ambientes', data.ambiente_id);
+        const jorNombre = await nombreDe('jornadas', data.jornada_id);
+        const diaNombre = DIA_ES[data.dia_semana] ?? `dia ${data.dia_semana}`;
+        // Nombra los grupos que comparten el ambiente (los OTROS ya cargados + el actual).
+        const otros = await HorarioModel.gruposEnAmbiente(data.ambiente_id, data.dia_semana, data.jornada_id, semana, fichaId);
+        const grupoActual = String((ficha as any).numero_ficha ?? fichaId);
+        const grupos = [...new Set([grupoActual, ...otros])];
+        conflictos.push({ tipo: TIPOS_ALERTA.AMBIENTE_OCUPADO,
+          mensaje: `Dos o mas grupos (${grupos.join(' y ')}) tienen asignado el mismo ambiente (${ambNombre}) el ${diaNombre} en la jornada ${jorNombre} (semana ${rangoSemana(semana)}). Revisa el cruce de ambiente.` });
+      }
+    }
+
+    // Co-docencia (soft, informativa — la coordinacion decide): dos o mas
+    // instructores distintos en el MISMO grupo, dia, jornada y semana. No es
+    // provisional (eso es area mismatch) ni ambiente ocupado (eso excluye el
+    // mismo grupo). Nunca bloquea, ni en UI ni en import; solo alerta.
+    const coDocentes = await HorarioModel.coDocentesEnGrupo(
+      fichaId, data.dia_semana, data.jornada_id, semana, data.instructor_id,
+    );
+    let coDocenciaMsg: string | null = null;
+    if (coDocentes.length > 0) {
+      const diaNombre = DIA_ES[data.dia_semana] ?? `dia ${data.dia_semana}`;
+      const jorNombre = await nombreDe('jornadas', data.jornada_id);
+      const grupo = String((ficha as any).numero_ficha ?? fichaId);
+      const todos = [...new Set([instructor.nombre, ...coDocentes])];
+      coDocenciaMsg = `Dos o mas instructores (${todos.join(' y ')}) quedaron asignados al mismo grupo ${grupo} el ${diaNombre} en la jornada ${jorNombre} (semana ${rangoSemana(semana)}). Revisa si es co-docencia intencional o un cruce; la coordinacion decide.`;
+    }
+
+    let rapCompartido = false;
+    if (data.rap_id) {
+      rapCompartido = await HorarioModel.rapAsignadoAOtroEnFicha(fichaId, data.rap_id, data.instructor_id);
+      if (rapCompartido) {
+        conflictos.push({ tipo: TIPOS_ALERTA.RAP_COMPARTIDO, mensaje: 'Este resultado de aprendizaje ya esta a cargo de otro instructor en el grupo. Debe quedar con uno solo; reasignelo antes de continuar.' });
+      }
+    }
+
+    // Limite semanal segun la vinculacion del instructor: contrato=40h, planta=32.5h.
+    const { min: minHoras, max: maxHoras } = limitesDe((instructor as any).tipo_vinculacion);
+    const horasActuales = await HorarioModel.getHorasPorInstructor(data.instructor_id, semana);
+    const nuevasHoras = ((new Date(`2000-01-01T${data.hora_fin}`).getTime() - new Date(`2000-01-01T${data.hora_inicio}`).getTime()) / (1000 * 60 * 60));
+    const totalHoras = horasActuales + nuevasHoras;
+    if (totalHoras > maxHoras) {
+      conflictos.push({ tipo: TIPOS_ALERTA.HORAS_EXCEDIDAS, mensaje: `La carga del instructor ${instructor.nombre} supera las ${maxHoras} horas autorizadas (${(instructor as any).tipo_vinculacion === 'planta' ? 'planta' : 'contrato'}) en la semana ${rangoSemana(semana)} (carga actual de la semana: ${totalHoras}h). Revisa su horario.` });
+    }
+
+    let alertaJornadaRestringida = false;
+    const esDePlanta = await HorarioModel.isInstructorDePlanta(data.instructor_id);
+    const esNocheOFinde = await HorarioModel.isJornadaNocturnaOFinDeSemana(data.jornada_id, data.dia_semana);
+    if (esDePlanta && esNocheOFinde) {
+      alertaJornadaRestringida = true;
+    }
+
+    // Boton del sistema: se bloquea hasta corregir. La carga por Excel no.
+    if (origin === 'ui' && conflictos.length > 0) {
+      throw new ConflictError(conflictos.map((c) => c.mensaje).join(' '));
+    }
+
+    const id = await HorarioModel.create({ ...data, semana });
+    const horario = await HorarioModel.findById(id);
+
+    // Persistir alertas (llega aca en carga masiva, o en UI sin conflictos).
+    for (const c of conflictos) {
+      if (c.tipo === TIPOS_ALERTA.RAP_COMPARTIDO && data.rap_id) {
+        await AlertaService.rapCompartido(data.instructor_id, fichaId, data.rap_id);
+      } else {
+        await AlertaService.crear({ instructor_id: data.instructor_id, tipo: c.tipo, mensaje: c.mensaje, semana, total_horas: totalHoras });
+      }
+    }
+    if (alertaJornadaRestringida) {
+      await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.JORNADA_RESTRINGIDA, semana, total_horas: totalHoras,
+        mensaje: `El instructor de planta ${instructor.nombre} quedo programado en jornada nocturna o fin de semana (grupo ${(ficha as any).numero_ficha ?? fichaId}, semana ${rangoSemana(semana)}).` });
+    }
+    // Co-docencia: alerta soft (nunca bloquea). Se persiste aparte de `conflictos`
+    // para que ni en UI se rechace la creacion.
+    if (coDocenciaMsg) {
+      await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.CO_DOCENCIA, semana, ficha_id: fichaId, mensaje: coDocenciaMsg });
+    }
+    if (totalHoras < minHoras) {
+      await AlertaService.crear({ instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.HORAS_INSUFICIENTES, semana, total_horas: totalHoras,
+        mensaje: `La carga del instructor ${instructor.nombre} esta por debajo de ${minHoras} horas en la semana ${rangoSemana(semana)} (carga actual de la semana: ${totalHoras}h).` });
+    }
+
+    return {
+      ...horario,
+      alerta_ambiente_ocupado: ambienteOcupado,
+      alerta_jornada_restringida: alertaJornadaRestringida,
+      total_horas: totalHoras,
+      instructor_id: data.instructor_id,
+    };
+  },
+
+  async update(id: number, data: {
+    dia_semana?: number;
+    hora_inicio?: string;
+    hora_fin?: string;
+    competencia_id?: number;
+    rap_id?: number | null;
+    ambiente_id?: number | null;
+    tipo_actividad_id?: number | null;
+  }) {
+    // P23: leer registro raw para obtener IDs numericos (findById devuelve HorarioDetail sin ellos)
+    const [rawRows] = await pool.query(
+      'SELECT * FROM horarios WHERE id = ? AND activo = TRUE',
+      [id],
+    );
+    const existing = (rawRows as any[])[0];
+    if (!existing) throw new NotFoundError('Horario no encontrado');
+
+    // RN-27: si se cambia el RAP, debe pertenecer al programa del grupo
+    if (data.rap_id !== undefined && data.rap_id !== null) {
+      const rapOk = await HorarioModel.rapPerteneceAlProgramaDeFicha(data.rap_id, existing.ficha_id);
+      if (!rapOk) {
+        throw new ValidationError('El RAP no pertenece al programa del grupo (RN-27)');
+      }
+    }
+
+    // Valores finales (merge datos nuevos + existentes)
+    const finalDia = data.dia_semana ?? existing.dia_semana;
+    const finalHoraInicio = data.hora_inicio ?? existing.hora_inicio;
+    const finalHoraFin = data.hora_fin ?? existing.hora_fin;
+    const finalAmbienteId = data.ambiente_id !== undefined ? data.ambiente_id : existing.ambiente_id;
+    const semana: string = existing.semana instanceof Date
+      ? existing.semana.toISOString().split('T')[0]
+      : String(existing.semana);
+
+    // Validar hora_fin > hora_inicio
+    const tInicio = new Date(`2000-01-01T${finalHoraInicio}`).getTime();
+    const tFin = new Date(`2000-01-01T${finalHoraFin}`).getTime();
+    if (tFin <= tInicio) {
+      throw new ValidationError('La hora de fin debe ser posterior a la hora de inicio');
+    }
+
+    // RN-04: solapamiento del instructor (hard block)
+    if (data.dia_semana !== undefined || data.hora_inicio !== undefined || data.hora_fin !== undefined) {
+      const conflicto = await HorarioModel.findConflicto(
+        existing.instructor_id,
+        finalDia,
+        finalHoraInicio,
+        finalHoraFin,
+        semana,
+        id,
+      );
+      if (conflicto) {
+        const diaNombre = DIA_ES[finalDia] ?? `dia ${finalDia}`;
+        throw new ConflictError(
+          `El instructor ya tiene otra clase el ${diaNombre} a esa hora (se cruza con el grupo ${conflicto.grupo}, ${conflicto.hora_inicio}-${conflicto.hora_fin}).`,
+        );
+      }
+    }
+
+    // RN-09: bloqueo de ambiente (hard block)
+    if (finalAmbienteId) {
+      const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(finalAmbienteId, semana);
+      if (tieneBloqueo) {
+        throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+      }
+    }
+
+    // RN-05 (edicion interactiva = boton): BLOQUEA si el ambiente (aula/lab) queda
+    // ocupado en esa jornada. Los talleres no cuentan (ver hasAmbienteOcupado).
+    if (finalAmbienteId && (data.ambiente_id !== undefined || data.dia_semana !== undefined)) {
+      const ocupado = await HorarioModel.hasAmbienteOcupado(
+        finalAmbienteId,
+        finalDia,
+        existing.jornada_id,
+        semana,
+        existing.ficha_id,
+        id,
+      );
+      if (ocupado) {
+        throw new ConflictError('El ambiente ya esta ocupado por otro grupo en esa jornada. Elija otro ambiente u horario.');
+      }
+    }
+
+    // RN-06 (edicion interactiva): BLOQUEA si el RAP quedaria a cargo de otro
+    // instructor en el mismo grupo. La correccion (reasignar) si se permite.
+    const finalRapId = data.rap_id !== undefined ? data.rap_id : existing.rap_id;
+    if (finalRapId) {
+      const compartido = await HorarioModel.rapAsignadoAOtroEnFicha(existing.ficha_id, finalRapId, existing.instructor_id);
+      if (compartido) {
+        throw new ConflictError('Este resultado de aprendizaje ya esta a cargo de otro instructor en el grupo. Debe quedar con uno solo; reasignelo antes de continuar.');
+      }
+    }
+
+    // RN-03: jornada restringida (soft alert) — revalida si cambia dia
+    let alertaJornadaRestringida = false;
+    if (data.dia_semana !== undefined) {
+      const esDePlanta = await HorarioModel.isInstructorDePlanta(existing.instructor_id);
+      const esNocheOFinde = await HorarioModel.isJornadaNocturnaOFinDeSemana(existing.jornada_id, finalDia);
+      if (esDePlanta && esNocheOFinde) {
+        alertaJornadaRestringida = true;
+      }
+    }
+
+    await HorarioModel.update(id, data);
+    const updated = await HorarioModel.findById(id);
+
+    return {
+      ...updated,
+      alerta_ambiente_ocupado: false, // si estuviera ocupado, se habria bloqueado arriba
+      alerta_jornada_restringida: alertaJornadaRestringida,
+    };
+  },
+
+  async toggleActivo(id: number, motivo?: string) {
+    // existsById (no findById): findById filtra activos por su JOIN, y aqui
+    // necesitamos poder REACTIVAR un horario inactivo (Laura 05/08).
+    const existe = await HorarioModel.existsById(id);
+    if (!existe) throw new NotFoundError('Horario no encontrado');
+
+    const nuevoEstado = await HorarioModel.toggleActivo(id, motivo);
+    return { activo: nuevoEstado };
+  },
+
+  async aprobar(id: number) {
+    const horario = await HorarioModel.findById(id);
+    if (!horario) throw new NotFoundError('Horario no encontrado');
+
+    await HorarioModel.aprobar(id);
+    return HorarioModel.findById(id);
+  },
+
+  async rechazar(id: number, motivo: string) {
+    const horario = await HorarioModel.findById(id);
+    if (!horario) throw new NotFoundError('Horario no encontrado');
+
+    if (!motivo || motivo.trim().length === 0) {
+      throw new ValidationError('El motivo de rechazo es obligatorio');
+    }
+
+    await HorarioModel.rechazar(id, motivo);
+    return HorarioModel.findById(id);
+  },
+
+  async updateMultiDia(id: number, data: {
+    dia_ids: number[];
+    hora_inicio: string;
+    hora_fin: string;
+    jornada_id: number;
+    ambiente_id?: number | null;
+  }) {
+    const existing = await HorarioModel.findById(id);
+    if (!existing) throw new NotFoundError('Horario no encontrado');
+
+    const existingRecord = await pool.query(
+      'SELECT ficha_id, instructor_id, competencia_id, dia_semana, hora_inicio, hora_fin, jornada_id, ambiente_id, semana FROM horarios WHERE id = ?',
+      [id],
+    );
+    const base = (existingRecord as any[])[0];
+    if (!base) throw new NotFoundError('Horario no encontrado');
+
+    const currentDias = await pool.query(
+      'SELECT id, dia_semana FROM horarios WHERE ficha_id = ? AND instructor_id = ? AND competencia_id = ? AND hora_inicio = ? AND hora_fin = ? AND jornada_id = ? AND semana = ? AND activo = TRUE',
+      [base.ficha_id, base.instructor_id, base.competencia_id, base.hora_inicio, base.hora_fin, base.jornada_id, base.semana],
+    );
+    const currentDiasRows = (currentDias as any[])[0] as any[];
+    const currentDiaIds = new Set(currentDiasRows.map((r: any) => r.dia_semana));
+    const currentDiaRecords = currentDiasRows;
+    const newDias = new Set(data.dia_ids);
+
+    const diasToRemove = currentDiasRows.filter((r: any) => !newDias.has(r.dia_semana));
+    const diasToAdd = data.dia_ids.filter((d: number) => !currentDiaIds.has(d));
+    const diasToUpdate = data.dia_ids.filter((d: number) => currentDiaIds.has(d));
+
+    for (const record of diasToRemove as any[]) {
+      await pool.query('UPDATE horarios SET activo = FALSE WHERE id = ?', [record.id]);
+    }
+
+    for (const dia of diasToAdd) {
+      const hasOverlap = await HorarioModel.hasOverlap(
+        base.instructor_id,
+        dia,
+        data.hora_inicio,
+        data.hora_fin,
+        base.semana,
+      );
+      if (hasOverlap) {
+        throw new ConflictError(`El instructor ya tiene otra clase el ${dia} a esa hora (los horarios se cruzan)`);
+      }
+
+      const ambienteId = data.ambiente_id ?? base.ambiente_id;
+      if (ambienteId) {
+        const tieneBloqueo = await AmbienteModel.hasBloqueoVigente(ambienteId, base.semana);
+        if (tieneBloqueo) {
+          throw new ValidationError('El ambiente tiene un bloqueo temporal vigente en esa semana (RN-09)');
+        }
+        // RN-05 (edicion interactiva): bloquea si el aula/lab ya esta ocupado ese dia.
+        const ocupado = await HorarioModel.hasAmbienteOcupado(ambienteId, dia, data.jornada_id, base.semana, base.ficha_id);
+        if (ocupado) {
+          throw new ConflictError(`El ambiente ya esta ocupado por otro grupo en esa jornada el dia ${dia}. Elija otro ambiente u horario.`);
+        }
+      }
+
+      await pool.query(
+        "INSERT INTO horarios (ficha_id, instructor_id, competencia_id, ambiente_id, dia_semana, hora_inicio, hora_fin, jornada_id, semana, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'aprobado')",
+        [base.ficha_id, base.instructor_id, base.competencia_id, data.ambiente_id ?? base.ambiente_id, dia, data.hora_inicio, data.hora_fin, data.jornada_id, base.semana],
+      );
+    }
+
+    for (const dia of diasToUpdate) {
+      const record = currentDiaRecords.find((r: any) => r.dia_semana === dia);
+      if (record) {
+        await pool.query(
+          'UPDATE horarios SET hora_inicio = ?, hora_fin = ?, jornada_id = ?, ambiente_id = ? WHERE id = ?',
+          [data.hora_inicio, data.hora_fin, data.jornada_id, data.ambiente_id ?? base.ambiente_id, record.id],
+        );
+      }
+    }
+
+    return HorarioModel.findAll();
+  },
+
+  async suspender(id: number, motivo: string) {
+    const horario = await HorarioModel.findById(id);
+    if (!horario) throw new NotFoundError('Horario no encontrado');
+
+    await HorarioModel.suspender(id, motivo);
+    return HorarioModel.findById(id);
+  },
+};
+
+// Formacion complementaria: bloque de horario SIN grupo ni competencia/RAP, atado a un
+// programa complementario. Llena carga baja; suma a la carga y respeta el solape (RN-04),
+// pero no valida competencia/RAP/ambiente-ocupado/co-docencia (no aplica sin grupo).
+// Lunes (YYYY-MM-DD) de la semana que contiene la fecha dada. UTC-safe.
+function lunesDe(fechaISO: string): string {
+  const d = new Date(`${fechaISO}T00:00:00Z`);
+  const dow = d.getUTCDay();               // 0=Dom ... 6=Sab
+  const offset = dow === 0 ? -6 : 1 - dow; // retrocede al lunes
+  d.setUTCDate(d.getUTCDate() + offset);
+  return d.toISOString().slice(0, 10);
+}
+
+async function crearComplementaria(data: {
+  instructor_id: number;
+  programa_id?: number | null;
+  modalidad?: 'presencial' | 'virtual' | null;
+  observaciones?: string | null;
+  ambiente_id?: number | null;
+  dia_semana: number;
+  hora_inicio: string;
+  hora_fin: string;
+  jornada_id: number;
+  semana?: string;
+  fecha_inicio?: string | null;
+  fecha_fin?: string | null;
+}) {
+  const instructor = await InstructorModel.findById(data.instructor_id);
+  if (!instructor) throw new NotFoundError('Instructor no encontrado');
+  if (!data.programa_id) throw new ValidationError('La formacion complementaria requiere un programa');
+  if (!data.modalidad) throw new ValidationError('La formacion complementaria requiere modalidad (presencial/virtual)');
+  if (!data.fecha_inicio) throw new ValidationError('La formacion complementaria requiere fecha de inicio');
+  if (data.fecha_fin && data.fecha_fin < data.fecha_inicio) {
+    throw new ValidationError('La fecha de fin no puede ser anterior a la fecha de inicio');
+  }
+  if (new Date(`2000-01-01T${data.hora_fin}`).getTime() <= new Date(`2000-01-01T${data.hora_inicio}`).getTime()) {
+    throw new ValidationError('La hora de fin debe ser posterior a la hora de inicio');
+  }
+
+  const fechaInicio = data.fecha_inicio;
+  const fechaFin = data.fecha_fin ?? data.fecha_inicio; // sin fin = evento de una sola semana
+  const diaNombre = DIA_ES[data.dia_semana] ?? `dia ${data.dia_semana}`;
+
+  // Una fila por semana dentro del rango (modelo por semana, como el resto de
+  // horarios). Cada semana valida RN-04 por separado; el fin (mid-week) se incluye
+  // porque su lunes <= fechaFin.
+  const semanas: string[] = [];
+  for (let lunes = lunesDe(fechaInicio); lunes <= fechaFin; ) {
+    semanas.push(lunes);
+    const next = new Date(`${lunes}T00:00:00Z`);
+    next.setUTCDate(next.getUTCDate() + 7);
+    lunes = next.toISOString().slice(0, 10);
+  }
+
+  // 1) Validar RN-04 en TODAS las semanas antes de insertar (atomico: si alguna
+  //    se cruza, no se crea nada).
+  for (const semana of semanas) {
+    const conflicto = await HorarioModel.findConflicto(
+      data.instructor_id, data.dia_semana, data.hora_inicio, data.hora_fin, semana,
+    );
+    if (conflicto) {
+      throw new ConflictError(
+        `El instructor ya tiene otra clase el ${diaNombre} a esa hora en la semana del ${semana} (se cruza con ${conflicto.grupo}, ${conflicto.hora_inicio}-${conflicto.hora_fin}).`,
+      );
+    }
+  }
+
+  // tipo_actividad Complementaria: suma carga y permite filtrar por tipo de formacion.
+  const [taRows] = await pool.query("SELECT id FROM tipos_actividad WHERE nombre = 'Complementaria' AND activo = TRUE LIMIT 1");
+  const tipoActividadId = (taRows as any[])[0]?.id ?? null;
+  const { min: minHoras } = limitesDe((instructor as any).tipo_vinculacion);
+
+  // 2) Insertar una fila por semana; cada fila lleva el rango completo para que la
+  //    UI pueda agrupar el "curso" complementario.
+  let primerId = 0;
+  for (const semana of semanas) {
+    const id = await HorarioModel.create({
+      ficha_id: null,
+      instructor_id: data.instructor_id,
+      competencia_id: null,
+      programa_id: data.programa_id,
+      modalidad: data.modalidad,
+      observaciones: data.observaciones ?? null,
+      ambiente_id: data.ambiente_id ?? null,
+      dia_semana: data.dia_semana,
+      hora_inicio: data.hora_inicio,
+      hora_fin: data.hora_fin,
+      tipo_actividad_id: tipoActividadId,
+      jornada_id: data.jornada_id,
+      semana,
+      fecha_inicio: fechaInicio,
+      fecha_fin: data.fecha_fin ?? null,
+    });
+    if (!primerId) primerId = id;
+
+    // Alerta de carga baja por semana (la complementaria suma).
+    const horas = await HorarioModel.getHorasPorInstructor(data.instructor_id, semana);
+    if (horas < minHoras) {
+      await AlertaService.crear({
+        instructor_id: data.instructor_id, tipo: TIPOS_ALERTA.HORAS_INSUFICIENTES, semana, total_horas: horas,
+        mensaje: `La carga del instructor ${instructor.nombre} esta por debajo de ${minHoras} horas en la semana ${rangoSemana(semana)} (carga actual: ${horas}h).`,
+      });
+    }
+  }
+
+  // Devuelve la primera fila (contrato de retorno de una sola creacion).
+  return (await HorarioModel.findById(primerId))!;
+}
